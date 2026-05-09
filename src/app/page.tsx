@@ -1,65 +1,338 @@
-import Image from "next/image";
+'use client';
+
+import Image from 'next/image';
+import Link from 'next/link';
+import { X, User, Calendar, Clock, ArrowRight, Users, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import styles from './page.module.css';
+import SiteHeader from './components/SiteHeader';
+import SiteFooter from './components/SiteFooter';
+
+const MODALITY: Record<string, string> = { VIRTUAL: 'Virtual', PRESENCIAL: 'Presencial', HIBRIDO: 'Híbrido' };
 
 export default function Home() {
+  const [professionals, setProfessionals] = useState<any[]>([]);
+  const [blogPosts, setBlogPosts] = useState<any[]>([]);
+  const [courses, setCourses] = useState<any[]>([]);
+  const [selectedPro, setSelectedPro] = useState<any>(null);
+  const [carouselIdx, setCarouselIdx] = useState(0);
+  const carouselRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    fetch('/api/professionals')
+      .then(res => res.json())
+      .then(data => setProfessionals(Array.isArray(data) ? data.filter((p: any) => p.active) : []))
+      .catch(err => console.error(err));
+
+    fetch('/api/posts')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data)) setBlogPosts(data.filter(p => p.published).slice(0, 3));
+      })
+      .catch(err => console.error(err));
+
+    fetch('/api/courses')
+      .then(res => res.json())
+      .then(data => setCourses(Array.isArray(data) ? data.filter((c: any) => c.status !== 'BORRADOR') : []))
+      .catch(err => console.error(err));
+  }, []);
+
+  const scrollToSlide = useCallback((idx: number) => {
+    const el = carouselRef.current;
+    if (!el) return;
+    el.scrollTo({ left: idx * el.offsetWidth, behavior: 'smooth' });
+    setCarouselIdx(idx);
+  }, []);
+
+  const onCarouselScroll = useCallback(() => {
+    const el = carouselRef.current;
+    if (!el) return;
+    const idx = Math.round(el.scrollLeft / el.offsetWidth);
+    setCarouselIdx(idx);
+  }, []);
+
+  const publicados = courses.filter((c: any) => c.status === 'PUBLICADO');
+  const cursosAnteriores = courses.filter((c: any) => c.status === 'CERRADO');
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <>
+      <SiteHeader />
+      <main>
+
+        {/* ── Hero ── */}
+        <div className={styles.container}>
+          <section className={styles.hero}>
+            <div className={styles.heroBackground}></div>
+            <div className={styles.heroContent}>
+              <div className={styles.heroText}>
+                <span className={styles.badge}>CURSO</span>
+                <h1 className={styles.title}>
+                  Apraxia del Habla <span>Infantil</span>
+                </h1>
+                <p className={styles.description}>
+                  Ayuda a tu hijo/a a desarrollar su capacidad de habla y comunicación de manera efectiva y divertida.
+                </p>
+                <Link href="/cursos" className={styles.verCursosBtn}>
+                  Ver Cursos <ArrowRight size={16} />
+                </Link>
+              </div>
+              <div className={styles.heroImageContainer} style={{ minHeight: '500px' }}>
+                <Image
+                  src="/hero.png"
+                  alt="Apraxia del Habla Infantil"
+                  fill
+                  style={{ objectFit: 'contain', transform: 'scale(1.1)' }}
+                  priority
+                />
+              </div>
+            </div>
+          </section>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+
+        {/* ── Cursos ── */}
+        {(publicados.length > 0 || cursosAnteriores.length > 0) && (
+          <section id="cursos" className={styles.cursosSection}>
+
+            {/* Header dentro del max-width */}
+            <div className={styles.sectionInner}>
+              {publicados.length > 0 && (
+                <div className={styles.cursosSectionHeader}>
+                  <div>
+                    <h2 className={styles.cursosSectionTitle}>
+                      {publicados.length >= 2 ? 'Próximos Cursos' : 'Próximo Curso'}
+                    </h2>
+                    <p className={styles.cursosSectionSubtitle}>Formación especializada en apraxia del habla infantil.</p>
+                  </div>
+                  <Link href="/cursos" className={styles.verTodosLink}>Ver todos los cursos →</Link>
+                </div>
+              )}
+            </div>
+
+            {/* Carousel — ancho completo para el efecto peek */}
+            {publicados.length > 0 && (
+              <div className={styles.carouselOuter}>
+                <div
+                  ref={carouselRef}
+                  className={styles.carouselTrack}
+                  onScroll={onCarouselScroll}
+                >
+                  {publicados.map((curso: any) => (
+                    <div key={curso.id} className={styles.carouselSlide}>
+                      <Link href={`/cursos/${curso.id}`} className={styles.proximoCursoCard}>
+                        <div className={styles.proximoCursoImage}>
+                          {curso.coverImage
+                            ? <Image src={curso.coverImage} alt={curso.title} fill style={{ objectFit: 'cover' }} />
+                            : <div className={styles.proximoCursoImagePlaceholder} />
+                          }
+                          <span className={styles.courseModalityBadge}>{MODALITY[curso.modality] ?? curso.modality}</span>
+                        </div>
+                        <div className={styles.proximoCursoContent}>
+                          <h3 className={styles.proximoCursoTitle}>{curso.title}</h3>
+                          {curso.description && (
+                            <p className={styles.proximoCursoDesc}>{curso.description}</p>
+                          )}
+                          <div className={styles.proximoCursoMeta}>
+                            {curso.startDate && (
+                              <span><Calendar size={15} /> {new Date(curso.startDate).toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                            )}
+                            {curso.schedule && <span><Clock size={15} /> {curso.schedule}</span>}
+                            {curso.targetAudience && <span><Users size={15} /> {curso.targetAudience}</span>}
+                          </div>
+                          <span className={styles.proximoCursoCta}>Ver curso e inscribirme <ArrowRight size={16} /></span>
+                        </div>
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Flechas laterales */}
+                {publicados.length > 1 && (
+                  <>
+                    <button
+                      className={`${styles.carouselArrow} ${styles.carouselArrowLeft} ${carouselIdx === 0 ? styles.carouselArrowHidden : ''}`}
+                      onClick={() => scrollToSlide(carouselIdx - 1)}
+                    >
+                      <ChevronLeft size={22} />
+                    </button>
+                    <button
+                      className={`${styles.carouselArrow} ${styles.carouselArrowRight} ${carouselIdx === publicados.length - 1 ? styles.carouselArrowHidden : ''}`}
+                      onClick={() => scrollToSlide(carouselIdx + 1)}
+                    >
+                      <ChevronRight size={22} />
+                    </button>
+                  </>
+                )}
+
+                {/* Dots */}
+                {publicados.length > 1 && (
+                  <div className={styles.carouselDots}>
+                    {publicados.map((_: any, i: number) => (
+                      <button
+                        key={i}
+                        className={`${styles.dot} ${i === carouselIdx ? styles.dotActive : ''}`}
+                        onClick={() => scrollToSlide(i)}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Cursos anteriores */}
+            {cursosAnteriores.length > 0 && (
+              <div className={styles.sectionInner}>
+                <div className={styles.cursosAnterioresWrap}>
+                  <p className={styles.cursosAnterioresLabel}>Cursos anteriores</p>
+                  <div className={styles.cursosAnterioresGrid}>
+                    {cursosAnteriores.map((c: any) => (
+                      <Link key={c.id} href={`/cursos/${c.id}`} className={styles.cursoAnteriorCard}>
+                        <div className={styles.cursoAnteriorImage}>
+                          {c.coverImage
+                            ? <Image src={c.coverImage} alt={c.title} fill style={{ objectFit: 'cover' }} />
+                            : <div className={styles.proximoCursoImagePlaceholder} />
+                          }
+                        </div>
+                        <div className={styles.cursoAnteriorInfo}>
+                          <span className={styles.cursoAnteriorBadge}>Cerrado</span>
+                          <h4 className={styles.cursoAnteriorTitle}>{c.title}</h4>
+                          {c.startDate && (
+                            <span className={styles.cursoAnteriorDate}>
+                              <Calendar size={12} /> {new Date(c.startDate).toLocaleDateString('es-AR', { month: 'long', year: 'numeric' })}
+                            </span>
+                          )}
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+          </section>
+        )}
+
+        {/* ── Nosotras ── */}
+        <section id="nosotras" className={styles.nosotrasSection}>
+          <div className={styles.sectionInner}>
+            <div className={styles.sectionHeader}>
+              <h2 className={styles.sectionTitle}>Nosotras</h2>
+              <p className={styles.sectionSubtitle}>
+                Conocé a las profesionales que te acompañarán en este camino.
+              </p>
+            </div>
+            <div className={styles.prosGrid}>
+              {professionals.length > 0 ? (
+                professionals.map(pro => (
+                  <div key={pro.id} className={styles.proCard}>
+                    <div className={styles.proImage}>
+                      {pro.imageUrl ? (
+                        <Image src={pro.imageUrl} alt={pro.name} width={160} height={160} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
+                      ) : (
+                        <User size={60} color="white" />
+                      )}
+                    </div>
+                    <h3 className={styles.proName}>{pro.name}</h3>
+                    <span className={styles.proRole}>{pro.role}</span>
+                    <p className={styles.proBio}>{pro.bio}</p>
+                    <button className={styles.saberMasBtn} onClick={() => setSelectedPro(pro)}>
+                      Saber más
+                    </button>
+                  </div>
+                ))
+              ) : (
+                [1, 2].map(i => (
+                  <div key={i} className={`${styles.proCard} ${styles.skeleton}`}>
+                    <div className={styles.proImageSkeleton}></div>
+                    <div className={styles.skeletonText} style={{ width: '60%', height: '24px', margin: '0 auto 10px' }}></div>
+                    <div className={styles.skeletonText} style={{ width: '40%', height: '16px', margin: '0 auto 20px' }}></div>
+                    <div className={styles.skeletonText} style={{ width: '80%', height: '60px', margin: '0 auto' }}></div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* ── Noticias ── */}
+        <section className={styles.blogSection}>
+          <div className={styles.sectionInner}>
+            <div className={styles.blogHeader}>
+              <div>
+                <h2 className={styles.blogSectionTitle}>Publicaciones</h2>
+                <p className={styles.blogSectionSubtitle}>Investigaciones, recursos clínicos y novedades sobre apraxia del habla.</p>
+              </div>
+              <Link href="/blog" className={styles.viewAllLink}>Ver todas →</Link>
+            </div>
+            <div className={styles.blogGrid}>
+              {blogPosts.length > 0 ? (
+                blogPosts.map(post => (
+                  <article key={post.id} className={styles.blogCard}>
+                    <div className={styles.blogImage}>
+                      {post.coverImage ? (
+                        <Image src={post.coverImage} alt={post.title} fill style={{ objectFit: 'cover' }} />
+                      ) : (
+                        <div className={styles.blogImagePlaceholder} />
+                      )}
+                    </div>
+                    <div className={styles.blogContent}>
+                      <span className={styles.blogDate}>
+                        {new Date(post.createdAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
+                      </span>
+                      <h3 className={styles.blogTitle}>{post.title}</h3>
+                      <p className={styles.blogExcerpt}>{post.excerpt}</p>
+                      <Link href={`/blog/${post.slug}`} className={styles.readMore}>Leer más <ArrowRight size={13} /></Link>
+                    </div>
+                  </article>
+                ))
+              ) : (
+                [1, 2, 3].map(i => (
+                  <article key={i} className={`${styles.blogCard} ${styles.skeleton}`}>
+                    <div className={styles.blogImagePlaceholder}></div>
+                    <div className={styles.blogContent}>
+                      <div className={styles.skeletonText} style={{ width: '40%', height: '14px', marginBottom: '10px' }}></div>
+                      <div className={styles.skeletonText} style={{ width: '90%', height: '24px', marginBottom: '10px' }}></div>
+                      <div className={styles.skeletonText} style={{ width: '100%', height: '60px' }}></div>
+                    </div>
+                  </article>
+                ))
+              )}
+            </div>
+          </div>
+        </section>
+
       </main>
-    </div>
+
+      <SiteFooter />
+
+      {selectedPro && (
+        <div className={styles.modalOverlay} onClick={() => setSelectedPro(null)}>
+          <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
+            <button className={styles.closeModal} onClick={() => setSelectedPro(null)}>
+              <X size={24} />
+            </button>
+            <div className={styles.modalHeader}>
+              <div className={styles.modalImageContainer}>
+                <Image
+                  src={selectedPro.imageUrl || '/images/default-pro.png'}
+                  alt={selectedPro.name}
+                  width={120}
+                  height={120}
+                  style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                />
+              </div>
+              <div className={styles.modalInfo}>
+                <h3 className={styles.modalTitle}>{selectedPro.name}</h3>
+                <span className={styles.modalRole}>{selectedPro.role}</span>
+              </div>
+            </div>
+            <div className={styles.modalDivider}></div>
+            <div
+              className={styles.modalCV}
+              dangerouslySetInnerHTML={{ __html: selectedPro.cvContent || 'CV no disponible.' }}
+            />
+          </div>
+        </div>
+      )}
+    </>
   );
 }

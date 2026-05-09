@@ -1,0 +1,228 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum UserRole {
+  ADMIN
+  STUDENT
+}
+
+enum CourseStatus {
+  PUBLICADO
+  BORRADOR
+  CERRADO
+}
+
+enum Modality {
+  VIRTUAL
+  PRESENCIAL
+  HIBRIDO
+}
+
+enum EnrollmentStatus {
+  PENDIENTE_PAGO
+  COMPROBANTE_SUBIDO
+  CONFIRMADA
+  CANCELADA
+}
+
+// ─── Profiles (global, admin-managed) ────────────────────────────────────────
+
+model Profile {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+
+  users          User[]
+  courseProfiles CourseProfile[]
+  prices         Price[]
+  moduleAccess   ModuleAccess[]
+  enrollments    Enrollment[]
+}
+
+// ─── Users ───────────────────────────────────────────────────────────────────
+
+model User {
+  id               Int       @id @default(autoincrement())
+  email            String    @unique
+  password         String?
+  name             String?
+  role             UserRole  @default(STUDENT)
+  profileId        Int?
+  googleId         String?   @unique
+  phone            String?
+  profession       String?
+  resetToken       String?   @unique
+  resetTokenExpiry DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  profile     Profile?     @relation(fields: [profileId], references: [id])
+  enrollments Enrollment[]
+}
+
+// ─── Courses ─────────────────────────────────────────────────────────────────
+
+model Course {
+  id             Int          @id @default(autoincrement())
+  title          String
+  coverImage     String?
+  startDate      DateTime?
+  endDate        DateTime?
+  modality       Modality     @default(VIRTUAL)
+  capacity       Int          @default(0)
+  schedule       String?
+  description    String?
+  targetAudience String?
+  status         CourseStatus @default(BORRADOR)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  confirmationEmailSubject String?
+  confirmationEmail        String?
+
+  modules        Module[]
+  enrollments    Enrollment[]
+  prices         Price[]
+  courseProfiles CourseProfile[]
+  resources      CourseResource[]
+}
+
+// Qué perfiles pueden inscribirse a un curso y con qué cupo
+model CourseProfile {
+  id                 Int     @id @default(autoincrement())
+  courseId           Int
+  profileId          Int
+  capacity           Int     @default(0)
+  requireCredential  Boolean @default(false)
+
+  course  Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([courseId, profileId])
+}
+
+model Module {
+  id        Int      @id @default(autoincrement())
+  courseId  Int
+  name      String
+  order     Int      @default(0)
+  date      String?
+  accessAll Boolean  @default(true)
+  topics    String[]
+
+  course         Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  accessProfiles ModuleAccess[]
+}
+
+// Acceso restringido: qué perfiles pueden ver un módulo (cuando accessAll = false)
+model ModuleAccess {
+  moduleId  Int
+  profileId Int
+
+  module  Module  @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@id([moduleId, profileId])
+}
+
+model Price {
+  id        Int     @id @default(autoincrement())
+  courseId  Int
+  profileId Int?
+  name      String
+  amount    Float
+  currency  String  @default("ARS")
+  active    Boolean @default(true)
+
+  course  Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  profile Profile? @relation(fields: [profileId], references: [id])
+}
+
+model Enrollment {
+  id            Int              @id @default(autoincrement())
+  courseId      Int
+  userId        Int?
+  profileId     Int?
+  status        EnrollmentStatus @default(PENDIENTE_PAGO)
+  paymentMethod   String?
+  paymentRef      String?
+  receiptUrl      String?
+  credentialUrl   String?
+  paidAt        DateTime?
+  notes         String?
+  userName      String
+  email         String
+  createdAt     DateTime         @default(now())
+
+  course  Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user    User?    @relation(fields: [userId], references: [id])
+  profile Profile? @relation(fields: [profileId], references: [id])
+}
+
+// ─── Course Repository ───────────────────────────────────────────────────────
+
+model CourseResource {
+  id        Int      @id @default(autoincrement())
+  courseId  Int
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  type      String   // "SECTION" | "FILE"
+  title     String
+  fileUrl   String?
+  visible   Boolean  @default(false)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+// ─── Blog ────────────────────────────────────────────────────────────────────
+
+model Post {
+  id         Int      @id @default(autoincrement())
+  title      String
+  slug       String   @unique
+  excerpt    String?
+  content    String
+  coverImage String?
+  published  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// ─── Nosotras ────────────────────────────────────────────────────────────────
+
+model Professional {
+  id        Int      @id @default(autoincrement())
+  name      String
+  role      String
+  bio       String?
+  cvContent String?
+  imageUrl  String?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─── Settings (key-value para credenciales de pago, etc.) ────────────────────
+
+model Setting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+}
+
+// ─── Newsletter ──────────────────────────────────────────────────────────────
+
+model Subscriber {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+}

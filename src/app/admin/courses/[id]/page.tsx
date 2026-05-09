@@ -1,0 +1,82 @@
+'use client';
+
+import { useState, use } from 'react';
+import AdminLayout from '../../components/AdminLayout';
+import { ArrowLeft, Info, Layers, Users as UsersIcon, DollarSign, Mail, BookOpen } from 'lucide-react';
+import styles from './courseAdmin.module.css';
+import Link from 'next/link';
+
+import GeneralData from './tabs/GeneralData';
+import Modules from './tabs/Modules';
+import Enrollments from './tabs/Enrollments';
+import Prices from './tabs/Prices';
+import ConfirmationEmail from './tabs/ConfirmationEmail';
+import Repository from './tabs/Repository';
+
+type TabType = 'general' | 'modules' | 'prices' | 'enrollments' | 'confirmEmail' | 'repository';
+
+export default function CourseAdminPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id: courseId } = use(params);
+  const [activeTab, setActiveTab] = useState<TabType>('general');
+  const [courseTitle, setCourseTitle] = useState('...');
+
+  const tabs = [
+    { id: 'general',      label: 'Datos Generales',       icon: Info },
+    { id: 'modules',      label: 'Módulos',                icon: Layers },
+    { id: 'prices',       label: 'Precios',                icon: DollarSign },
+    { id: 'enrollments',  label: 'Inscripciones',          icon: UsersIcon },
+    { id: 'confirmEmail', label: 'Email de confirmación',  icon: Mail },
+    { id: 'repository',   label: 'Repositorio',             icon: BookOpen },
+  ];
+
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'general':      return <GeneralData courseId={courseId} onTitleChange={(t) => setCourseTitle(t)} />;
+      case 'modules':      return <Modules courseId={courseId} />;
+      case 'prices':       return <Prices courseId={courseId} />;
+      case 'enrollments':  return <Enrollments courseId={courseId} />;
+      case 'confirmEmail': return <ConfirmationEmail courseId={courseId} />;
+      case 'repository':   return <Repository courseId={courseId} />;
+      default:             return null;
+    }
+  };
+
+  return (
+    <AdminLayout>
+      <div className={styles.container}>
+        <div className={styles.breadcrumb}>
+          <Link href="/admin/courses" className={styles.backLink}>
+            <ArrowLeft size={18} />
+            Volver a Cursos
+          </Link>
+        </div>
+
+        <div className={styles.header}>
+          <div className={styles.headerInfo}>
+            <div className={styles.statusDot} />
+            <h2 className={styles.title}>Administrar Curso: <span>{courseTitle}</span></h2>
+          </div>
+        </div>
+
+        <div className={styles.tabsContainer}>
+          <div className={styles.tabsList}>
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                className={`${styles.tabItem} ${activeTab === tab.id ? styles.tabActive : ''}`}
+                onClick={() => setActiveTab(tab.id as TabType)}
+              >
+                <tab.icon size={18} />
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          <div className={styles.tabContent}>
+            {renderTabContent()}
+          </div>
+        </div>
+      </div>
+    </AdminLayout>
+  );
+}

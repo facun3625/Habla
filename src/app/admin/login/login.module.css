@@ -1,0 +1,262 @@
+.page {
+  display: flex;
+  min-height: 100vh;
+  background: #f5f4ff;
+}
+
+/* ─── Left decorative panel ─── */
+.panel {
+  width: 45%;
+  background: linear-gradient(145deg, #6c5ce7 0%, #8490ff 60%, #a29bfe 100%);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.panelContent {
+  position: relative;
+  z-index: 2;
+  padding: 60px 50px;
+  color: white;
+  max-width: 420px;
+}
+
+.logo {
+  margin-bottom: 48px;
+}
+
+.panelTitle {
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1.25;
+  margin-bottom: 16px;
+  color: white;
+}
+
+.panelDesc {
+  font-size: 16px;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+/* Blob decorations */
+.blobs {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.blob1 {
+  position: absolute;
+  width: 350px;
+  height: 350px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+  bottom: -80px;
+  left: -80px;
+}
+
+.blob2 {
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+  top: -40px;
+  right: -50px;
+}
+
+.blob3 {
+  position: absolute;
+  width: 140px;
+  height: 140px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  top: 40%;
+  left: 65%;
+}
+
+/* ─── Right form side ─── */
+.formSide {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+}
+
+.formCard {
+  width: 100%;
+  max-width: 460px;
+}
+
+.formHeader {
+  margin-bottom: 40px;
+}
+
+.formTitle {
+  font-size: 32px;
+  font-weight: 800;
+  color: #2c3e50;
+  margin-bottom: 8px;
+}
+
+.formSubtitle {
+  font-size: 15px;
+  color: #7f8fa6;
+}
+
+/* ─── Form ─── */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #2c3e50;
+  letter-spacing: 0.3px;
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 16px;
+  color: #a29bfe;
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+.input {
+  width: 100%;
+  padding: 14px 48px 14px 46px;
+  border: 2px solid #e8e4ff;
+  border-radius: 14px;
+  font-size: 15px;
+  font-family: inherit;
+  color: #2c3e50;
+  background: white;
+  transition: border-color 0.25s, box-shadow 0.25s;
+  outline: none;
+}
+
+.input::placeholder {
+  color: #c0c8d8;
+}
+
+.input:focus {
+  border-color: #a29bfe;
+  box-shadow: 0 0 0 4px rgba(162, 155, 254, 0.18);
+}
+
+.eyeButton {
+  position: absolute;
+  right: 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #a5b1c2;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  transition: color 0.2s;
+}
+
+.eyeButton:hover {
+  color: #6c5ce7;
+}
+
+/* Error */
+.errorMsg {
+  background: #fff0f3;
+  border: 1.5px solid #ffb8c8;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: #d63031;
+  font-weight: 600;
+}
+
+/* Submit button */
+.submitButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, #6c5ce7, #8490ff);
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: inherit;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+  box-shadow: 0 6px 24px rgba(108, 92, 231, 0.35);
+}
+
+.submitButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 32px rgba(108, 92, 231, 0.45);
+}
+
+.submitButton:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
+/* Spinner animation */
+.spinner {
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Back link */
+.backLink {
+  margin-top: 28px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.backLink a {
+  color: #a29bfe;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+
+.backLink a:hover {
+  color: #6c5ce7;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 900px) {
+  .panel {
+    display: none;
+  }
+
+  .page {
+    background: linear-gradient(160deg, #f0eeff 0%, #faf9ff 100%);
+  }
+}

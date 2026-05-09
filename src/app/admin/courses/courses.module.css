@@ -1,0 +1,247 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 4px;
+}
+
+.subtitle {
+  color: #64748b;
+  font-weight: 500;
+}
+
+.createButton {
+  background-color: var(--primary);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(108, 92, 231, 0.2);
+}
+
+.createButton:hover {
+  background-color: #5f4ed1;
+  transform: translateY(-1px);
+}
+
+.toolbar {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.searchBox {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: white;
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  color: #94a3b8;
+}
+
+.searchBox input {
+  background: none;
+  border: none;
+  outline: none;
+  width: 100%;
+  color: #475569;
+}
+
+.filterButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: white;
+  border: 1px solid #e2e8f0;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+}
+
+.tableCard {
+  background-color: white;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.table th {
+  background-color: #f8fafc;
+  padding: 16px 24px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.table td {
+  padding: 16px 24px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #475569;
+  font-size: 0.95rem;
+}
+
+.courseCell {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.courseIcon {
+  width: 40px;
+  height: 40px;
+  background-color: #f5f3ff;
+  color: var(--primary);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.courseTitle {
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.dateCell, .enrollmentCell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.badge {
+  background-color: #f1f5f9;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.statusBadge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.publicado {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+.borrador {
+  background-color: #fef9c3;
+  color: #a16207;
+}
+
+.cerrado {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+.actionsHeader {
+  text-align: right;
+}
+
+.actionsCell {
+  text-align: right;
+}
+
+.actionButtons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.actionBtn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background-color: #f8fafc;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.actionBtn:hover {
+  background-color: #f1f5f9;
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.actionBtnAdmin {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+  height: 36px;
+  background-color: #f5f3ff;
+  color: var(--primary);
+  border: 1px solid #e9e7ff;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.actionBtnAdmin:hover {
+  background-color: var(--primary);
+  color: white;
+}
+
+.actionBtnDelete {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background-color: #fff5f5;
+  color: #e74c3c;
+  border: 1px solid #fde8e8;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.actionBtnDelete:hover {
+  background-color: #e74c3c;
+  color: white;
+  border-color: #e74c3c;
+}

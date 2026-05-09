@@ -1,0 +1,1081 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.breadcrumb {
+  margin-bottom: 8px;
+}
+
+.backLink {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #64748b;
+  font-weight: 600;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+
+.backLink:hover {
+  color: var(--primary);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.headerInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.statusDot {
+  width: 12px;
+  height: 12px;
+  background-color: #22c55e;
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.1);
+}
+
+.title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+.title span {
+  color: #64748b;
+  font-weight: 600;
+}
+
+.saveButton {
+  background-color: var(--primary);
+  color: white;
+  padding: 10px 24px;
+  border-radius: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(108, 92, 231, 0.2);
+}
+
+.saveButton:hover {
+  background-color: #5f4ed1;
+  transform: translateY(-1px);
+}
+
+.tabsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.tabsList {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 2px;
+  overflow-x: auto;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.tabsList::-webkit-scrollbar {
+  display: none;
+}
+
+.tabItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: #64748b;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.tabItem:hover {
+  color: var(--primary);
+  background-color: #f8fafc;
+}
+
+.tabActive {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+.tabContent {
+  background-color: white;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  padding: 32px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  min-height: 400px;
+}
+
+.tabGrid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 48px;
+}
+
+.formSection {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fieldGroup label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #475569;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.input {
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: #1e293b;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input:focus {
+  border-color: var(--primary);
+}
+
+.imageUpload {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.imagePlaceholder {
+  position: relative;
+  aspect-ratio: 16/9;
+  background-color: #f8fafc;
+  border: 2px dashed #e2e8f0;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  font-weight: 600;
+  overflow: hidden;
+}
+
+.secondaryButton {
+  padding: 10px;
+  background-color: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+}
+
+.statusToggle {
+  display: flex;
+  gap: 4px;
+  background-color: #f1f5f9;
+  padding: 4px;
+  border-radius: 12px;
+}
+
+.statusBtn {
+  flex: 1;
+  padding: 8px;
+  border-radius: 8px;
+  border: none;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #64748b;
+  background: none;
+  cursor: pointer;
+}
+
+.statusActive {
+  background-color: white;
+  color: var(--primary);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* Tab specific lists */
+.listContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.listItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background-color: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #f1f5f9;
+}
+
+.itemInfo h4 {
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.itemInfo p {
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.addBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: 2px dashed #cbd5e1;
+  padding: 16px;
+  border-radius: 12px;
+  color: #64748b;
+  font-weight: 700;
+  cursor: pointer;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.addBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background-color: #f5f3ff;
+}
+
+.tabHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+}
+
+.sectionTitle {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 4px;
+}
+
+.sectionDesc {
+  font-size: 0.9rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.addBtnSmall {
+  background-color: var(--primary);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(108, 92, 231, 0.15);
+}
+
+.itemMain {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.dragHandle {
+  color: #94a3b8;
+  cursor: grab;
+}
+
+.itemMeta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin-top: 4px;
+}
+
+.itemActions {
+  display: flex;
+  gap: 8px;
+}
+
+.actionBtn, .actionBtnDelete {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background-color: white;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.actionBtn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.actionBtnDelete:hover {
+  background-color: #fef2f2;
+  border-color: #fee2e2;
+  color: #ef4444;
+}
+
+/* Prices */
+.pricesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.priceCard {
+  background-color: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.priceHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.priceInfo h4 {
+  font-weight: 800;
+  color: #1e293b;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+.priceBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #f5f3ff;
+  color: var(--primary);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+
+.dotActive {
+  background-color: #22c55e;
+}
+
+.priceDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.detailItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.detailItem strong {
+  color: #475569;
+}
+
+.warning {
+  color: #a16207;
+}
+
+.priceActions {
+  display: flex;
+  gap: 12px;
+  margin-top: auto;
+}
+
+/* Smart prices layout */
+.pricesSmartGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pricesSmartRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 20px 24px;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 14px;
+  flex-wrap: wrap;
+}
+
+.pricesSmartLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 200px;
+}
+
+.pricesSmartName {
+  font-weight: 800;
+  color: #1e293b;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.pricesSmartModules {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+.pricesModuleNames {
+  color: #94a3b8;
+}
+
+.pricesSmartRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.pricesSmartInputRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pricesSmartCurrent {
+  font-size: 0.78rem;
+  color: #94a3b8;
+  margin: 0;
+  text-align: right;
+}
+
+.textButton {
+  background: none;
+  border: none;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #94a3b8;
+  cursor: pointer;
+}
+
+/* Enrollments */
+.enrollmentTable {
+  margin-top: 16px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  text-align: left;
+  padding: 12px 16px;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  color: #94a3b8;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.table td {
+  padding: 16px;
+  border-bottom: 1px solid #f8fafc;
+}
+
+.userCell {
+  display: flex;
+  flex-direction: column;
+}
+
+.userName {
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.userEmail {
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.statusBadge, .paymentBadge {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.confirmed {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+.pendingDocs {
+  background-color: #fff7ed;
+  color: #c2410c;
+}
+
+.paid {
+  background-color: #f0fdf4;
+  color: #16a34a;
+}
+
+.unpaid {
+  background-color: #f8fafc;
+  color: #64748b;
+}
+
+.iconBtn, .iconBtnSuccess, .iconBtnCancel {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: white;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.iconBtnSuccess:hover {
+  background-color: #f0fdf4;
+  color: #16a34a;
+  border-color: #bbf7d0;
+}
+
+.iconBtnCancel:hover {
+  background-color: #fef2f2;
+  color: #ef4444;
+  border-color: #fecaca;
+}
+
+/* Segments */
+.segmentIcon {
+  width: 40px;
+  height: 40px;
+  background-color: #f0fdfa;
+  color: #0d9488;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emptyState h3 {
+  color: #475569;
+  margin-bottom: 8px;
+}
+
+/* Module access control */
+.accessRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.accessToggleBtn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 8px;
+  border: 1.5px solid #e2e8f0;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.accessToggleActive {
+  border-color: var(--primary);
+  background: #f5f3ff;
+  color: var(--primary);
+}
+
+.profileCheckboxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.profileCheckbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1.5px solid #e2e8f0;
+  background: #f8fafc;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.profileCheckbox:has(input:checked) {
+  border-color: var(--primary);
+  background: #f5f3ff;
+  color: var(--primary);
+}
+
+.profileCheckbox input {
+  accent-color: var(--primary);
+}
+
+/* Enrollments tab */
+.alertBadge {
+  background: #fff7ed;
+  border: 1.5px solid #fed7aa;
+  color: #c2410c;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.filterTabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.filterTab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1.5px solid #e2e8f0;
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.filterTab:hover { border-color: var(--primary); color: var(--primary); }
+
+.filterTabActive {
+  border-color: var(--primary);
+  background: #f5f3ff;
+  color: var(--primary);
+}
+
+.filterCount {
+  background: #e2e8f0;
+  color: #475569;
+  border-radius: 10px;
+  padding: 1px 7px;
+  font-size: 0.75rem;
+}
+
+.enrollStatusBadge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.statusPending { background: #fef9c3; color: #854d0e; }
+.statusReview  { background: #fff7ed; color: #c2410c; }
+.statusConfirmed { background: #dcfce7; color: #15803d; }
+.statusCancelled { background: #fee2e2; color: #991b1b; }
+
+.receiptLink {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--primary);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.actionBtnConfirm {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 7px;
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.actionBtnConfirm:hover { background: #15803d; color: white; }
+
+.topicsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.topicsList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.topicRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.topicRow :global(.ql-editor) {
+  min-height: 72px;
+}
+
+.topicsPreview {
+  margin: 6px 0 0 0;
+  padding-left: 18px;
+  list-style: disc;
+  font-size: 0.82rem;
+  color: #64748b;
+  line-height: 1.7;
+}
+
+/* ── Repository tab ────────────────────────────────────────────────────────── */
+
+.repoTab {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.repoAddBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  background: white;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.repoAddBtn:hover { border-color: #a29bfe; color: #6c5ce7; }
+
+.repoAddBtnPrimary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 10px;
+  background: var(--primary);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: white;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity 0.15s;
+}
+.repoAddBtnPrimary:hover { opacity: 0.85; }
+
+.repoAddForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 18px;
+}
+
+.repoAddFormLabel {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.repoUploadArea {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 2px dashed #c4b5fd;
+  border-radius: 12px;
+  padding: 16px 20px;
+  cursor: pointer;
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: background 0.15s;
+}
+.repoUploadArea:hover { background: #f5f3ff; }
+
+.repoFileName {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #15803d;
+  font-weight: 600;
+  font-size: 0.88rem;
+}
+
+.repoError {
+  color: #e74c3c;
+  font-size: 0.85rem;
+  background: #fff5f5;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin: 0;
+}
+
+.repoEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 48px 0;
+  color: #94a3b8;
+  text-align: center;
+}
+.repoEmpty p { margin: 0; font-weight: 700; font-size: 1rem; color: #64748b; }
+.repoEmpty span { font-size: 0.85rem; }
+
+.repoList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.repoItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  background: white;
+  transition: border-color 0.15s;
+}
+
+.repoItemSection {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  border-style: dashed;
+}
+
+.repoItemHidden {
+  opacity: 0.55;
+}
+
+.repoItemOrder {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.repoOrderBtn {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #94a3b8;
+  border-radius: 4px;
+  transition: all 0.12s;
+}
+.repoOrderBtn:hover:not(:disabled) { background: #f1f5f9; color: #475569; }
+.repoOrderBtn:disabled { opacity: 0.2; cursor: default; }
+
+.repoItemIcon {
+  color: #94a3b8;
+  flex-shrink: 0;
+}
+.repoItemSection .repoItemIcon { color: #6c5ce7; }
+
+.repoItemInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.repoItemTitle {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #1e293b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.repoItemSection .repoItemTitle { color: #4c3a8a; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
+
+.repoItemLink {
+  font-size: 0.78rem;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+.repoItemLink:hover { text-decoration: underline; }
+
+.repoItemActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.repoVisibleBtn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1.5px solid #e2e8f0;
+  background: #f8fafc;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #94a3b8;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+.repoVisibleBtn:hover { border-color: #a29bfe; color: #6c5ce7; }
+
+.repoVisibleOn {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+  color: #15803d;
+}
+.repoVisibleOn:hover { border-color: #86efac; color: #15803d; }
+
+@keyframes repoSpin { to { transform: rotate(360deg); } }
+.spinner { animation: repoSpin 1s linear infinite; }
+
+.repoGroups { display: flex; flex-direction: column; gap: 16px; }
+
+.repoGroup {
+  border: 1.5px solid #e2e8f0;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.repoGroupFiles {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 8px 12px 12px 12px;
+  background: #fafafa;
+}
+
+.repoGroupFiles .repoItem {
+  border-radius: 10px;
+  margin-top: 6px;
+  background: white;
+}
+
+.repoGroup > .repoItem {
+  border-radius: 0;
+  border: none;
+  border-bottom: 1.5px solid #e2e8f0;
+  background: #f5f3ff;
+}
+
+.repoAddFileForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+  padding: 14px;
+  border: 1.5px dashed #c4b5fd;
+  border-radius: 12px;
+  background: white;
+}
+
+.repoAddFileBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 8px 12px;
+  border: 1.5px dashed #e2e8f0;
+  border-radius: 10px;
+  background: none;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #94a3b8;
+  cursor: pointer;
+  font-family: inherit;
+  width: 100%;
+  transition: all 0.15s;
+}
+.repoAddFileBtn:hover { border-color: #a29bfe; color: #6c5ce7; background: #faf8ff; }

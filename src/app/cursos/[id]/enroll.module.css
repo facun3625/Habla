@@ -1,0 +1,498 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+}
+
+.card {
+  background: white;
+  border-radius: 24px;
+  padding: 32px;
+  width: 100%;
+  max-width: 460px;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(108,92,231,0.2);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.closeBtn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1f5f9;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #64748b;
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+  color: var(--primary);
+}
+
+.heading h2 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  margin: 0;
+  color: var(--text-dark);
+}
+
+.heading p {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 2px 0 0;
+}
+
+.priceTag {
+  background: #f5f3ff;
+  color: var(--primary);
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.methods {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.methodLabel {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #475569;
+  margin: 0 0 4px;
+}
+
+.methodBtn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: 14px;
+  border: 2px solid #e2e8f0;
+  background: #f8fafc;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: inherit;
+  color: #2c3e50;
+  transition: all 0.15s;
+  text-align: left;
+}
+
+.methodBtn:hover:not(:disabled) {
+  border-color: var(--primary);
+  background: #f5f3ff;
+  color: var(--primary);
+}
+
+.methodBtnActive {
+  border-color: var(--primary);
+  background: #f5f3ff;
+  color: var(--primary);
+}
+
+.methodBtn:last-child { margin-left: auto; }
+
+.methodIcon { font-size: 1.2rem; }
+
+.methodBtnDisabled {
+  opacity: 0.5;
+  cursor: not-allowed !important;
+}
+
+.comingSoon {
+  margin-left: auto;
+  font-size: 0.72rem;
+  background: #f1f5f9;
+  color: #94a3b8;
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-weight: 700;
+}
+
+.note {
+  font-size: 0.78rem;
+  color: #94a3b8;
+  text-align: center;
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+.transferSection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.bankInfo {
+  background: #f8fafc;
+  border-radius: 14px;
+  padding: 16px;
+  font-size: 0.9rem;
+  color: #475569;
+  line-height: 1.8;
+}
+
+.bankInfo h3 {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--text-dark);
+  margin: 0 0 8px;
+}
+
+.bankInfo p { margin: 0; }
+
+.uploadArea {
+  border: 2px dashed #c4b5fd;
+  border-radius: 16px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: var(--primary);
+  transition: background 0.15s;
+}
+
+.uploadArea:hover { background: #f5f3ff; }
+
+.uploadArea p {
+  font-weight: 700;
+  margin: 0;
+}
+
+.uploadArea span {
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.uploading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.doneSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+  padding: 12px 0;
+}
+
+.doneSection h3 {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--text-dark);
+  margin: 0;
+}
+
+.doneSection p {
+  color: #64748b;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.primaryBtn {
+  padding: 12px 28px;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+  padding: 16px 0;
+}
+
+.error {
+  color: #e74c3c;
+  font-size: 0.85rem;
+  text-align: center;
+  padding: 8px;
+  background: #fff5f5;
+  border-radius: 8px;
+}
+
+/* Step section wrapper */
+.stepSection {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.stepLabel {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #475569;
+  margin: 0;
+}
+
+/* Profile grid */
+.profileGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.profileOption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  background: #f8fafc;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  transition: all 0.15s;
+}
+
+.profileOption:hover { border-color: #a29bfe; color: #6c5ce7; }
+
+.profileOptionActive {
+  border-color: #6c5ce7;
+  background: #f5f3ff;
+  color: #6c5ce7;
+}
+
+/* Method grid (AR / EXT) */
+.methodGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.methodCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 18px 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 14px;
+  background: #f8fafc;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+
+.methodCard:hover { border-color: #a29bfe; background: #f5f3ff; }
+
+.methodFlag { font-size: 2rem; }
+
+.methodCard strong {
+  font-size: 0.88rem;
+  color: #1e293b;
+}
+
+.methodCard span {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.changeMethod {
+  background: none;
+  border: none;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+  text-align: left;
+}
+
+.changeMethod:hover { color: #6c5ce7; }
+
+.credentialInfo {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: #f5f3ff;
+  border-radius: 14px;
+  padding: 14px 16px;
+  color: #4c3a8a;
+}
+
+.credentialInfo svg { flex-shrink: 0; margin-top: 2px; color: #6c5ce7; }
+
+.credentialInfo strong {
+  display: block;
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+}
+
+.credentialInfo p {
+  font-size: 0.82rem;
+  margin: 0;
+  opacity: 0.8;
+  line-height: 1.5;
+}
+
+.credentialDone {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f0fdf4;
+  border: 1.5px solid #bbf7d0;
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: #16a34a;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+/* Auth step */
+.authTabs {
+  display: flex;
+  gap: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid #e2e8f0;
+  margin-bottom: 4px;
+}
+
+.authTab {
+  flex: 1;
+  padding: 10px 0;
+  border: none;
+  background: #f8fafc;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #94a3b8;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+
+.authTabActive {
+  background: var(--primary);
+  color: white;
+}
+
+.googleBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  background: white;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #2c3e50;
+  cursor: pointer;
+  text-decoration: none;
+  transition: border-color 0.15s, background 0.15s;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.googleBtn:hover { border-color: #6c5ce7; background: #fafafa; }
+
+.authDivider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #cbd5e1;
+  font-size: 0.8rem;
+}
+
+.authDivider::before,
+.authDivider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #e2e8f0;
+}
+
+.authDivider span { color: #94a3b8; font-weight: 600; }
+
+.authForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.authField {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 11px 14px;
+  background: #f8fafc;
+  transition: border-color 0.15s;
+}
+
+.authField:focus-within { border-color: #a29bfe; background: white; }
+
+.authIcon { color: #94a3b8; flex-shrink: 0; }
+
+.authInput {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 0.92rem;
+  color: #2c3e50;
+  font-family: inherit;
+  outline: none;
+}
+
+.authInput::placeholder { color: #cbd5e1; }
+
+.eyeBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #94a3b8;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.eyeBtn:hover { color: #6c5ce7; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner { animation: spin 1s linear infinite; }

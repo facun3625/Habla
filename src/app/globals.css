@@ -1,26 +1,65 @@
-@import "tailwindcss";
-
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --primary: #6c5ce7;
+  --primary-light: #a29bfe;
+  --secondary: #8490ff;
+  --background: #f7f9ff;
+  --surface: #ffffff;
+  --text-dark: #2c3e50;
+  --text-light: #7f8fa6;
+  --text-lightest: #a5b1c2;
+  --accent: #ffd32a;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@keyframes ambientPan {
+  0% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 10% 20%;
+  }
+  100% {
+    background-position: 0% 0%;
   }
 }
 
+html,
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  max-width: 100vw;
+  overflow-x: clip;
+  background-color: #ffffff;
+  color: var(--text-dark);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+}
+
+li {
+  list-style: none;
+}
+
+/* Ocultar UI nativa de Google Translate */
+.goog-te-banner-frame,
+.goog-te-balloon-frame,
+.skiptranslate,
+#goog-gt-tt,
+.goog-te-spinner-pos {
+  display: none !important;
+}
+body {
+  top: 0 !important;
 }
