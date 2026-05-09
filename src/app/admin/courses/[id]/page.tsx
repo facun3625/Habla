@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, use } from 'react';
+import { useState, use, useEffect } from 'react';
 import AdminLayout from '../../components/AdminLayout';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { ArrowLeft, Info, Layers, Users as UsersIcon, DollarSign, Mail, BookOpen } from 'lucide-react';
 import styles from './courseAdmin.module.css';
 import Link from 'next/link';
@@ -17,8 +18,24 @@ type TabType = 'general' | 'modules' | 'prices' | 'enrollments' | 'confirmEmail'
 
 export default function CourseAdminPage({ params }: { params: Promise<{ id: string }> }) {
   const { id: courseId } = use(params);
-  const [activeTab, setActiveTab] = useState<TabType>('general');
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const [activeTab, setActiveTab] = useState<TabType>((searchParams.get('tab') as TabType) || 'general');
   const [courseTitle, setCourseTitle] = useState('...');
+
+  useEffect(() => {
+    const tab = searchParams.get('tab') as TabType;
+    if (tab && tab !== activeTab) {
+      setActiveTab(tab);
+    }
+  }, [searchParams, activeTab]);
+
+  const handleTabChange = (tab: TabType) => {
+    setActiveTab(tab);
+    const newParams = new URLSearchParams(searchParams.toString());
+    newParams.set('tab', tab);
+    router.push(`/admin/courses/${courseId}?${newParams.toString()}`);
+  };
 
   const tabs = [
     { id: 'general',      label: 'Datos Generales',       icon: Info },
@@ -64,7 +81,7 @@ export default function CourseAdminPage({ params }: { params: Promise<{ id: stri
               <button
                 key={tab.id}
                 className={`${styles.tabItem} ${activeTab === tab.id ? styles.tabActive : ''}`}
-                onClick={() => setActiveTab(tab.id as TabType)}
+                onClick={() => handleTabChange(tab.id as TabType)}
               >
                 <tab.icon size={18} />
                 {tab.label}

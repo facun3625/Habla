@@ -33,6 +33,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const router = useRouter();
   const [authState, setAuthState] = useState<AuthState>('checking');
   const [user, setUser] = useState<User | null>(null);
+  const [notifications, setNotifications] = useState<{ total: number; details: any[] }>({ total: 0, details: [] });
+  const [showNotifications, setShowNotifications] = useState(false);
 
   useEffect(() => {
     fetch('/api/auth/me')
@@ -46,6 +48,25 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       })
       .catch(() => setAuthState('unauthenticated'));
   }, []);
+
+  useEffect(() => {
+    if (authState === 'authenticated') {
+      const fetchNotifications = () => {
+        fetch('/api/admin/enrollments/pending')
+          .then(res => res.json())
+          .then(data => {
+            if (data && typeof data.total === 'number') {
+              setNotifications(data);
+            }
+          })
+          .catch(err => console.error('Error fetching notifications', err));
+      };
+
+      fetchNotifications();
+      const interval = setInterval(fetchNotifications, 60000); // Update every minute
+      return () => clearInterval(interval);
+    }
+  }, [authState]);
 
   const handleLoginSuccess = (loggedUser: User) => {
     setUser(loggedUser);
@@ -129,10 +150,55 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               <Search size={18} />
               <input type="text" placeholder="Buscar..." />
             </div>
-            <button className={styles.iconButton}>
-              <Bell size={20} />
-              <span className={styles.notificationBadge} />
-            </button>
+            <div className={styles.notificationWrapper}>
+              <button 
+                className={styles.iconButton} 
+                onClick={() => setShowNotifications(!showNotifications)}
+                title="Notificaciones"
+              >
+                <Bell size={20} />
+                {notifications.total > 0 && (
+                  <span className={styles.notificationBadge}>
+                    {notifications.total}
+                  </span>
+                )}
+              </button>
+
+              {showNotifications && (
+                <div className={styles.notificationsDropdown}>
+                  <div className={styles.notificationsHeader}>
+                    <h3>Nuevas Inscripciones</h3>
+                    <button 
+                      onClick={() => setShowNotifications(false)}
+                      style={{ background: 'none', border: 'none', fontSize: '1.2rem', cursor: 'pointer', color: '#94a3b8' }}
+                    >
+                      &times;
+                    </button>
+                  </div>
+                  <div className={styles.notificationList}>
+                    {notifications.details.length > 0 ? (
+                      notifications.details.map((notif: any) => (
+                        <Link 
+                          key={notif.courseId} 
+                          href={`/admin/courses/${notif.courseId}?tab=enrollments`}
+                          className={styles.notificationItem}
+                          onClick={() => setShowNotifications(false)}
+                        >
+                          <span className={styles.notificationCourse}>{notif.courseTitle}</span>
+                          <span className={styles.notificationCount}>
+                            {notif.count === 1 ? '1 nueva inscripción' : `${notif.count} nuevas inscripciones`}
+                          </span>
+                        </Link>
+                      ))
+                    ) : (
+                      <div className={styles.emptyNotifications}>
+                        No hay nuevas inscripciones sin corroborar.
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
             <div className={styles.userProfile}>
               <div className={styles.avatar}>
                 {user?.name?.[0]?.toUpperCase() ?? 'A'}
