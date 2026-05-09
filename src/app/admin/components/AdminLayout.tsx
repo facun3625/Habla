@@ -63,8 +63,16 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       };
 
       fetchNotifications();
+      
+      // Listen for custom events to refresh notifications immediately
+      const handleRefresh = () => fetchNotifications();
+      window.addEventListener('refreshNotifications', handleRefresh);
+
       const interval = setInterval(fetchNotifications, 60000); // Update every minute
-      return () => clearInterval(interval);
+      return () => {
+        clearInterval(interval);
+        window.removeEventListener('refreshNotifications', handleRefresh);
+      };
     }
   }, [authState]);
 

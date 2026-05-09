@@ -98,6 +98,7 @@ export default function Enrollments({ courseId }: { courseId: string }) {
     if (res.ok) {
       const updated = await res.json();
       setEnrollments((prev) => prev.map((e) => e.id === id ? { ...e, ...updated } : e));
+      window.dispatchEvent(new CustomEvent('refreshNotifications'));
     }
   };
 
@@ -111,13 +112,17 @@ export default function Enrollments({ courseId }: { courseId: string }) {
     if (res.ok) {
       const updated = await res.json();
       setEnrollments((prev) => prev.map((e) => e.id === id ? { ...e, ...updated } : e));
+      window.dispatchEvent(new CustomEvent('refreshNotifications'));
     }
   };
 
   const deleteEnrollment = async (id: number) => {
     if (!confirm('¿Eliminar esta inscripción?')) return;
     const res = await fetch(`/api/enrollments/${id}`, { method: 'DELETE' });
-    if (res.ok) setEnrollments((prev) => prev.filter((e) => e.id !== id));
+    if (res.ok) {
+      setEnrollments((prev) => prev.filter((e) => e.id !== id));
+      window.dispatchEvent(new CustomEvent('refreshNotifications'));
+    }
   };
 
   const filtered = filter === 'all' ? enrollments : enrollments.filter((e) => e.status === filter);
