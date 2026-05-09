@@ -22,6 +22,7 @@ export default function CourseAdminPage({ params }: { params: Promise<{ id: stri
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<TabType>((searchParams.get('tab') as TabType) || 'general');
   const [courseTitle, setCourseTitle] = useState('...');
+  const [pendingCount, setPendingCount] = useState(0);
 
   useEffect(() => {
     const tab = searchParams.get('tab') as TabType;
@@ -36,6 +37,25 @@ export default function CourseAdminPage({ params }: { params: Promise<{ id: stri
     newParams.set('tab', tab);
     router.push(`/admin/courses/${courseId}?${newParams.toString()}`);
   };
+
+  const fetchPendingCount = async () => {
+    try {
+      const res = await fetch(`/api/courses/${courseId}/enrollments`);
+      if (res.ok) {
+        const data = await res.json();
+        const count = data.filter((e: any) => e.status === 'COMPROBANTE_SUBIDO').length;
+        setPendingCount(count);
+      }
+    } catch (err) {
+      console.error('Error fetching pending count:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchPendingCount();
+    window.addEventListener('refreshNotifications', fetchPendingCount);
+    return () => window.removeEventListener('refreshNotifications', fetchPendingCount);
+  }, [courseId]);
 
   const tabs = [
     { id: 'general',      label: 'Datos Generales',       icon: Info },
@@ -85,6 +105,9 @@ export default function CourseAdminPage({ params }: { params: Promise<{ id: stri
               >
                 <tab.icon size={18} />
                 {tab.label}
+                {tab.id === 'enrollments' && pendingCount > 0 && (
+                  <span className={styles.tabBadge}>{pendingCount}</span>
+                )}
               </button>
             ))}
           </div>

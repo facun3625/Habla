@@ -107,6 +107,22 @@
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.2s;
+  position: relative;
+}
+
+.tabBadge {
+  background-color: #ef4444;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 0 5px;
+  border-radius: 10px;
+  min-width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
 }
 
 .tabItem:hover {
