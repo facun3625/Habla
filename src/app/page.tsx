@@ -52,6 +52,7 @@ export default function Home() {
   }, []);
 
   const publicados = courses.filter((c: any) => c.status === 'PUBLICADO');
+  const latestCourse = publicados[0];
   const cursosAnteriores = courses.filter((c: any) => c.status === 'CERRADO');
 
   return (
@@ -67,13 +68,13 @@ export default function Home() {
               <div className={styles.heroText}>
                 <span className={styles.badge}>CURSO</span>
                 <h1 className={styles.title}>
-                  Apraxia del Habla <span>Infantil</span>
+                  {latestCourse ? latestCourse.title : <>Apraxia del Habla <span>Infantil</span></>}
                 </h1>
                 <p className={styles.description}>
-                  Ayuda a tu hijo/a a desarrollar su capacidad de habla y comunicación de manera efectiva y divertida.
+                  {latestCourse?.description || 'Ayuda a tu hijo/a a desarrollar su capacidad de habla y comunicación de manera efectiva y divertida.'}
                 </p>
-                <Link href="/cursos" className={styles.verCursosBtn}>
-                  Ver Cursos <ArrowRight size={16} />
+                <Link href={latestCourse ? `/cursos/${latestCourse.id}` : "/cursos"} className={styles.verCursosBtn}>
+                  {latestCourse ? 'Inscribirme al curso' : 'Ver Cursos'} <ArrowRight size={16} />
                 </Link>
               </div>
               <div className={styles.heroImageContainer} style={{ minHeight: '500px' }}>
