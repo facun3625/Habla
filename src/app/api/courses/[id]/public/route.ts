@@ -12,6 +12,10 @@ export async function GET(_req: NextRequest, { params }: Params) {
         orderBy: { order: 'asc' },
         include: { accessProfiles: { include: { profile: true } } },
       },
+      resources: {
+        where: { visible: true },
+        orderBy: { order: 'asc' }
+      },
       prices: { where: { active: true }, include: { profile: true } },
       courseProfiles: { include: { profile: true } },
     },

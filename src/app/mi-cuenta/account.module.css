@@ -465,3 +465,72 @@
 
 @keyframes spin { to { transform: rotate(360deg); } }
 .spin { animation: spin 1s linear infinite; }
+
+/* ── Repository ─────────────────────────────────────────────── */
+.repoSection {
+  margin-top: 32px;
+}
+
+.repoGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.repoSectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #475569;
+  padding: 8px 12px;
+  background: #f8fafc;
+  border-radius: 10px;
+}
+
+.repoFileList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-left: 12px;
+}
+
+.repoFileItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #ede9fe;
+  transition: border-color 0.15s;
+  text-decoration: none;
+}
+
+.repoFileItem:hover {
+  border-color: #a78bfa;
+  box-shadow: 0 2px 8px rgba(108,92,231,0.05);
+}
+
+.repoFileInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.repoFileTitle {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1e1b4b;
+}
+
+.repoFileLink {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #6c5ce7;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
