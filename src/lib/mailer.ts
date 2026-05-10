@@ -16,7 +16,17 @@ async function getSmtpConfig() {
   };
 }
 
-export async function sendMail({ to, subject, html }: { to: string | string[]; subject: string; html: string }) {
+export async function sendMail({ 
+  to, 
+  subject, 
+  html, 
+  type = 'TRANSACTIONAL' 
+}: { 
+  to: string | string[]; 
+  subject: string; 
+  html: string;
+  type?: string;
+}) {
   const cfg = await getSmtpConfig();
   const transporter = nodemailer.createTransport({
     host: cfg.host,
@@ -25,7 +35,19 @@ export async function sendMail({ to, subject, html }: { to: string | string[]; s
     auth: { user: cfg.user, pass: cfg.pass },
   });
   const from = cfg.fromName ? `"${cfg.fromName}" <${cfg.fromEmail}>` : cfg.fromEmail;
-  return transporter.sendMail({ from, to, subject, html });
+  
+  try {
+    const info = await transporter.sendMail({ from, to, subject, html });
+    await prisma.emailLog.create({
+      data: { to: Array.isArray(to) ? to.join(', ') : to, subject, status: 'SENT', type }
+    });
+    return info;
+  } catch (err: any) {
+    await prisma.emailLog.create({
+      data: { to: Array.isArray(to) ? to.join(', ') : to, subject, status: 'FAILED', error: err.message, type }
+    });
+    throw err;
+  }
 }
 
 export async function sendBulk(
@@ -50,8 +72,14 @@ export async function sendBulk(
   for (const email of emails) {
     try {
       await transporter.sendMail({ from, to: email, subject, html });
+      await prisma.emailLog.create({
+        data: { to: email, subject, status: 'SENT', type: 'BULK' }
+      });
       sent++;
-    } catch {
+    } catch (err: any) {
+      await prisma.emailLog.create({
+        data: { to: email, subject, status: 'FAILED', error: err.message, type: 'BULK' }
+      });
       failed++;
     }
     onProgress?.(sent + failed, emails.length);

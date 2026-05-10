@@ -15,7 +15,8 @@ import {
   ChevronRight,
   FileText,
   ExternalLink,
-  Megaphone
+  Megaphone,
+  Mail
 } from 'lucide-react';
 import Image from 'next/image';
 import styles from './AdminLayout.module.css';
@@ -97,6 +98,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     { name: 'Suscriptores', href: '/admin/subscribers', icon: Bell },
     { name: 'Usuarios', href: '/admin/users', icon: Users },
     { name: 'Marketing', href: '/admin/marketing', icon: Megaphone },
+    { name: 'Correos', href: '/admin/emails', icon: Mail },
     { name: 'Configuración', href: '/admin/settings', icon: Settings },
   ];
 
