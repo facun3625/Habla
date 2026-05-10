@@ -8,7 +8,7 @@ async function getSmtpConfig() {
   return {
     host: cfg.smtp_host || process.env.SMTP_HOST || '',
     port: Number(cfg.smtp_port || process.env.SMTP_PORT || 587),
-    secure: (cfg.smtp_secure ?? 'false') === 'true',
+    secure: (cfg.smtp_secure ?? process.env.SMTP_SECURE ?? 'false') === 'true',
     user: cfg.smtp_user || process.env.SMTP_USER || '',
     pass: cfg.smtp_pass || process.env.SMTP_PASS || '',
     fromEmail: cfg.smtp_from_email || process.env.SMTP_FROM || '',
