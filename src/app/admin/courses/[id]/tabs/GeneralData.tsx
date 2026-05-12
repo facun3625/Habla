@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import Image from 'next/image';
 import styles from '../courseAdmin.module.css';
 
 type CourseForm = {
@@ -341,7 +340,7 @@ export default function GeneralData({ courseId, onTitleChange }: { courseId: str
           <div className={styles.imageUpload}>
             <div className={styles.imagePlaceholder} onClick={() => fileInputRef.current?.click()} style={{ cursor: 'pointer' }}>
               {form.coverImage ? (
-                <Image src={form.coverImage} alt="Portada" fill style={{ objectFit: 'cover' }} />
+                <img src={form.coverImage} alt="Portada" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 'inherit' }} />
               ) : (
                 <span>{uploading ? 'Subiendo...' : 'Subir Imagen (1200x600)'}</span>
               )}
