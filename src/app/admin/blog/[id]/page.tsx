@@ -155,7 +155,7 @@ export default function EditPostPage({ params }: { params: Promise<{ id: string 
 
               {formData.coverImage ? (
                 <div style={{ position: 'relative', width: '100%', height: 220, borderRadius: 12, overflow: 'hidden', border: '1px solid #eee' }}>
-                  <Image src={formData.coverImage} alt="Portada" fill style={{ objectFit: 'cover' }} />
+                  <img src={formData.coverImage} alt="Portada" style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
                   <button
                     type="button"
                     onClick={() => setFormData((prev) => ({ ...prev, coverImage: '' }))}

@@ -172,7 +172,7 @@ export default function NewProfessionalPage() {
                 }}>
                   {formData.imageUrl ? (
                     <>
-                      <Image src={formData.imageUrl} alt="Preview" fill style={{ objectFit: 'cover' }} />
+                      <img src={formData.imageUrl} alt="Preview" style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
                       <button 
                         type="button"
                         onClick={() => setFormData(prev => ({ ...prev, imageUrl: '' }))}

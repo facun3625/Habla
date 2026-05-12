@@ -64,7 +64,7 @@ export default function CursosPage() {
                       <Link key={course.id} href={`/cursos/${course.id}`} className={styles.card}>
                         <div className={styles.cardImage}>
                           {course.coverImage
-                            ? <Image src={course.coverImage} alt={course.title} fill style={{ objectFit: 'cover' }} />
+                            ? <img src={course.coverImage} alt={course.title} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
                             : <div className={styles.cardImagePlaceholder} />
                           }
                           <span className={styles.modalityBadge}>{MODALITY[course.modality] ?? course.modality}</span>
@@ -97,7 +97,7 @@ export default function CursosPage() {
                       <Link key={course.id} href={`/cursos/${course.id}`} className={styles.pastCard}>
                         <div className={styles.pastImage}>
                           {course.coverImage
-                            ? <Image src={course.coverImage} alt={course.title} fill style={{ objectFit: 'cover' }} />
+                            ? <img src={course.coverImage} alt={course.title} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
                             : <div className={styles.pastImagePlaceholder} />
                           }
                         </div>

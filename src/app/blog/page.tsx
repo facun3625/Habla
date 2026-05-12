@@ -31,7 +31,7 @@ export default async function BlogPage() {
               <article key={post.id} className={styles.blogCard}>
                 <div className={styles.blogImage}>
                   {post.coverImage ? (
-                    <Image src={post.coverImage} alt={post.title} fill style={{ objectFit: 'cover' }} />
+                    <img src={post.coverImage} alt={post.title} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
                   ) : (
                     <div className={styles.blogImagePlaceholder}>
                       <span>Foto del artículo</span>
