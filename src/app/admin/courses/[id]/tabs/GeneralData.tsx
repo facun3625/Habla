@@ -165,7 +165,14 @@ export default function GeneralData({ courseId, onTitleChange }: { courseId: str
     fd.append('file', file);
     const res = await fetch('/api/upload', { method: 'POST', body: fd });
     const data = await res.json();
-    if (data.url) setForm((prev) => ({ ...prev, coverImage: data.url }));
+    if (data.url) {
+      setForm((prev) => ({ ...prev, coverImage: data.url }));
+      await fetch(`/api/courses/${courseId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...form, coverImage: data.url }),
+      });
+    }
     setUploading(false);
     e.target.value = '';
   };
