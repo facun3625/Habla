@@ -260,15 +260,22 @@ export default function EditProfessionalPage() {
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '10px' }}>
-              <input 
-                type="checkbox" 
-                name="active" 
+              <input
+                type="checkbox"
+                name="active"
                 id="active"
                 checked={formData.active}
                 onChange={handleChange}
                 style={{ width: '18px', height: '18px' }}
               />
               <label htmlFor="active" style={{ fontWeight: 600, cursor: 'pointer' }}>Activa</label>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', paddingTop: '10px', borderTop: '1px solid #f1f5f9' }}>
+              <button onClick={handleSubmit} disabled={saving} className={styles.createButton}>
+                <Save size={20} />
+                {saving ? 'Guardando...' : 'Guardar Cambios'}
+              </button>
             </div>
 
           </form>
