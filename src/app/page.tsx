@@ -122,7 +122,7 @@ export default function Home() {
                       <Link href={`/cursos/${curso.id}`} className={styles.proximoCursoCard}>
                         <div className={styles.proximoCursoImage}>
                           {curso.coverImage
-                            ? <Image src={curso.coverImage} alt={curso.title} fill style={{ objectFit: 'cover' }} />
+                            ? <img src={curso.coverImage} alt={curso.title} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
                             : <div className={styles.proximoCursoImagePlaceholder} />
                           }
                           <span className={styles.courseModalityBadge}>{MODALITY[curso.modality] ?? curso.modality}</span>
@@ -189,7 +189,7 @@ export default function Home() {
                       <Link key={c.id} href={`/cursos/${c.id}`} className={styles.cursoAnteriorCard}>
                         <div className={styles.cursoAnteriorImage}>
                           {c.coverImage
-                            ? <Image src={c.coverImage} alt={c.title} fill style={{ objectFit: 'cover' }} />
+                            ? <img src={c.coverImage} alt={c.title} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
                             : <div className={styles.proximoCursoImagePlaceholder} />
                           }
                         </div>
@@ -227,7 +227,7 @@ export default function Home() {
                   <div key={pro.id} className={styles.proCard}>
                     <div className={styles.proImage}>
                       {pro.imageUrl ? (
-                        <Image src={pro.imageUrl} alt={pro.name} width={160} height={160} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
+                        <img src={pro.imageUrl} alt={pro.name} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
                       ) : (
                         <User size={60} color="white" />
                       )}
@@ -270,7 +270,7 @@ export default function Home() {
                   <article key={post.id} className={styles.blogCard}>
                     <div className={styles.blogImage}>
                       {post.coverImage ? (
-                        <Image src={post.coverImage} alt={post.title} fill style={{ objectFit: 'cover' }} />
+                        <img src={post.coverImage} alt={post.title} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
                       ) : (
                         <div className={styles.blogImagePlaceholder} />
                       )}
