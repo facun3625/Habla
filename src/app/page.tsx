@@ -313,11 +313,9 @@ export default function Home() {
             </button>
             <div className={styles.modalHeader}>
               <div className={styles.modalImageContainer}>
-                <Image
-                  src={selectedPro.imageUrl || '/images/default-pro.png'}
+                <img
+                  src={selectedPro.imageUrl || '/favicon.png'}
                   alt={selectedPro.name}
-                  width={120}
-                  height={120}
                   style={{ objectFit: 'cover', width: '100%', height: '100%' }}
                 />
               </div>
