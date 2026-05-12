@@ -147,12 +147,8 @@ export default function Modules({ courseId }: { courseId: string }) {
       <div className={styles.objectivesSection}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
           <label style={{ fontWeight: 700, fontSize: '0.95rem', color: '#1e293b' }}>Objetivos del Curso</label>
-          <button
-            className={styles.iconBtnSuccess}
-            onClick={saveObjectives}
-            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', fontSize: '0.85rem' }}
-          >
-            {objSaved ? <><Check size={14} /> Guardado</> : <><Check size={14} /> Guardar</>}
+          <button className={styles.addBtnSmall} onClick={saveObjectives}>
+            <Check size={14} /> {objSaved ? 'Guardado' : 'Guardar'}
           </button>
         </div>
         <ReactQuill

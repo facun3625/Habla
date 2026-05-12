@@ -139,6 +139,20 @@
   letter-spacing: -0.3px;
 }
 
+.objectivesContent {
+  color: #2c3e50;
+  line-height: 1.8;
+  font-size: 1rem;
+}
+
+.objectivesContent ol,
+.objectivesContent ul {
+  padding-left: 1.5rem;
+  margin: 8px 0;
+}
+
+.objectivesContent p { margin: 6px 0; }
+
 /* ── Plans grid ── */
 .plansGrid {
   display: grid;

@@ -24,6 +24,7 @@ type Course = {
   schedule: string | null;
   targetAudience: string | null;
   status: string;
+  objectives: string | null;
   modules: Module[];
   prices: Price[];
   courseProfiles: CourseProfile[];
@@ -184,6 +185,14 @@ export default function CoursePage({ params }: { params: Promise<{ id: string }>
                   );
                 })}
               </div>
+            </section>
+          )}
+
+          {/* Objetivos del curso */}
+          {course.objectives && (
+            <section className={styles.section}>
+              <h2 className={styles.sectionTitle}>Objetivos del curso</h2>
+              <div className={styles.objectivesContent} dangerouslySetInnerHTML={{ __html: course.objectives }} />
             </section>
           )}
 
