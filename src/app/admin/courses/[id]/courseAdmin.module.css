@@ -246,6 +246,14 @@
 }
 
 /* Tab specific lists */
+.objectivesSection {
+  background: white;
+  border-radius: 14px;
+  padding: 20px;
+  border: 1px solid #f0eeff;
+  box-shadow: 0 2px 8px rgba(108,92,231,0.06);
+}
+
 .listContainer {
   display: flex;
   flex-direction: column;

@@ -40,6 +40,8 @@ export default function Modules({ courseId }: { courseId: string }) {
   const [editAccessAll, setEditAccessAll] = useState(true);
   const [editProfileIds, setEditProfileIds] = useState<number[]>([]);
   const [editTopics, setEditTopics] = useState<string[]>([]);
+  const [objectives, setObjectives] = useState('');
+  const [objSaved, setObjSaved] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -48,6 +50,7 @@ export default function Modules({ courseId }: { courseId: string }) {
       fetch('/api/profiles').then((r) => r.json()),
     ]).then(([mods, course, allProfiles]) => {
       setModules(mods);
+      setObjectives(course.objectives ?? '');
       const targetNames = (course.targetAudience ?? '')
         .split(',').map((s: string) => s.trim()).filter(Boolean);
       const filtered = Array.isArray(allProfiles)
@@ -56,6 +59,16 @@ export default function Modules({ courseId }: { courseId: string }) {
       setCourseProfiles(filtered);
     }).finally(() => setLoading(false));
   }, [courseId]);
+
+  const saveObjectives = async () => {
+    await fetch(`/api/courses/${courseId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ objectives }),
+    });
+    setObjSaved(true);
+    setTimeout(() => setObjSaved(false), 2000);
+  };
 
   const addModule = async () => {
     const res = await fetch(`/api/courses/${courseId}/modules`, {
@@ -129,6 +142,27 @@ export default function Modules({ courseId }: { courseId: string }) {
         <button className={styles.addBtnSmall} onClick={addModule}>
           <Plus size={18} /> Nuevo Módulo
         </button>
+      </div>
+
+      <div className={styles.objectivesSection}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+          <label style={{ fontWeight: 700, fontSize: '0.95rem', color: '#1e293b' }}>Objetivos del Curso</label>
+          <button
+            className={styles.iconBtnSuccess}
+            onClick={saveObjectives}
+            style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', fontSize: '0.85rem' }}
+          >
+            {objSaved ? <><Check size={14} /> Guardado</> : <><Check size={14} /> Guardar</>}
+          </button>
+        </div>
+        <ReactQuill
+          theme="snow"
+          value={objectives}
+          onChange={setObjectives}
+          modules={QUILL_MODULES}
+          formats={QUILL_FORMATS}
+          placeholder="Escribí los objetivos generales y específicos del curso..."
+        />
       </div>
 
       <div className={styles.listContainer}>

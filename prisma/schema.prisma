@@ -53,6 +53,7 @@ model Course {
   updatedAt                DateTime         @updatedAt
   confirmationEmail        String?
   confirmationEmailSubject String?
+  objectives               String?
   courseProfiles           CourseProfile[]
   resources                CourseResource[]
   enrollments              Enrollment[]

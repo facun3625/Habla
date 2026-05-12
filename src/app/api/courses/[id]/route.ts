@@ -42,6 +42,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
         status: body.status,
         confirmationEmailSubject: body.confirmationEmailSubject ?? undefined,
         confirmationEmail: body.confirmationEmail ?? undefined,
+        objectives: body.objectives ?? undefined,
       },
     });
     return NextResponse.json(course);

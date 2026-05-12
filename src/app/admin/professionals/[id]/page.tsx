@@ -6,7 +6,6 @@ import AdminLayout from '../../components/AdminLayout';
 import { ArrowLeft, Save, Upload, X } from 'lucide-react';
 import styles from '../../courses/courses.module.css'; 
 import Link from 'next/link';
-import Image from 'next/image';
 import dynamic from 'next/dynamic';
 const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
 import 'react-quill-new/dist/quill.snow.css';
@@ -69,6 +68,11 @@ export default function EditProfessionalPage() {
       if (res.ok) {
         const data = await res.json();
         setFormData(prev => ({ ...prev, imageUrl: data.url }));
+        await fetch(`/api/professionals/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...formData, imageUrl: data.url }),
+        });
       } else {
         alert('Error al subir imagen');
       }
@@ -195,7 +199,7 @@ export default function EditProfessionalPage() {
                 }}>
                   {formData.imageUrl ? (
                     <>
-                      <Image src={formData.imageUrl} alt="Preview" fill style={{ objectFit: 'cover' }} />
+                      <img src={formData.imageUrl} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                       <button 
                         type="button"
                         onClick={() => setFormData(prev => ({ ...prev, imageUrl: '' }))}
