@@ -93,7 +93,7 @@ export default function ProfilesPage() {
         ) : (
           <div className={styles.grid}>
             {profiles.map((p) => (
-              <div key={p.id} className={styles.card}>
+              <div key={p.id} className={`${styles.card} ${editingId === p.id ? styles.cardEditing : ''}`}>
                 {editingId === p.id ? (
                   <>
                     <input

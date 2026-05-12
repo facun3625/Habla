@@ -76,7 +76,7 @@ export default function CursosPage() {
                           )}
                           <div className={styles.cardMeta}>
                             {course.startDate && (
-                              <span><Calendar size={14} /> {new Date(course.startDate).toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                              <span><Calendar size={14} /> {new Date(course.startDate.slice(0, 10).replace(/-/g, '/')).toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
                             )}
                             {course.schedule && <span><Clock size={14} /> {course.schedule}</span>}
                             {course.targetAudience && <span><Users size={14} /> {course.targetAudience}</span>}
@@ -106,7 +106,7 @@ export default function CursosPage() {
                           <h4 className={styles.pastTitle}>{course.title}</h4>
                           {course.startDate && (
                             <span className={styles.pastDate}>
-                              <Calendar size={12} /> {new Date(course.startDate).toLocaleDateString('es-AR', { month: 'long', year: 'numeric' })}
+                              <Calendar size={12} /> {new Date(course.startDate.slice(0, 10).replace(/-/g, '/')).toLocaleDateString('es-AR', { month: 'long', year: 'numeric' })}
                             </span>
                           )}
                         </div>

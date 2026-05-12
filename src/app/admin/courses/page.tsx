@@ -128,7 +128,7 @@ export default function CoursesPage() {
                       <div className={styles.dateCell}>
                         <Calendar size={14} />
                         {course.startDate
-                          ? new Date(course.startDate).toLocaleDateString('es-AR')
+                          ? new Date(course.startDate.slice(0, 10).replace(/-/g, '/')).toLocaleDateString('es-AR')
                           : '—'}
                       </div>
                     </td>

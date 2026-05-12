@@ -134,7 +134,7 @@ export default function Home() {
                           )}
                           <div className={styles.proximoCursoMeta}>
                             {curso.startDate && (
-                              <span><Calendar size={15} /> {new Date(curso.startDate).toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                              <span><Calendar size={15} /> {new Date(curso.startDate.slice(0, 10).replace(/-/g, '/')).toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
                             )}
                             {curso.schedule && <span><Clock size={15} /> {curso.schedule}</span>}
                             {curso.targetAudience && <span><Users size={15} /> {curso.targetAudience}</span>}
@@ -198,7 +198,7 @@ export default function Home() {
                           <h4 className={styles.cursoAnteriorTitle}>{c.title}</h4>
                           {c.startDate && (
                             <span className={styles.cursoAnteriorDate}>
-                              <Calendar size={12} /> {new Date(c.startDate).toLocaleDateString('es-AR', { month: 'long', year: 'numeric' })}
+                              <Calendar size={12} /> {new Date(c.startDate.slice(0, 10).replace(/-/g, '/')).toLocaleDateString('es-AR', { month: 'long', year: 'numeric' })}
                             </span>
                           )}
                         </div>
