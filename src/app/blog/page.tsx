@@ -1,9 +1,7 @@
-import Image from 'next/image';
 import Link from 'next/link';
 import { prisma } from '@/lib/prisma';
 import SiteHeader from '../components/SiteHeader';
 import SiteFooter from '../components/SiteFooter';
-import styles from '../page.module.css';
 import blogStyles from './blog.module.css';
 
 export const dynamic = 'force-dynamic';
@@ -26,25 +24,21 @@ export default async function BlogPage() {
         {posts.length === 0 ? (
           <p className={blogStyles.empty}>No hay entradas publicadas aún.</p>
         ) : (
-          <div className={styles.blogGrid}>
+          <div className={blogStyles.blogGrid}>
             {posts.map(post => (
-              <article key={post.id} className={styles.blogCard}>
-                <div className={styles.blogImage}>
-                  {post.coverImage ? (
+              <article key={post.id} className={blogStyles.blogCard}>
+                <div className={blogStyles.blogCardImage}>
+                  {post.coverImage && (
                     <img src={post.coverImage} alt={post.title} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
-                  ) : (
-                    <div className={styles.blogImagePlaceholder}>
-                      <span>Foto del artículo</span>
-                    </div>
                   )}
                 </div>
-                <div className={styles.blogContent}>
-                  <span className={styles.blogDate}>
+                <div className={blogStyles.blogCardContent}>
+                  <span className={blogStyles.blogCardDate}>
                     {new Date(post.createdAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
                   </span>
-                  <h2 className={styles.blogTitle}>{post.title}</h2>
-                  {post.excerpt && <p className={styles.blogExcerpt}>{post.excerpt}</p>}
-                  <Link href={`/blog/${post.slug}`} className={styles.readMore}>Leer más</Link>
+                  <h2 className={blogStyles.blogCardTitle}>{post.title}</h2>
+                  {post.excerpt && <p className={blogStyles.blogCardExcerpt}>{post.excerpt}</p>}
+                  <Link href={`/blog/${post.slug}`} className={blogStyles.blogCardReadMore}>Leer más →</Link>
                 </div>
               </article>
             ))}
