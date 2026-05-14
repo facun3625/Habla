@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { CheckCircle, XCircle, ExternalLink, Trash2, X } from 'lucide-react';
 import styles from '../courseAdmin.module.css';
-import ConfirmModal from '../../components/ConfirmModal';
+import ConfirmModal from '../../../components/ConfirmModal';
 
 function FileLink({ url, label = 'Ver' }: { url: string; label?: string }) {
   const [preview, setPreview] = useState(false);

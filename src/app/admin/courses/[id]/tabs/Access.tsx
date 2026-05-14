@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Trash2, Users, Edit2, Check, X } from 'lucide-react';
 import styles from '../courseAdmin.module.css';
-import ConfirmModal from '../../components/ConfirmModal';
+import ConfirmModal from '../../../components/ConfirmModal';
 
 type Profile = { id: number; name: string; description: string | null };
 type CourseProfile = { id: number; profileId: number; capacity: number; profile: Profile };

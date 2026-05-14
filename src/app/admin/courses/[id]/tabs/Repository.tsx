@@ -6,7 +6,7 @@ import {
   ChevronUp, ChevronDown, Upload, Loader, CheckCircle,
 } from 'lucide-react';
 import styles from '../courseAdmin.module.css';
-import ConfirmModal from '../../components/ConfirmModal';
+import ConfirmModal from '../../../components/ConfirmModal';
 
 type Resource = {
   id: number;
