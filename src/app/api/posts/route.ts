@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma';
 export async function GET() {
   try {
     const posts = await prisma.post.findMany({
-      orderBy: { createdAt: 'desc' }
+      orderBy: [{ order: 'asc' }, { createdAt: 'desc' }]
     });
     return NextResponse.json(posts);
   } catch (error) {
