@@ -20,6 +20,7 @@ export default function NewPostPage() {
     excerpt: '',
     content: '',
     coverImage: '',
+    videoUrl: '',
     published: false,
   });
 
@@ -139,6 +140,18 @@ export default function NewPostPage() {
                   <input type="file" accept="image/*" style={{ display: 'none' }} onChange={handleImageUpload} disabled={uploading} />
                 </label>
               )}
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
+              <label style={{ fontWeight: 600 }}>Video (YouTube o Vimeo) <span style={{ fontWeight: 400, color: '#94a3b8', fontSize: '0.85rem' }}>opcional</span></label>
+              <input
+                type="text"
+                name="videoUrl"
+                placeholder="https://www.youtube.com/watch?v=... o https://vimeo.com/..."
+                value={formData.videoUrl}
+                onChange={handleChange}
+                style={{ padding: '10px 14px', border: '1.5px solid #e2e8f0', borderRadius: 10, fontSize: '0.95rem', fontFamily: 'inherit', outline: 'none' }}
+              />
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '10px' }}>

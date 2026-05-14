@@ -33,6 +33,7 @@ export async function POST(request: Request) {
         excerpt: data.excerpt,
         content: data.content,
         coverImage: data.coverImage,
+        videoUrl: data.videoUrl ?? null,
         published: data.published,
       }
     });

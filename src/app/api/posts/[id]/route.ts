@@ -41,6 +41,7 @@ export async function PUT(
         excerpt: data.excerpt,
         content: data.content,
         coverImage: data.coverImage,
+        videoUrl: data.videoUrl ?? null,
         published: data.published,
         ...(slug ? { slug } : {}),
       }

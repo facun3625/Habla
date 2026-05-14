@@ -145,6 +145,7 @@ model Post {
   excerpt    String?
   content    String
   coverImage String?
+  videoUrl   String?
   published  Boolean  @default(false)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt

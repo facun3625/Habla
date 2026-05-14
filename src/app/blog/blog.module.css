@@ -142,6 +142,16 @@
   margin: 20px 0;
 }
 
+.videoWrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 48px;
+  background: #000;
+}
+
 /* ── Mobile ── */
 @media (max-width: 768px) {
   .main { padding: 40px 16px; }
