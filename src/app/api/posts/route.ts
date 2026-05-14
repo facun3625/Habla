@@ -34,6 +34,7 @@ export async function POST(request: Request) {
         content: data.content,
         coverImage: data.coverImage,
         videoUrl: data.videoUrl ?? null,
+        showCoverImage: data.showCoverImage ?? true,
         published: data.published,
       }
     });

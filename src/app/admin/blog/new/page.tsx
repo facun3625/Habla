@@ -21,6 +21,7 @@ export default function NewPostPage() {
     content: '',
     coverImage: '',
     videoUrl: '',
+    showCoverImage: true,
     published: false,
   });
 
@@ -152,6 +153,18 @@ export default function NewPostPage() {
                 onChange={handleChange}
                 style={{ padding: '10px 14px', border: '1.5px solid #e2e8f0', borderRadius: 10, fontSize: '0.95rem', fontFamily: 'inherit', outline: 'none' }}
               />
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '10px' }}>
+              <input
+                type="checkbox"
+                name="showCoverImage"
+                id="showCoverImage"
+                checked={formData.showCoverImage}
+                onChange={handleChange}
+                style={{ width: '18px', height: '18px' }}
+              />
+              <label htmlFor="showCoverImage" style={{ fontWeight: 600, cursor: 'pointer' }}>Mostrar imagen destacada en la noticia</label>
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '10px' }}>

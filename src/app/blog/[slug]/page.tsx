@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 
 function toEmbedUrl(url: string): string | null {
   if (!url) return null;
-  const yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  const yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/);
   if (yt) return `https://www.youtube.com/embed/${yt[1]}`;
   const vimeo = url.match(/vimeo\.com\/(\d+)/);
   if (vimeo) return `https://player.vimeo.com/video/${vimeo[1]}`;
@@ -38,7 +38,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
             {post.excerpt && <p className={blogStyles.articleExcerpt}>{post.excerpt}</p>}
           </header>
 
-          {post.coverImage && (
+          {post.coverImage && post.showCoverImage && (
             <div className={blogStyles.coverImageWrapper}>
               <img src={post.coverImage} alt={post.title} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
             </div>

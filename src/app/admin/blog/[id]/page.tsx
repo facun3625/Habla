@@ -35,6 +35,7 @@ export default function EditPostPage({ params }: { params: Promise<{ id: string 
     content: '',
     coverImage: '',
     videoUrl: '',
+    showCoverImage: true,
     published: false,
   });
 
@@ -49,6 +50,7 @@ export default function EditPostPage({ params }: { params: Promise<{ id: string 
             content: data.content || '',
             coverImage: data.coverImage || '',
             videoUrl: data.videoUrl || '',
+            showCoverImage: data.showCoverImage ?? true,
             published: data.published || false,
           });
         }
@@ -184,6 +186,18 @@ export default function EditPostPage({ params }: { params: Promise<{ id: string 
                 onChange={(e) => setFormData(prev => ({ ...prev, videoUrl: e.target.value }))}
                 style={{ padding: '10px 14px', border: '1.5px solid #e2e8f0', borderRadius: 10, fontSize: '0.95rem', fontFamily: 'inherit', outline: 'none' }}
               />
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '10px' }}>
+              <input
+                type="checkbox"
+                name="showCoverImage"
+                id="showCoverImage"
+                checked={formData.showCoverImage}
+                onChange={handleChange}
+                style={{ width: '18px', height: '18px' }}
+              />
+              <label htmlFor="showCoverImage" style={{ fontWeight: 600, cursor: 'pointer' }}>Mostrar imagen destacada en la noticia</label>
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '10px' }}>
