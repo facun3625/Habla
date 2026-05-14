@@ -6,6 +6,7 @@ import {
   ChevronUp, ChevronDown, Upload, Loader, CheckCircle,
 } from 'lucide-react';
 import styles from '../courseAdmin.module.css';
+import ConfirmModal from '../../components/ConfirmModal';
 
 type Resource = {
   id: number;
@@ -38,6 +39,7 @@ export default function Repository({ courseId }: { courseId: string }) {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
+  const [confirmModal, setConfirmModal] = useState<{ message: string; onConfirm: () => void } | null>(null);
 
   // "Nueva sección" form
   const [showAddSection, setShowAddSection] = useState(false);
@@ -70,10 +72,15 @@ export default function Repository({ courseId }: { courseId: string }) {
     setResources(prev => prev.map(x => x.id === r.id ? { ...x, visible: !r.visible } : x));
   };
 
-  const deleteResource = async (id: number) => {
-    if (!confirm('¿Eliminar este elemento?')) return;
-    await fetch(`/api/courses/${courseId}/resources/${id}`, { method: 'DELETE' });
-    setResources(prev => prev.filter(x => x.id !== id));
+  const deleteResource = (id: number) => {
+    setConfirmModal({
+      message: '¿Eliminar este elemento?',
+      onConfirm: async () => {
+        setConfirmModal(null);
+        await fetch(`/api/courses/${courseId}/resources/${id}`, { method: 'DELETE' });
+        setResources(prev => prev.filter(x => x.id !== id));
+      },
+    });
   };
 
   const moveItem = async (index: number, dir: -1 | 1) => {
@@ -309,6 +316,13 @@ export default function Repository({ courseId }: { courseId: string }) {
             );
           })}
         </div>
+      )}
+      {confirmModal && (
+        <ConfirmModal
+          message={confirmModal.message}
+          onConfirm={confirmModal.onConfirm}
+          onCancel={() => setConfirmModal(null)}
+        />
       )}
     </div>
   );

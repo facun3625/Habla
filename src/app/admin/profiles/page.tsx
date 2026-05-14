@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import AdminLayout from '../components/AdminLayout';
 import { Plus, Edit2, Trash2, Check, X, Users } from 'lucide-react';
 import styles from './profiles.module.css';
+import ConfirmModal from '../components/ConfirmModal';
 
 type Profile = { id: number; name: string; description: string | null; createdAt: string };
 
@@ -13,6 +14,7 @@ export default function ProfilesPage() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [adding, setAdding] = useState(false);
   const [form, setForm] = useState({ name: '', description: '' });
+  const [confirmModal, setConfirmModal] = useState<{ message: string; onConfirm: () => void } | null>(null);
 
   useEffect(() => {
     fetch('/api/profiles')
@@ -38,11 +40,15 @@ export default function ProfilesPage() {
     cancel();
   };
 
-  const deleteProfile = async (id: number, name: string) => {
-    if (!confirm(`¿Eliminar el perfil "${name}"?`)) return;
-    const res = await fetch(`/api/profiles/${id}`, { method: 'DELETE' });
-    if (res.ok) setProfiles((prev) => prev.filter((p) => p.id !== id));
-    else { const e = await res.json(); alert(e.error); }
+  const deleteProfile = (id: number, name: string) => {
+    setConfirmModal({
+      message: `¿Eliminar el perfil "${name}"?`,
+      onConfirm: async () => {
+        setConfirmModal(null);
+        const res = await fetch(`/api/profiles/${id}`, { method: 'DELETE' });
+        if (res.ok) setProfiles((prev) => prev.filter((p) => p.id !== id));
+      },
+    });
   };
 
   return (
@@ -131,6 +137,13 @@ export default function ProfilesPage() {
           </div>
         )}
       </div>
+      {confirmModal && (
+        <ConfirmModal
+          message={confirmModal.message}
+          onConfirm={confirmModal.onConfirm}
+          onCancel={() => setConfirmModal(null)}
+        />
+      )}
     </AdminLayout>
   );
 }

@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import AdminLayout from '../components/AdminLayout';
 import { Mail, Search, Trash2 } from 'lucide-react';
-import styles from '../courses/courses.module.css'; 
+import styles from '../courses/courses.module.css';
+import ConfirmModal from '../components/ConfirmModal';
 
 type Subscriber = {
   id: number;
@@ -16,6 +17,7 @@ export default function SubscribersAdminPage() {
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [confirmModal, setConfirmModal] = useState<{ message: string; onConfirm: () => void } | null>(null);
 
   const fetchSubscribers = () => {
     setLoading(true);
@@ -30,18 +32,15 @@ export default function SubscribersAdminPage() {
     fetchSubscribers();
   }, []);
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('¿Estás seguro de eliminar este suscriptor?')) return;
-    
-    try {
-      const res = await fetch(`/api/subscribers/${id}`, { method: 'DELETE' });
-      if (res.ok) {
-        setSubscribers(prev => prev.filter(s => s.id !== id));
-      }
-    } catch (err) {
-      console.error(err);
-      alert('Error al eliminar');
-    }
+  const handleDelete = (id: number) => {
+    setConfirmModal({
+      message: '¿Estás seguro de eliminar este suscriptor?',
+      onConfirm: async () => {
+        setConfirmModal(null);
+        const res = await fetch(`/api/subscribers/${id}`, { method: 'DELETE' });
+        if (res.ok) setSubscribers(prev => prev.filter(s => s.id !== id));
+      },
+    });
   };
 
   const filtered = subscribers.filter((s) =>
@@ -121,6 +120,13 @@ export default function SubscribersAdminPage() {
           )}
         </div>
       </div>
+      {confirmModal && (
+        <ConfirmModal
+          message={confirmModal.message}
+          onConfirm={confirmModal.onConfirm}
+          onCancel={() => setConfirmModal(null)}
+        />
+      )}
     </AdminLayout>
   );
 }

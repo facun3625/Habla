@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Plus, Trash2, Users, Edit2, Check, X } from 'lucide-react';
 import styles from '../courseAdmin.module.css';
+import ConfirmModal from '../../components/ConfirmModal';
 
 type Profile = { id: number; name: string; description: string | null };
 type CourseProfile = { id: number; profileId: number; capacity: number; profile: Profile };
@@ -15,6 +16,7 @@ export default function Access({ courseId }: { courseId: string }) {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState({ profileId: '', capacity: '' });
   const [editCapacity, setEditCapacity] = useState('');
+  const [confirmModal, setConfirmModal] = useState<{ message: string; onConfirm: () => void } | null>(null);
 
   useEffect(() => {
     Promise.all([
@@ -58,14 +60,19 @@ export default function Access({ courseId }: { courseId: string }) {
     }
   };
 
-  const removeAccess = async (profileId: number, name: string) => {
-    if (!confirm(`¿Quitar el perfil "${name}" de este curso?`)) return;
-    const res = await fetch(`/api/courses/${courseId}/access`, {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ profileId }),
+  const removeAccess = (profileId: number, name: string) => {
+    setConfirmModal({
+      message: `¿Quitar el perfil "${name}" de este curso?`,
+      onConfirm: async () => {
+        setConfirmModal(null);
+        const res = await fetch(`/api/courses/${courseId}/access`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ profileId }),
+        });
+        if (res.ok) setCourseProfiles((prev) => prev.filter((cp) => cp.profileId !== profileId));
+      },
     });
-    if (res.ok) setCourseProfiles((prev) => prev.filter((cp) => cp.profileId !== profileId));
   };
 
   if (loading) return <p style={{ padding: '1rem', color: '#888' }}>Cargando...</p>;
@@ -176,6 +183,14 @@ export default function Access({ courseId }: { courseId: string }) {
           </button>
         )}
       </div>
+      {confirmModal && (
+        <ConfirmModal
+          message={confirmModal.message}
+          confirmLabel="Quitar"
+          onConfirm={confirmModal.onConfirm}
+          onCancel={() => setConfirmModal(null)}
+        />
+      )}
     </div>
   );
 }

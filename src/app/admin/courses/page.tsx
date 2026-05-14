@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import styles from './courses.module.css';
 import Link from 'next/link';
+import ConfirmModal from '../components/ConfirmModal';
 
 type Course = {
   id: number;
@@ -43,6 +44,7 @@ export default function CoursesPage() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [confirmModal, setConfirmModal] = useState<{ message: string; onConfirm: () => void } | null>(null);
 
   useEffect(() => {
     fetch('/api/courses')
@@ -56,11 +58,15 @@ export default function CoursesPage() {
     c.title.toLowerCase().includes(search.toLowerCase())
   );
 
-  const deleteCourse = async (id: number, title: string) => {
-    if (!confirm(`¿Eliminar el curso "${title}"? Esta acción no se puede deshacer.`)) return;
-    const res = await fetch(`/api/courses/${id}`, { method: 'DELETE' });
-    if (res.ok) setCourses((prev) => prev.filter((c) => c.id !== id));
-    else alert('Error al eliminar el curso.');
+  const deleteCourse = (id: number, title: string) => {
+    setConfirmModal({
+      message: `¿Eliminar el curso "${title}"? Esta acción no se puede deshacer.`,
+      onConfirm: async () => {
+        setConfirmModal(null);
+        const res = await fetch(`/api/courses/${id}`, { method: 'DELETE' });
+        if (res.ok) setCourses((prev) => prev.filter((c) => c.id !== id));
+      },
+    });
   };
 
   return (
@@ -177,6 +183,13 @@ export default function CoursesPage() {
           )}
         </div>
       </div>
+      {confirmModal && (
+        <ConfirmModal
+          message={confirmModal.message}
+          onConfirm={confirmModal.onConfirm}
+          onCancel={() => setConfirmModal(null)}
+        />
+      )}
     </AdminLayout>
   );
 }

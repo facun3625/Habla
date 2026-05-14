@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import AdminLayout from '../components/AdminLayout';
 import { Search, User, Trash2, ShieldCheck, BookOpen } from 'lucide-react';
 import styles from '../courses/courses.module.css';
+import ConfirmModal from '../components/ConfirmModal';
 
 type Profile = { id: number; name: string };
 type UserRow = {
@@ -25,6 +26,7 @@ export default function UsersAdminPage() {
   const [search, setSearch] = useState('');
   const [filterRole, setFilterRole] = useState('');
   const [filterProfile, setFilterProfile] = useState('');
+  const [confirmModal, setConfirmModal] = useState<{ message: string; onConfirm: () => void } | null>(null);
 
   useEffect(() => {
     Promise.all([
@@ -60,11 +62,15 @@ export default function UsersAdminPage() {
     }
   };
 
-  const deleteUser = async (id: number, email: string) => {
-    if (!confirm(`¿Eliminar el usuario "${email}"? Esta acción no se puede deshacer.`)) return;
-    const res = await fetch(`/api/users/${id}`, { method: 'DELETE' });
-    if (res.ok) setUsers((prev) => prev.filter((u) => u.id !== id));
-    else alert('Error al eliminar el usuario.');
+  const deleteUser = (id: number, email: string) => {
+    setConfirmModal({
+      message: `¿Eliminar el usuario "${email}"? Esta acción no se puede deshacer.`,
+      onConfirm: async () => {
+        setConfirmModal(null);
+        const res = await fetch(`/api/users/${id}`, { method: 'DELETE' });
+        if (res.ok) setUsers((prev) => prev.filter((u) => u.id !== id));
+      },
+    });
   };
 
   const filtered = users.filter((u) => {
@@ -211,6 +217,13 @@ export default function UsersAdminPage() {
           )}
         </div>
       </div>
+      {confirmModal && (
+        <ConfirmModal
+          message={confirmModal.message}
+          onConfirm={confirmModal.onConfirm}
+          onCancel={() => setConfirmModal(null)}
+        />
+      )}
     </AdminLayout>
   );
 }

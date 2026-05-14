@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import AdminLayout from '../components/AdminLayout';
 import { Plus, Edit3, Calendar, Search, FileText, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
+import ConfirmModal from '../components/ConfirmModal';
 import styles from '../courses/courses.module.css';
 import Link from 'next/link';
 
@@ -18,6 +19,7 @@ export default function BlogAdminPage() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [confirmModal, setConfirmModal] = useState<{ message: string; onConfirm: () => void } | null>(null);
 
   useEffect(() => {
     fetch('/api/posts')
@@ -27,19 +29,15 @@ export default function BlogAdminPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('¿Estás seguro de eliminar esta noticia?')) return;
-    try {
-      const res = await fetch(`/api/posts/${id}`, { method: 'DELETE' });
-      if (res.ok) {
-        setPosts(prev => prev.filter(p => p.id !== id));
-      } else {
-        alert('Error al eliminar');
-      }
-    } catch (err) {
-      console.error(err);
-      alert('Error de conexión');
-    }
+  const handleDelete = (id: number) => {
+    setConfirmModal({
+      message: '¿Estás seguro de eliminar esta noticia?',
+      onConfirm: async () => {
+        setConfirmModal(null);
+        const res = await fetch(`/api/posts/${id}`, { method: 'DELETE' });
+        if (res.ok) setPosts(prev => prev.filter(p => p.id !== id));
+      },
+    });
   };
 
   const move = async (index: number, dir: -1 | 1) => {
@@ -169,6 +167,13 @@ export default function BlogAdminPage() {
           )}
         </div>
       </div>
+      {confirmModal && (
+        <ConfirmModal
+          message={confirmModal.message}
+          onConfirm={confirmModal.onConfirm}
+          onCancel={() => setConfirmModal(null)}
+        />
+      )}
     </AdminLayout>
   );
 }

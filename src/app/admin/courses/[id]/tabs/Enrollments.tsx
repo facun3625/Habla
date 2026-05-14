@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { CheckCircle, XCircle, ExternalLink, Trash2, X } from 'lucide-react';
 import styles from '../courseAdmin.module.css';
+import ConfirmModal from '../../components/ConfirmModal';
 
 function FileLink({ url, label = 'Ver' }: { url: string; label?: string }) {
   const [preview, setPreview] = useState(false);
@@ -85,6 +86,7 @@ export default function Enrollments({ courseId }: { courseId: string }) {
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>('all');
+  const [confirmModal, setConfirmModal] = useState<{ message: string; onConfirm: () => void } | null>(null);
 
   useEffect(() => {
     fetch(`/api/courses/${courseId}/enrollments`)
@@ -116,13 +118,18 @@ export default function Enrollments({ courseId }: { courseId: string }) {
     }
   };
 
-  const deleteEnrollment = async (id: number) => {
-    if (!confirm('¿Eliminar esta inscripción?')) return;
-    const res = await fetch(`/api/enrollments/${id}`, { method: 'DELETE' });
-    if (res.ok) {
-      setEnrollments((prev) => prev.filter((e) => e.id !== id));
-      window.dispatchEvent(new CustomEvent('refreshNotifications'));
-    }
+  const deleteEnrollment = (id: number) => {
+    setConfirmModal({
+      message: '¿Eliminar esta inscripción? Esta acción no se puede deshacer.',
+      onConfirm: async () => {
+        setConfirmModal(null);
+        const res = await fetch(`/api/enrollments/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          setEnrollments((prev) => prev.filter((e) => e.id !== id));
+          window.dispatchEvent(new CustomEvent('refreshNotifications'));
+        }
+      },
+    });
   };
 
   const filtered = filter === 'all' ? enrollments : enrollments.filter((e) => e.status === filter);
@@ -248,6 +255,13 @@ export default function Enrollments({ courseId }: { courseId: string }) {
           </table>
         )}
       </div>
+      {confirmModal && (
+        <ConfirmModal
+          message={confirmModal.message}
+          onConfirm={confirmModal.onConfirm}
+          onCancel={() => setConfirmModal(null)}
+        />
+      )}
     </div>
   );
 }

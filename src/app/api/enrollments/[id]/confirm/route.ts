@@ -16,9 +16,15 @@ export async function POST(_req: NextRequest, { params }: P) {
       },
     });
 
-    // Send confirmation email if template is configured
-    const template = enrollment.course.confirmationEmail;
-    if (template && enrollment.email) {
+    const DEFAULT_TEMPLATE = `<p>Hola {nombre},</p>
+<p>Tu inscripción en el curso <strong>{curso}</strong> ha sido <strong>confirmada</strong>.</p>
+<p>Fecha de inicio: {fecha_inicio}</p>
+<p>¡Te esperamos! Ante cualquier consulta respondé este email.</p>
+<p>Equipo Hablapraxia</p>`;
+
+    // Send confirmation email — use course template or default
+    const template = enrollment.course.confirmationEmail || DEFAULT_TEMPLATE;
+    if (enrollment.email) {
       const startDate = enrollment.course.startDate
         ? new Date(enrollment.course.startDate).toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' })
         : '—';
@@ -48,7 +54,7 @@ export async function POST(_req: NextRequest, { params }: P) {
         .replace(/\{curso\}/g, enrollment.course.title);
 
       try {
-        await sendMail({ to: enrollment.email, subject, html });
+        await sendMail({ to: enrollment.email, subject, html, type: 'TRANSACTIONAL' });
       } catch (mailErr) {
         console.error('Error sending confirmation email:', mailErr);
         // Don't fail the confirmation if email fails
