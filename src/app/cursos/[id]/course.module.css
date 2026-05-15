@@ -363,10 +363,11 @@
   font-size: 0.88rem;
   color: #3d2a6b;
   line-height: 1.65;
-  overflow-wrap: normal;
+  overflow-wrap: break-word;
   word-break: normal !important;
   hyphens: none !important;
   min-width: 0;
+  width: 100%;
 }
 
 .topicItem * {
