@@ -66,7 +66,7 @@ export default function SiteFooter() {
         </div>
         <div className={styles.footerColumn}>
           <h4 className={styles.footerTitle}>Contacto</h4>
-          <p className={styles.footerText}>hola@hablapraxia.com</p>
+          <p className={styles.footerText}>hablapraxia@gmail.com</p>
           <div className={styles.footerSocials}>
             {socialLinks.instagram_url && (
               <a href={socialLinks.instagram_url} aria-label="Instagram" target="_blank" rel="noopener noreferrer">
