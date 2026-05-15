@@ -9,6 +9,7 @@ const PUBLIC_KEYS = new Set([
   'transfer_bank', 'transfer_cbu', 'transfer_alias', 'transfer_holder', 'transfer_reference_note',
   'transfer_ext_enabled',
   'transfer_ext_bank', 'transfer_ext_cbu', 'transfer_ext_alias', 'transfer_ext_holder',
+  'instagram_url', 'youtube_url',
 ]);
 
 export async function GET(req: NextRequest) {

@@ -23,6 +23,7 @@ export async function POST(request: Request) {
         bio: data.bio,
         cvContent: data.cvContent,
         imageUrl: data.imageUrl,
+        instagram: data.instagram ?? null,
         active: data.active ?? true,
       }
     });

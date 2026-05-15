@@ -8,6 +8,9 @@ import styles from './settings.module.css';
 type Settings = Record<string, string>;
 
 const DEFAULTS: Settings = {
+  // Redes Sociales
+  instagram_url: '',
+  youtube_url: '',
   // Mercado Pago
   mp_enabled: 'false',
   mp_access_token: '',
@@ -126,6 +129,23 @@ export default function SettingsPage() {
             {saving ? 'Guardando...' : saved ? <><CheckCircle size={18} /> Guardado</> : <><Save size={18} /> Guardar cambios</>}
           </button>
         </div>
+
+        {/* ── REDES SOCIALES ── */}
+        <div className={styles.groupLabel}>Redes Sociales</div>
+        <section className={styles.section}>
+          <div className={styles.fields}>
+            <div className={styles.field}>
+              <label>Instagram</label>
+              <input type="text" className={styles.input} value={settings.instagram_url ?? ''} onChange={set('instagram_url')} placeholder="https://www.instagram.com/hablapraxia" />
+              <span className={styles.hint}>Link al perfil institucional de Instagram.</span>
+            </div>
+            <div className={styles.field}>
+              <label>YouTube</label>
+              <input type="text" className={styles.input} value={settings.youtube_url ?? ''} onChange={set('youtube_url')} placeholder="https://www.youtube.com/@hablapraxia" />
+              <span className={styles.hint}>Link al canal de YouTube.</span>
+            </div>
+          </div>
+        </section>
 
         {/* ── MEDIOS DE PAGO ── */}
         <div className={styles.groupLabel}>Medios de Pago</div>

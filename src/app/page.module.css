@@ -395,6 +395,22 @@
   box-shadow: 0 8px 24px rgba(108,92,231,0.3);
 }
 
+.proInstagram {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #e1306c;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  margin-bottom: 12px;
+  transition: opacity 0.2s;
+}
+
+.proInstagram:hover {
+  opacity: 0.75;
+}
+
 /* Modal Styles */
 .modalOverlay {
   position: fixed;

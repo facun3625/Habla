@@ -20,6 +20,7 @@ export default function NewProfessionalPage() {
     bio: '',
     cvContent: '',
     imageUrl: '',
+    instagram: '',
     active: true,
   });
 
@@ -134,12 +135,24 @@ export default function NewProfessionalPage() {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <label style={{ fontWeight: 600 }}>Biografía corta</label>
-              <textarea 
-                name="bio" 
+              <textarea
+                name="bio"
                 value={formData.bio}
                 onChange={handleChange}
                 rows={3}
-                style={{ padding: '12px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '16px', resize: 'vertical' }} 
+                style={{ padding: '12px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '16px', resize: 'vertical' }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <label style={{ fontWeight: 600 }}>Instagram <span style={{ fontWeight: 400, color: '#94a3b8', fontSize: '0.85rem' }}>opcional</span></label>
+              <input
+                type="text"
+                name="instagram"
+                placeholder="https://www.instagram.com/usuario"
+                value={formData.instagram}
+                onChange={handleChange}
+                style={{ padding: '12px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '16px' }}
               />
             </div>
 

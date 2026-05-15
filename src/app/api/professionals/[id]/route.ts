@@ -36,6 +36,7 @@ export async function PUT(
         bio: body.bio,
         cvContent: body.cvContent,
         imageUrl: body.imageUrl,
+        instagram: body.instagram ?? null,
         active: body.active,
       },
     });
