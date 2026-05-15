@@ -363,6 +363,9 @@
   font-size: 0.88rem;
   color: #3d2a6b;
   line-height: 1.65;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  min-width: 0;
 }
 
 .topicItem p { margin: 0; }

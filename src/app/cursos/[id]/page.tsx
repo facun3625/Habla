@@ -121,7 +121,7 @@ export default function CoursePage({ params }: { params: Promise<{ id: string }>
               {course.description && <p className={styles.heroDesc}>{course.description}</p>}
               <div className={styles.heroMeta}>
                 {course.startDate && (
-                  <span><Calendar size={15} /> {new Date(course.startDate).toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                  <span><Calendar size={15} /> {new Date(course.startDate.slice(0, 10).replace(/-/g, '/')).toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
                 )}
                 {course.schedule && <span><Clock size={15} /> {course.schedule}</span>}
                 {profileNamesFromPrices.length > 0 && (
