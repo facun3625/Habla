@@ -67,6 +67,12 @@ export default function EnrollModal({ course, session: initialSession, onClose, 
 
   const selectedCp = course.courseProfiles.find(cp => cp.profileId === selectedProfileId) ?? null;
 
+  // Credential state
+  const [credentialUrl, setCredentialUrl] = useState<string | null>(null);
+
+  // Payment state
+  const [transferMethod, setTransferMethod] = useState<TransferMethod>(null);
+
   // Get both ARS and USD prices for selected profile
   const priceARS = selectedProfileId
     ? (course.prices.find(p => p.profile?.id === selectedProfileId && p.currency === 'ARS') ?? null)
@@ -75,20 +81,14 @@ export default function EnrollModal({ course, session: initialSession, onClose, 
     ? (course.prices.find(p => p.profile?.id === selectedProfileId && p.currency === 'USD') ?? null)
     : null;
 
-  // Price to show depends on transfer method selected
-  const activePrice = transferMethod === 'AR' ? priceARS : transferMethod === 'EXT' ? priceUSD : null;
   const formatPrice = (p: Price | null) =>
     p ? (p.amount === 0 ? 'Gratuito' : `${p.amount.toLocaleString('es-AR')} ${p.currency}`) : null;
 
+  // Price to show depends on transfer method selected
+  const activePrice = transferMethod === 'AR' ? priceARS : transferMethod === 'EXT' ? priceUSD : null;
   const priceLabel = activePrice
     ? formatPrice(activePrice)!
     : [formatPrice(priceARS), formatPrice(priceUSD)].filter(Boolean).join(' / ') || '—';
-
-  // Credential state
-  const [credentialUrl, setCredentialUrl] = useState<string | null>(null);
-
-  // Payment state
-  const [transferMethod, setTransferMethod] = useState<TransferMethod>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const [cfg, setCfg] = useState<PublicSettings>({});
