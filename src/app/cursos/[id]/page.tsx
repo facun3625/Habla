@@ -78,14 +78,31 @@ export default function CoursePage({ params }: { params: Promise<{ id: string }>
   );
 
   const userProfileId = session?.profileId ?? null;
-  const myPrice = course.prices.find(p => p.profile?.id === userProfileId)
-    ?? course.prices.find(p => !p.profile)
-    ?? course.prices[0];
+
+  // Group prices by profile — one entry per profile with ARS and USD
+  const pricesByProfile = course.prices
+    .filter(p => p.profile)
+    .reduce<Record<number, { profile: Profile; ARS: Price | null; USD: Price | null }>>((acc, p) => {
+      const pid = p.profile!.id;
+      if (!acc[pid]) acc[pid] = { profile: p.profile!, ARS: null, USD: null };
+      if (p.currency === 'ARS') acc[pid].ARS = p;
+      else if (p.currency === 'USD') acc[pid].USD = p;
+      return acc;
+    }, {});
+  const profileGroups = Object.values(pricesByProfile);
+
+  const myPriceARS = course.prices.find(p => p.profile?.id === userProfileId && p.currency === 'ARS') ?? null;
+  const myPriceUSD = course.prices.find(p => p.profile?.id === userProfileId && p.currency === 'USD') ?? null;
+  const myPriceLabel = [
+    myPriceARS ? `${myPriceARS.amount.toLocaleString('es-AR')} ARS` : null,
+    myPriceUSD ? `${myPriceUSD.amount.toLocaleString('es-AR')} USD` : null,
+  ].filter(Boolean).join(' / ');
+
   const requireCredential = userProfileId
     ? (course.courseProfiles.find(cp => cp.profileId === userProfileId)?.requireCredential ?? false)
     : false;
 
-  const profileNamesFromPrices = course.prices.filter(p => p.profile).map(p => p.profile!.name);
+  const profileNamesFromPrices = [...new Set(course.prices.filter(p => p.profile).map(p => p.profile!.name))];
 
   const modulesForProfile = (profileId: number) =>
     course.modules.filter(m => m.accessAll || m.accessProfiles.some(a => a.profileId === profileId));
@@ -117,10 +134,9 @@ export default function CoursePage({ params }: { params: Promise<{ id: string }>
                 <div className={styles.enrolledBadge}><CheckCircle size={22} /> ¡Inscripta!</div>
               ) : course.status === 'PUBLICADO' ? (
                 <>
-                  {myPrice && userProfileId && (
+                  {myPriceLabel && userProfileId && (
                     <div className={styles.heroPrice}>
-                      {myPrice.amount === 0 ? 'Gratuito' : `${myPrice.amount.toLocaleString('es-AR')} ${myPrice.currency}`}
-                      {myPrice.profile && <span>para {myPrice.profile.name}</span>}
+                      {myPriceLabel}
                     </div>
                   )}
                   <button className={styles.enrollBtn} onClick={handleInscribirse}>
@@ -139,19 +155,18 @@ export default function CoursePage({ params }: { params: Promise<{ id: string }>
         <div className={styles.body}>
 
           {/* Planes y precios */}
-          {course.prices.some(p => p.profile) && (
+          {profileGroups.length > 0 && (
             <section className={styles.section}>
               <h2 className={styles.sectionTitle}>Planes y precios</h2>
               <div className={styles.plansGrid}>
-                {course.prices.filter(p => p.profile).map(price => {
-                  const profileId = price.profile!.id;
-                  const cp = course.courseProfiles.find(c => c.profileId === profileId);
-                  const mods = modulesForProfile(profileId);
-                  const isMe = userProfileId === profileId;
+                {profileGroups.map(({ profile, ARS, USD }) => {
+                  const cp = course.courseProfiles.find(c => c.profileId === profile.id);
+                  const mods = modulesForProfile(profile.id);
+                  const isMe = userProfileId === profile.id;
                   return (
-                    <div key={price.id} className={`${styles.planCard} ${isMe ? styles.planCardMe : ''}`}>
+                    <div key={profile.id} className={`${styles.planCard} ${isMe ? styles.planCardMe : ''}`}>
                       <div className={styles.planHeader}>
-                        <span className={styles.planName}>{price.profile!.name}</span>
+                        <span className={styles.planName}>{profile.name}</span>
                         {cp && cp.capacity > 0 && <span className={styles.planCupos}>{cp.capacity} cupos</span>}
                       </div>
 
@@ -173,7 +188,9 @@ export default function CoursePage({ params }: { params: Promise<{ id: string }>
                       </div>
 
                       <div className={styles.planPrice}>
-                        {price.amount === 0 ? 'Gratuito' : `${price.amount.toLocaleString('es-AR')} ${price.currency}`}
+                        {ARS && <div>{ARS.amount.toLocaleString('es-AR')} <span style={{ fontSize: '0.7em', fontWeight: 600 }}>ARS</span></div>}
+                        {USD && <div style={{ fontSize: ARS ? '0.75em' : '1em', color: ARS ? 'var(--text-light)' : 'var(--primary)', marginTop: ARS ? 2 : 0 }}>{USD.amount.toLocaleString('es-AR')} <span style={{ fontSize: '0.85em', fontWeight: 600 }}>USD</span></div>}
+                        {!ARS && !USD && 'Gratuito'}
                       </div>
 
                       {course.status === 'PUBLICADO' && !enrolled && (
