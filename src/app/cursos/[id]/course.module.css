@@ -364,9 +364,14 @@
   color: #3d2a6b;
   line-height: 1.65;
   overflow-wrap: break-word;
-  word-break: normal;
-  hyphens: none;
+  word-break: normal !important;
+  hyphens: none !important;
   min-width: 0;
+}
+
+.topicItem * {
+  word-break: normal !important;
+  hyphens: none !important;
 }
 
 .topicItem p { margin: 0; }
