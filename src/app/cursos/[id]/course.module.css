@@ -363,8 +363,9 @@
   font-size: 0.88rem;
   color: #3d2a6b;
   line-height: 1.65;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
   word-break: normal;
+  hyphens: none;
   min-width: 0;
 }
 
