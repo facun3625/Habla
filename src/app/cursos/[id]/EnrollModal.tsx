@@ -59,17 +59,30 @@ export default function EnrollModal({ course, session: initialSession, onClose, 
   });
 
   // Derived: available profiles come from prices (same source as "Planes y precios")
-  const profilesFromPrices: Profile[] = course.prices
-    .filter(p => p.profile)
-    .map(p => p.profile!);
+  const profilesFromPrices: Profile[] = Array.from(
+    new Map(
+      course.prices.filter(p => p.profile).map(p => [p.profile!.id, p.profile!])
+    ).values()
+  );
 
   const selectedCp = course.courseProfiles.find(cp => cp.profileId === selectedProfileId) ?? null;
-  const price = selectedProfileId
-    ? (course.prices.find(p => p.profile?.id === selectedProfileId) ?? course.prices.find(p => !p.profile) ?? null)
+
+  // Get both ARS and USD prices for selected profile
+  const priceARS = selectedProfileId
+    ? (course.prices.find(p => p.profile?.id === selectedProfileId && p.currency === 'ARS') ?? null)
     : null;
-  const priceLabel = price
-    ? (price.amount === 0 ? 'Gratuito' : `${price.amount.toLocaleString('es-AR')} ${price.currency}`)
-    : '—';
+  const priceUSD = selectedProfileId
+    ? (course.prices.find(p => p.profile?.id === selectedProfileId && p.currency === 'USD') ?? null)
+    : null;
+
+  // Price to show depends on transfer method selected
+  const activePrice = transferMethod === 'AR' ? priceARS : transferMethod === 'EXT' ? priceUSD : null;
+  const formatPrice = (p: Price | null) =>
+    p ? (p.amount === 0 ? 'Gratuito' : `${p.amount.toLocaleString('es-AR')} ${p.currency}`) : null;
+
+  const priceLabel = activePrice
+    ? formatPrice(activePrice)!
+    : [formatPrice(priceARS), formatPrice(priceUSD)].filter(Boolean).join(' / ') || '—';
 
   // Credential state
   const [credentialUrl, setCredentialUrl] = useState<string | null>(null);

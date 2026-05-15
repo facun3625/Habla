@@ -88,18 +88,19 @@ export default function Enrollments({ courseId }: { courseId: string }) {
   const [filter, setFilter] = useState<string>('all');
   const [confirmModal, setConfirmModal] = useState<{ message: string; onConfirm: () => void } | null>(null);
 
-  useEffect(() => {
+  const refetch = () =>
     fetch(`/api/courses/${courseId}/enrollments`)
       .then((r) => r.json())
-      .then(setEnrollments)
-      .finally(() => setLoading(false));
+      .then((data) => setEnrollments(Array.isArray(data) ? data : []));
+
+  useEffect(() => {
+    refetch().finally(() => setLoading(false));
   }, [courseId]);
 
   const confirmEnrollment = async (id: number) => {
     const res = await fetch(`/api/enrollments/${id}/confirm`, { method: 'POST' });
     if (res.ok) {
-      const updated = await res.json();
-      setEnrollments((prev) => prev.map((e) => e.id === id ? { ...e, ...updated } : e));
+      await refetch();
       window.dispatchEvent(new CustomEvent('refreshNotifications'));
     }
   };
@@ -112,8 +113,7 @@ export default function Enrollments({ courseId }: { courseId: string }) {
       body: JSON.stringify({ status }),
     });
     if (res.ok) {
-      const updated = await res.json();
-      setEnrollments((prev) => prev.map((e) => e.id === id ? { ...e, ...updated } : e));
+      await refetch();
       window.dispatchEvent(new CustomEvent('refreshNotifications'));
     }
   };
@@ -125,7 +125,7 @@ export default function Enrollments({ courseId }: { courseId: string }) {
         setConfirmModal(null);
         const res = await fetch(`/api/enrollments/${id}`, { method: 'DELETE' });
         if (res.ok) {
-          setEnrollments((prev) => prev.filter((e) => e.id !== id));
+          await refetch();
           window.dispatchEvent(new CustomEvent('refreshNotifications'));
         }
       },

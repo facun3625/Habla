@@ -13,14 +13,17 @@ type ProfileRow = {
   profile: Profile;
   accessibleModules: Module[];
   totalModules: number;
-  price: Price | null;
+  priceARS: Price | null;
+  priceUSD: Price | null;
 };
+
+type CurrencyDraft = { amount: string };
 
 export default function Prices({ courseId }: { courseId: string }) {
   const [rows, setRows] = useState<ProfileRow[]>([]);
-  const [drafts, setDrafts] = useState<Record<number, { amount: string; currency: string }>>({});
-  const [saving, setSaving] = useState<Record<number, boolean>>({});
-  const [saved, setSaved] = useState<Record<number, boolean>>({});
+  const [drafts, setDrafts] = useState<Record<number, { ARS: CurrencyDraft; USD: CurrencyDraft }>>({});
+  const [saving, setSaving] = useState<Record<string, boolean>>({});
+  const [saved, setSaved] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -39,40 +42,44 @@ export default function Prices({ courseId }: { courseId: string }) {
         const accessibleModules = modules.filter(m =>
           m.accessAll || m.accessProfiles.some(a => a.profileId === profile.id)
         );
-        const price = prices.find(p => p.profile?.id === profile.id) ?? null;
-        return { profile, accessibleModules, totalModules, price };
+        const profilePrices = prices.filter(p => p.profile?.id === profile.id);
+        const priceARS = profilePrices.find(p => p.currency === 'ARS') ?? null;
+        const priceUSD = profilePrices.find(p => p.currency === 'USD') ?? null;
+        return { profile, accessibleModules, totalModules, priceARS, priceUSD };
       });
 
       setRows(built);
-      const initialDrafts: Record<number, { amount: string; currency: string }> = {};
+      const initialDrafts: Record<number, { ARS: CurrencyDraft; USD: CurrencyDraft }> = {};
       built.forEach(r => {
         initialDrafts[r.profile.id] = {
-          amount: r.price ? String(r.price.amount) : '',
-          currency: r.price?.currency ?? 'ARS',
+          ARS: { amount: r.priceARS ? String(r.priceARS.amount) : '' },
+          USD: { amount: r.priceUSD ? String(r.priceUSD.amount) : '' },
         };
       });
       setDrafts(initialDrafts);
     }).finally(() => setLoading(false));
   }, [courseId]);
 
-  const savePrice = async (row: ProfileRow) => {
-    const draft = drafts[row.profile.id];
+  const savePrice = async (row: ProfileRow, currency: 'ARS' | 'USD') => {
+    const draft = drafts[row.profile.id]?.[currency];
     if (!draft?.amount) return;
-    setSaving(prev => ({ ...prev, [row.profile.id]: true }));
+    const key = `${row.profile.id}_${currency}`;
+    setSaving(prev => ({ ...prev, [key]: true }));
 
+    const existingPrice = currency === 'ARS' ? row.priceARS : row.priceUSD;
     const body = {
-      name: row.profile.name,
+      name: `${row.profile.name} - ${currency}`,
       amount: Number(draft.amount),
-      currency: draft.currency,
+      currency,
       profileId: row.profile.id,
     };
 
     let updated: Price;
-    if (row.price) {
-      const res = await fetch(`/api/courses/${courseId}/prices/${row.price.id}`, {
+    if (existingPrice) {
+      const res = await fetch(`/api/courses/${courseId}/prices/${existingPrice.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...body, active: row.price.active }),
+        body: JSON.stringify({ ...body, active: existingPrice.active }),
       });
       updated = await res.json();
     } else {
@@ -84,12 +91,13 @@ export default function Prices({ courseId }: { courseId: string }) {
       updated = await res.json();
     }
 
-    setRows(prev => prev.map(r =>
-      r.profile.id === row.profile.id ? { ...r, price: updated } : r
-    ));
-    setSaving(prev => ({ ...prev, [row.profile.id]: false }));
-    setSaved(prev => ({ ...prev, [row.profile.id]: true }));
-    setTimeout(() => setSaved(prev => ({ ...prev, [row.profile.id]: false })), 2000);
+    setRows(prev => prev.map(r => {
+      if (r.profile.id !== row.profile.id) return r;
+      return currency === 'ARS' ? { ...r, priceARS: updated } : { ...r, priceUSD: updated };
+    }));
+    setSaving(prev => ({ ...prev, [key]: false }));
+    setSaved(prev => ({ ...prev, [key]: true }));
+    setTimeout(() => setSaved(prev => ({ ...prev, [key]: false })), 2000);
   };
 
   if (loading) return <p style={{ padding: '1rem', color: '#888' }}>Cargando...</p>;
@@ -100,7 +108,7 @@ export default function Prices({ courseId }: { courseId: string }) {
         <div>
           <h3 className={styles.sectionTitle}>Esquema de Precios</h3>
           <p className={styles.sectionDesc}>
-            Los perfiles se toman de "Curso dirigido a" en Datos Generales.
+            Configurá el precio en pesos y en dólares por perfil. Los perfiles se toman de "Curso dirigido a".
           </p>
         </div>
       </div>
@@ -113,7 +121,7 @@ export default function Prices({ courseId }: { courseId: string }) {
       ) : (
         <div className={styles.pricesSmartGrid}>
           {rows.map(row => {
-            const draft = drafts[row.profile.id] ?? { amount: '', currency: 'ARS' };
+            const draft = drafts[row.profile.id] ?? { ARS: { amount: '' }, USD: { amount: '' } };
             const allModules = row.accessibleModules.length === row.totalModules;
             const moduleCount = row.accessibleModules.length;
 
@@ -141,44 +149,50 @@ export default function Prices({ courseId }: { courseId: string }) {
                   </div>
                 </div>
 
-                {/* Price input */}
+                {/* Price inputs — ARS and USD */}
                 <div className={styles.pricesSmartRight}>
-                  <div className={styles.pricesSmartInputRow}>
-                    <input
-                      type="number"
-                      className={styles.input}
-                      placeholder="Monto"
-                      value={draft.amount}
-                      onChange={e => setDrafts(prev => ({ ...prev, [row.profile.id]: { ...prev[row.profile.id], amount: e.target.value } }))}
-                      style={{ width: 130 }}
-                    />
-                    <select
-                      className={styles.input}
-                      value={draft.currency}
-                      onChange={e => setDrafts(prev => ({ ...prev, [row.profile.id]: { ...prev[row.profile.id], currency: e.target.value } }))}
-                      style={{ width: 80 }}
-                    >
-                      <option value="ARS">ARS</option>
-                      <option value="USD">USD</option>
-                    </select>
-                    <button
-                      className={styles.addBtnSmall}
-                      onClick={() => savePrice(row)}
-                      disabled={saving[row.profile.id] || !draft.amount}
-                      style={{ minWidth: 90 }}
-                    >
-                      {saved[row.profile.id] ? (
-                        <><Check size={14} /> Guardado</>
-                      ) : saving[row.profile.id] ? '...' : (
-                        row.price ? 'Actualizar' : 'Guardar'
-                      )}
-                    </button>
-                  </div>
-                  {row.price && (
-                    <p className={styles.pricesSmartCurrent}>
-                      Precio actual: <strong>{row.price.amount.toLocaleString('es-AR')} {row.price.currency}</strong>
-                    </p>
-                  )}
+                  {(['ARS', 'USD'] as const).map(currency => {
+                    const key = `${row.profile.id}_${currency}`;
+                    const currentPrice = currency === 'ARS' ? row.priceARS : row.priceUSD;
+                    return (
+                      <div key={currency} className={styles.pricesSmartInputRow} style={{ marginBottom: 8 }}>
+                        <span style={{ width: 40, fontWeight: 700, fontSize: '0.85rem', color: currency === 'ARS' ? '#2563eb' : '#16a34a' }}>
+                          {currency}
+                        </span>
+                        <input
+                          type="number"
+                          className={styles.input}
+                          placeholder="Monto"
+                          value={draft[currency].amount}
+                          onChange={e => setDrafts(prev => ({
+                            ...prev,
+                            [row.profile.id]: {
+                              ...prev[row.profile.id],
+                              [currency]: { amount: e.target.value },
+                            },
+                          }))}
+                          style={{ width: 120 }}
+                        />
+                        <button
+                          className={styles.addBtnSmall}
+                          onClick={() => savePrice(row, currency)}
+                          disabled={saving[key] || !draft[currency].amount}
+                          style={{ minWidth: 90 }}
+                        >
+                          {saved[key] ? (
+                            <><Check size={14} /> Guardado</>
+                          ) : saving[key] ? '...' : (
+                            currentPrice ? 'Actualizar' : 'Guardar'
+                          )}
+                        </button>
+                        {currentPrice && (
+                          <span style={{ fontSize: '0.8rem', color: '#64748b', marginLeft: 4 }}>
+                            {currentPrice.amount.toLocaleString('es-AR')} {currency}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             );
