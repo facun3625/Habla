@@ -242,7 +242,7 @@ export default function CoursePage({ params }: { params: Promise<{ id: string }>
                       {open && m.topics?.length > 0 && (
                         <div className={styles.moduleTopics}>
                           {m.topics.map((t, ti) => (
-                            <div key={ti} className={styles.topicItem} dangerouslySetInnerHTML={{ __html: t }} />
+                            <div key={ti} className={styles.topicItem} style={{ wordBreak: 'normal', hyphens: 'none', overflowWrap: 'break-word' }} dangerouslySetInnerHTML={{ __html: t }} />
                           ))}
                         </div>
                       )}

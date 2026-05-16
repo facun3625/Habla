@@ -16,6 +16,10 @@
   margin: 0;
 }
 
+html {
+  hyphens: none;
+}
+
 @keyframes ambientPan {
   0% {
     background-position: 0% 0%;
