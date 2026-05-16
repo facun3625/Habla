@@ -7,9 +7,7 @@ import { ArrowLeft, Save, Upload, X } from 'lucide-react';
 import styles from '../../courses/courses.module.css'; 
 import Link from 'next/link';
 import Image from 'next/image';
-import dynamic from 'next/dynamic';
-const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
-import 'react-quill-new/dist/quill.snow.css';
+import RichEditor from '@/app/components/RichEditor';
 
 export default function NewProfessionalPage() {
   const router = useRouter();
@@ -158,14 +156,11 @@ export default function NewProfessionalPage() {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <label style={{ fontWeight: 600 }}>CV Completo (Se mostrará en modal)</label>
-              <div className="quill-wrapper" style={{ minHeight: '300px' }}>
-                <ReactQuill 
-                  theme="snow"
-                  value={formData.cvContent}
-                  onChange={(content) => setFormData(prev => ({ ...prev, cvContent: content }))}
-                  style={{ height: '250px', marginBottom: '40px' }}
-                />
-              </div>
+              <RichEditor
+                value={formData.cvContent}
+                onChange={(content) => setFormData(prev => ({ ...prev, cvContent: content }))}
+                placeholder="CV completo del profesional..."
+              />
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>

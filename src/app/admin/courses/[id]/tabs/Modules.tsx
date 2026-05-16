@@ -1,22 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
 import { Plus, GripVertical, Edit2, Trash2, Calendar, Check, X, Lock, Globe } from 'lucide-react';
 import styles from '../courseAdmin.module.css';
-import 'react-quill-new/dist/quill.snow.css';
-
-const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
-
-const QUILL_MODULES = {
-  toolbar: [
-    [{ size: ['small', false, 'large', 'huge'] }],
-    ['bold', 'italic', 'underline'],
-    [{ list: 'bullet' }],
-    ['clean'],
-  ],
-};
-const QUILL_FORMATS = ['size', 'bold', 'italic', 'underline', 'list'];
+import RichEditor from '@/app/components/RichEditor';
 
 type Profile = { id: number; name: string };
 type ModuleAccess = { profileId: number; profile: Profile };
@@ -151,12 +138,9 @@ export default function Modules({ courseId }: { courseId: string }) {
             <Check size={14} /> {objSaved ? 'Guardado' : 'Guardar'}
           </button>
         </div>
-        <ReactQuill
-          theme="snow"
+        <RichEditor
           value={objectives}
           onChange={setObjectives}
-          modules={QUILL_MODULES}
-          formats={QUILL_FORMATS}
           placeholder="Escribí los objetivos generales y específicos del curso..."
         />
       </div>
@@ -215,14 +199,10 @@ export default function Modules({ courseId }: { courseId: string }) {
                     {editTopics.map((t, i) => (
                       <div key={i} className={styles.topicRow}>
                         <div style={{ flex: 1 }}>
-                          <ReactQuill
-                            theme="snow"
+                          <RichEditor
                             value={t}
                             onChange={(val) => updateTopic(i, val)}
-                            modules={QUILL_MODULES}
-                            formats={QUILL_FORMATS}
                             placeholder={`Tema ${i + 1}`}
-                            style={{ borderRadius: 8, overflow: 'hidden' }}
                           />
                         </div>
                         <button type="button" className={styles.actionBtn} onClick={() => removeTopic(i)} style={{ alignSelf: 'flex-start', marginTop: 8 }}>

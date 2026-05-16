@@ -7,9 +7,7 @@ import { ArrowLeft, Save, Upload, X } from 'lucide-react';
 import Image from 'next/image';
 import styles from '../../courses/courses.module.css';
 import Link from 'next/link';
-import dynamic from 'next/dynamic';
-const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
-import 'react-quill-new/dist/quill.snow.css';
+import RichEditor from '@/app/components/RichEditor';
 
 export default function EditPostPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -146,11 +144,10 @@ export default function EditPostPage({ params }: { params: Promise<{ id: string 
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <label style={{ fontWeight: 600 }}>Contenido Principal *</label>
-              <ReactQuill 
-                theme="snow"
+              <RichEditor
                 value={formData.content}
                 onChange={handleQuillChange}
-                style={{ height: '300px', marginBottom: '50px' }}
+                placeholder="Escribí el contenido del artículo..."
               />
             </div>
 
