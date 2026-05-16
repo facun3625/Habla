@@ -34,12 +34,13 @@ const MODALITY: Record<string, string> = { VIRTUAL: 'Virtual', PRESENCIAL: 'Pres
 
 function cleanHtml(html: string): string {
   return html
-    .replace(/\u200B/g, '')
-    .replace(/\u00AD/g, '')
-    .replace(/\uFEFF/g, '')
-    .replace(/\u200C/g, '')
-    .replace(/\u200D/g, '')
-    .replace(/<wbr\s*\/?>/gi, '');
+    .replace(/\u200B/g, '').replace(/&#8203;/g, '').replace(/&ZeroWidthSpace;/g, '')
+    .replace(/\u00AD/g, '').replace(/&#173;/g, '').replace(/&shy;/g, '')
+    .replace(/\uFEFF/g, '').replace(/&#65279;/g, '')
+    .replace(/\u200C/g, '').replace(/&#8204;/g, '')
+    .replace(/\u200D/g, '').replace(/&#8205;/g, '')
+    .replace(/<wbr\s*\/?>/gi, '')
+    .replace(/<span[^>]*class="ql-cursor"[^>]*>.*?<\/span>/gi, '');
 }
 
 export default function CoursePage({ params }: { params: Promise<{ id: string }> }) {
