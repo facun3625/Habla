@@ -32,6 +32,16 @@ type Course = {
 
 const MODALITY: Record<string, string> = { VIRTUAL: 'Virtual', PRESENCIAL: 'Presencial', HIBRIDO: 'Híbrido' };
 
+function cleanHtml(html: string): string {
+  return html
+    .replace(/\u200B/g, '')
+    .replace(/\u00AD/g, '')
+    .replace(/\uFEFF/g, '')
+    .replace(/\u200C/g, '')
+    .replace(/\u200D/g, '')
+    .replace(/<wbr\s*\/?>/gi, '');
+}
+
 export default function CoursePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const searchParams = useSearchParams();
@@ -79,7 +89,6 @@ export default function CoursePage({ params }: { params: Promise<{ id: string }>
 
   const userProfileId = session?.profileId ?? null;
 
-  // Group prices by profile — one entry per profile with ARS and USD
   const pricesByProfile = course.prices
     .filter(p => p.profile)
     .reduce<Record<number, { profile: Profile; ARS: Price | null; USD: Price | null }>>((acc, p) => {
@@ -112,7 +121,7 @@ export default function CoursePage({ params }: { params: Promise<{ id: string }>
       <SiteHeader />
       <main className={styles.main}>
 
-        {/* Hero — limpio, sin imagen */}
+        {/* Hero */}
         <div className={styles.hero}>
           <div className={styles.heroContent}>
             <div className={styles.heroLeft}>
@@ -135,9 +144,7 @@ export default function CoursePage({ params }: { params: Promise<{ id: string }>
               ) : course.status === 'PUBLICADO' ? (
                 <>
                   {myPriceLabel && userProfileId && (
-                    <div className={styles.heroPrice}>
-                      {myPriceLabel}
-                    </div>
+                    <div className={styles.heroPrice}>{myPriceLabel}</div>
                   )}
                   <button className={styles.enrollBtn} onClick={handleInscribirse}>
                     Inscribirme
@@ -169,7 +176,6 @@ export default function CoursePage({ params }: { params: Promise<{ id: string }>
                         <span className={styles.planName}>{profile.name}</span>
                         {cp && cp.capacity > 0 && <span className={styles.planCupos}>{cp.capacity} cupos</span>}
                       </div>
-
                       <div className={styles.planModules}>
                         <p className={styles.planModulesLabel}>
                           {mods.length === course.modules.length
@@ -186,13 +192,11 @@ export default function CoursePage({ params }: { params: Promise<{ id: string }>
                           ))}
                         </ul>
                       </div>
-
                       <div className={styles.planPrice}>
                         {ARS && <div>{ARS.amount.toLocaleString('es-AR')} <span style={{ fontSize: '0.7em', fontWeight: 600 }}>ARS</span></div>}
                         {USD && <div style={{ fontSize: ARS ? '0.75em' : '1em', color: ARS ? 'var(--text-light)' : 'var(--primary)', marginTop: ARS ? 2 : 0 }}>{USD.amount.toLocaleString('es-AR')} <span style={{ fontSize: '0.85em', fontWeight: 600 }}>USD</span></div>}
                         {!ARS && !USD && 'Gratuito'}
                       </div>
-
                       {course.status === 'PUBLICADO' && !enrolled && (
                         <button className={`${styles.planBtn} ${isMe ? styles.planBtnMe : ''}`} onClick={handleInscribirse}>
                           Inscribirme
@@ -242,7 +246,11 @@ export default function CoursePage({ params }: { params: Promise<{ id: string }>
                       {open && m.topics?.length > 0 && (
                         <div className={styles.moduleTopics}>
                           {m.topics.map((t, ti) => (
-                            <div key={ti} className={styles.topicItem} style={{ wordBreak: 'normal', hyphens: 'none', overflowWrap: 'break-word' }} dangerouslySetInnerHTML={{ __html: t }} />
+                            <div
+                              key={ti}
+                              className={styles.topicItem}
+                              dangerouslySetInnerHTML={{ __html: cleanHtml(t) }}
+                            />
                           ))}
                         </div>
                       )}
@@ -253,7 +261,7 @@ export default function CoursePage({ params }: { params: Promise<{ id: string }>
             </section>
           )}
 
-          {/* Materiales del curso — solo alumnos confirmados */}
+          {/* Materiales del curso */}
           {resources && resources.length > 0 && (
             <section className={styles.section}>
               <h2 className={styles.sectionTitle}>Materiales del curso</h2>
