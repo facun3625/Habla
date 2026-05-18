@@ -16,7 +16,8 @@ import {
   FileText,
   ExternalLink,
   Megaphone,
-  Mail
+  Mail,
+  BarChart2,
 } from 'lucide-react';
 import Image from 'next/image';
 import styles from './AdminLayout.module.css';
@@ -99,6 +100,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     { name: 'Usuarios', href: '/admin/users', icon: Users },
     { name: 'Marketing', href: '/admin/marketing', icon: Megaphone },
     { name: 'Correos', href: '/admin/emails', icon: Mail },
+    { name: 'Estadísticas', href: '/admin/analytics', icon: BarChart2 },
     { name: 'Configuración', href: '/admin/settings', icon: Settings },
   ];
 

@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import AdminLayout from '../components/AdminLayout';
-import { Save, Eye, EyeOff, CheckCircle, AlertCircle, Mail } from 'lucide-react';
+import { Save, Eye, EyeOff, CheckCircle, AlertCircle, Mail, Megaphone } from 'lucide-react';
+import RichEditor from '../../components/RichEditor';
 import styles from './settings.module.css';
 
 type Settings = Record<string, string>;
@@ -39,6 +40,12 @@ const DEFAULTS: Settings = {
   cuotas_ext_enabled: 'false',
   max_cuotas: '3',
   cuotas_due_day: '',
+  // Popup promocional
+  popup_enabled: 'false',
+  popup_title: '',
+  popup_content: '',
+  popup_cta_text: '',
+  popup_cta_url: '',
   // SMTP
   smtp_host: '',
   smtp_port: '587',
@@ -360,6 +367,46 @@ export default function SettingsPage() {
               </>
             )}
           </div>
+        </section>
+
+        {/* ── POPUP PROMOCIONAL ── */}
+        <div className={styles.groupLabel}>Popup Promocional</div>
+        <section className={`${styles.section} ${settings.popup_enabled !== 'true' ? styles.sectionOff : ''}`}>
+          <div className={styles.sectionHeader}>
+            <div className={styles.sectionIcon} style={{ background: '#fdf4ff' }}>
+              <Megaphone size={22} color="#a855f7" />
+            </div>
+            <div style={{ flex: 1 }}>
+              <h3>Popup de promoción</h3>
+              <p>Mostrá una ventana emergente en el sitio para destacar ofertas o información clave.</p>
+            </div>
+            <Toggle id="popup_enabled" />
+          </div>
+
+          {settings.popup_enabled === 'true' && (
+            <div className={styles.fields}>
+              <div className={`${styles.field} ${styles.fieldFull}`}>
+                <label>Título del popup</label>
+                <input type="text" className={styles.input} value={settings.popup_title ?? ''} onChange={set('popup_title')} placeholder="¡Ahora podés pagar en cuotas!" />
+              </div>
+              <div className={`${styles.field} ${styles.fieldFull}`}>
+                <label>Contenido</label>
+                <RichEditor
+                  value={settings.popup_content ?? ''}
+                  onChange={(html) => setSettings(prev => ({ ...prev, popup_content: html }))}
+                  placeholder="Escribí el mensaje del popup..."
+                />
+              </div>
+              <div className={styles.field}>
+                <label>Texto del botón (opcional)</label>
+                <input type="text" className={styles.input} value={settings.popup_cta_text ?? ''} onChange={set('popup_cta_text')} placeholder="Ver cursos" />
+              </div>
+              <div className={styles.field}>
+                <label>URL del botón (opcional)</label>
+                <input type="text" className={styles.input} value={settings.popup_cta_url ?? ''} onChange={set('popup_cta_url')} placeholder="/cursos" />
+              </div>
+            </div>
+          )}
         </section>
 
         {/* ── EMAIL ── */}

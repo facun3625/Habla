@@ -11,6 +11,7 @@ const PUBLIC_KEYS = new Set([
   'transfer_ext_bank', 'transfer_ext_cbu', 'transfer_ext_alias', 'transfer_ext_holder',
   'instagram_url', 'youtube_url',
   'cuotas_ar_enabled', 'cuotas_ext_enabled', 'max_cuotas', 'cuotas_due_day',
+  'popup_enabled', 'popup_title', 'popup_content', 'popup_cta_text', 'popup_cta_url',
 ]);
 
 export async function GET(req: NextRequest) {

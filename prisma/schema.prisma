@@ -208,6 +208,14 @@ model Subscriber {
   createdAt DateTime @default(now())
 }
 
+model PageView {
+  id        Int      @id @default(autoincrement())
+  path      String
+  referrer  String?
+  userAgent String?
+  createdAt DateTime @default(now())
+}
+
 model EmailLog {
   id        Int      @id @default(autoincrement())
   to        String

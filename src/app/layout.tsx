@@ -3,6 +3,8 @@ import { Nunito } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import PageTransition from "./components/PageTransition";
+import PromoPopup from "./components/PromoPopup";
+import AnalyticsTracker from "./components/AnalyticsTracker";
 
 const nunito = Nunito({
   variable: "--font-nunito",
@@ -29,6 +31,8 @@ export default function RootLayout({
       <body className={nunito.className}>
         <div id="google_translate_element" style={{ display: 'none' }} />
         <PageTransition>{children}</PageTransition>
+        <PromoPopup />
+        <AnalyticsTracker />
 
         {/* Google Translate — afterInteractive garantiza que el div ya existe en el DOM */}
         <Script id="gt-init" strategy="afterInteractive" dangerouslySetInnerHTML={{ __html: `
