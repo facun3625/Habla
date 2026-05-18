@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import AdminLayout from '../components/AdminLayout';
-import { Save, Eye, EyeOff, CheckCircle, AlertCircle, Mail, Megaphone } from 'lucide-react';
+import { Save, Eye, EyeOff, CheckCircle, AlertCircle, Mail, Megaphone, X } from 'lucide-react';
 import RichEditor from '../../components/RichEditor';
 import styles from './settings.module.css';
 
@@ -63,6 +63,7 @@ export default function SettingsPage() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
   const [showSecrets, setShowSecrets] = useState<Record<string, boolean>>({});
+  const [showPopupPreview, setShowPopupPreview] = useState(false);
 
   useEffect(() => {
     fetch('/api/settings')
@@ -381,6 +382,13 @@ export default function SettingsPage() {
               <p>Mostrá una ventana emergente en el sitio para destacar ofertas o información clave.</p>
             </div>
             <Toggle id="popup_enabled" />
+            <button
+              type="button"
+              onClick={() => setShowPopupPreview(true)}
+              style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#f0eeff', color: '#6c5ce7', border: 'none', borderRadius: 10, padding: '0.45rem 1rem', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', fontFamily: 'inherit' }}
+            >
+              <Eye size={15} /> Vista previa
+            </button>
           </div>
 
           {settings.popup_enabled === 'true' && (
@@ -478,6 +486,56 @@ export default function SettingsPage() {
           </button>
         </div>
       </div>
+      {showPopupPreview && (
+        <div
+          style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.55)', padding: '1rem' }}
+          onClick={() => setShowPopupPreview(false)}
+        >
+          <div
+            style={{ background: 'linear-gradient(140deg, #6c5ce7 0%, #4f3cc9 100%)', borderRadius: 24, padding: '2.2rem 2.2rem 1.8rem', maxWidth: 500, width: '100%', position: 'relative', boxShadow: '0 32px 80px rgba(108,92,231,0.45)', animation: 'slideUp 0.3s ease' }}
+            onClick={e => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setShowPopupPreview(false)}
+              style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'rgba(255,255,255,0.18)', border: 'none', borderRadius: '50%', width: 34, height: 34, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#fff' }}
+            >
+              <X size={16} />
+            </button>
+
+            <div style={{ display: 'inline-block', background: 'rgba(255,255,255,0.2)', color: '#fff', fontSize: '0.7rem', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', padding: '3px 12px', borderRadius: 20, border: '1.5px solid rgba(255,255,255,0.35)', marginBottom: '0.8rem' }}>
+              Promo
+            </div>
+
+            {settings.popup_title && (
+              <h2 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#fff', margin: '0 0 0.9rem', paddingRight: '2rem', lineHeight: 1.2 }}>
+                {settings.popup_title}
+              </h2>
+            )}
+
+            {settings.popup_content && (
+              <div
+                style={{ fontSize: '1.05rem', color: 'rgba(255,255,255,0.88)', lineHeight: 1.65, marginBottom: '1.6rem' }}
+                dangerouslySetInnerHTML={{ __html: settings.popup_content }}
+              />
+            )}
+
+            {!settings.popup_title && !settings.popup_content && (
+              <p style={{ color: 'rgba(255,255,255,0.6)', fontStyle: 'italic', marginBottom: '1.6rem' }}>
+                (Completá el título y contenido para ver la vista previa)
+              </p>
+            )}
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+              {settings.popup_cta_text && (
+                <span style={{ display: 'inline-block', background: '#fff', color: '#6c5ce7', padding: '0.7rem 1.8rem', borderRadius: 12, fontWeight: 800, fontSize: '0.95rem', boxShadow: '0 4px 16px rgba(0,0,0,0.15)' }}>
+                  {settings.popup_cta_text}
+                </span>
+              )}
+              <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.88rem' }}>No, gracias</span>
+            </div>
+          </div>
+        </div>
+      )}
     </AdminLayout>
   );
 }
