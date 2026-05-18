@@ -17,17 +17,21 @@ export default function PromoPopup() {
   const [cfg, setCfg] = useState<Settings>({});
 
   useEffect(() => {
-    if (sessionStorage.getItem('promo_dismissed')) return;
-
     fetch('/api/settings?public=1')
       .then(r => r.json())
       .then((data: Settings) => {
         if (data.popup_enabled === 'true' && data.popup_content) {
           setCfg(data);
-          setVisible(true);
+          if (!sessionStorage.getItem('promo_dismissed')) setVisible(true);
         }
       })
       .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    const handler = () => setVisible(true);
+    window.addEventListener('openPromoPopup', handler);
+    return () => window.removeEventListener('openPromoPopup', handler);
   }, []);
 
   const dismiss = () => {

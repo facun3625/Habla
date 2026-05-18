@@ -17,6 +17,7 @@ export default function Home() {
   const [selectedPro, setSelectedPro] = useState<any>(null);
   const [carouselIdx, setCarouselIdx] = useState(0);
   const carouselRef = useRef<HTMLDivElement>(null);
+  const [promoTitle, setPromoTitle] = useState('');
 
   useEffect(() => {
     fetch('/api/professionals')
@@ -35,6 +36,13 @@ export default function Home() {
       .then(res => res.json())
       .then(data => setCourses(Array.isArray(data) ? data.filter((c: any) => c.status !== 'BORRADOR') : []))
       .catch(err => console.error(err));
+
+    fetch('/api/settings?public=1')
+      .then(res => res.json())
+      .then(data => {
+        if (data.popup_enabled === 'true' && data.popup_title) setPromoTitle(data.popup_title);
+      })
+      .catch(() => {});
   }, []);
 
   const scrollToSlide = useCallback((idx: number) => {
@@ -119,6 +127,7 @@ export default function Home() {
                 >
                   {publicados.map((curso: any) => (
                     <div key={curso.id} className={styles.carouselSlide}>
+                      <div style={{ position: 'relative' }}>
                       <Link href={`/cursos/${curso.id}`} className={styles.proximoCursoCard}>
                         <div className={styles.proximoCursoImage}>
                           {curso.coverImage
@@ -142,6 +151,40 @@ export default function Home() {
                           <span className={styles.proximoCursoCta}>Ver curso e inscribirme <ArrowRight size={16} /></span>
                         </div>
                       </Link>
+                      {promoTitle && (
+                        <button
+                          onClick={() => window.dispatchEvent(new Event('openPromoPopup'))}
+                          style={{
+                            position: 'absolute',
+                            top: '50%',
+                            right: -2,
+                            transform: 'translateY(-50%)',
+                            background: 'linear-gradient(140deg, #6c5ce7 0%, #4f3cc9 100%)',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: '14px 0 0 14px',
+                            padding: '14px 16px 14px 20px',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            gap: 6,
+                            zIndex: 10,
+                            boxShadow: '-4px 0 24px rgba(108,92,231,0.35)',
+                            fontFamily: 'inherit',
+                            maxWidth: 100,
+                            writingMode: 'vertical-rl',
+                            textOrientation: 'mixed',
+                          }}
+                          title={promoTitle}
+                        >
+                          <span style={{ fontSize: '1rem' }}>🏷️</span>
+                          <span style={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: '0.04em', lineHeight: 1.3, transform: 'rotate(180deg)', display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxHeight: 160 }}>
+                            {promoTitle}
+                          </span>
+                        </button>
+                      )}
+                      </div>
                     </div>
                   ))}
                 </div>
