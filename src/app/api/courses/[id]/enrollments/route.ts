@@ -8,7 +8,11 @@ export async function GET(_req: NextRequest, { params }: P) {
     const { id } = await params;
     const enrollments = await prisma.enrollment.findMany({
       where: { courseId: Number(id) },
-      include: { profile: true, user: { select: { name: true, email: true } } },
+      include: {
+        profile: true,
+        user: { select: { name: true, email: true } },
+        installmentPlan: { include: { installments: { orderBy: { number: 'asc' } } } },
+      },
       orderBy: { createdAt: 'desc' },
     });
     return NextResponse.json(enrollments);

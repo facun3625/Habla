@@ -3,6 +3,14 @@ import { prisma } from '@/lib/prisma';
 
 type Params = { params: Promise<{ id: string }> };
 
+function cleanTopic(s: string): string {
+  return s
+    .replace(/​/g, '').replace(/&#8203;/g, '')
+    .replace(/­/g, '').replace(/&#173;/g, '').replace(/&shy;/g, '')
+    .replace(/﻿/g, '').replace(/‌/g, '').replace(/‍/g, '')
+    .replace(/<wbr\s*\/?>/gi, '');
+}
+
 export async function GET(_req: NextRequest, { params }: Params) {
   const { id } = await params;
   const course = await prisma.course.findUnique({
@@ -21,5 +29,10 @@ export async function GET(_req: NextRequest, { params }: Params) {
     },
   });
   if (!course) return NextResponse.json({ error: 'No encontrado' }, { status: 404 });
-  return NextResponse.json(course);
+
+  const cleaned = {
+    ...course,
+    modules: course.modules.map(m => ({ ...m, topics: m.topics.map(cleanTopic) })),
+  };
+  return NextResponse.json(cleaned);
 }

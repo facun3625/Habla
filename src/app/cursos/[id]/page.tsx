@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import SiteHeader from '@/app/components/SiteHeader';
 import SiteFooter from '@/app/components/SiteFooter';
 import EnrollModal from './EnrollModal';
-import { Calendar, Clock, Users, Globe, Lock, CheckCircle, ChevronDown, FolderOpen, FileText, Download } from 'lucide-react';
+import { Calendar, Clock, Users, Globe, Lock, CheckCircle, ChevronDown, FolderOpen, FileText, Download, Upload } from 'lucide-react';
 import styles from './course.module.css';
 
 type Profile = { id: number; name: string };
@@ -53,6 +53,10 @@ export default function CoursePage({ params }: { params: Promise<{ id: string }>
   const [enrolled, setEnrolled] = useState(false);
   const [openModules, setOpenModules] = useState<Set<number>>(new Set());
   const [resources, setResources] = useState<{ id: number; type: string; title: string; fileUrl: string | null }[] | null>(null);
+  type Installment = { id: number; number: number; amount: number; dueDate: string | null; status: string; proofUrl: string | null };
+  type InstallmentPlan = { id: number; numInstallments: number; amountPerInstallment: number; currency: string; dueDay: number | null; installments: Installment[] };
+  const [installmentPlan, setInstallmentPlan] = useState<InstallmentPlan | null>(null);
+  const [uploadingCuota, setUploadingCuota] = useState<number | null>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -67,9 +71,27 @@ export default function CoursePage({ params }: { params: Promise<{ id: string }>
         fetch(`/api/courses/${id}/resources/student`)
           .then(r => r.ok ? r.json() : null)
           .then(data => { if (data) setResources(data); });
+        fetch(`/api/courses/${id}/my-installments`)
+          .then(r => r.ok ? r.json() : null)
+          .then(data => { if (data) setInstallmentPlan(data); });
       }
     }).finally(() => setLoading(false));
   }, [id, searchParams]);
+
+  const handleInstallmentUpload = async (installmentId: number, file: File) => {
+    setUploadingCuota(installmentId);
+    const fd = new FormData();
+    fd.append('file', file);
+    const res = await fetch(`/api/installments/${installmentId}/proof`, { method: 'POST', body: fd });
+    if (res.ok) {
+      const updated = await res.json();
+      setInstallmentPlan(prev => prev ? {
+        ...prev,
+        installments: prev.installments.map(i => i.id === installmentId ? { ...i, ...updated } : i),
+      } : prev);
+    }
+    setUploadingCuota(null);
+  };
 
   const toggleModule = (mid: number) =>
     setOpenModules(prev => { const n = new Set(prev); n.has(mid) ? n.delete(mid) : n.add(mid); return n; });
@@ -281,6 +303,58 @@ export default function CoursePage({ params }: { params: Promise<{ id: string }>
                     </a>
                   )
                 ))}
+              </div>
+            </section>
+          )}
+
+          {/* Mis pagos en cuotas */}
+          {installmentPlan && (
+            <section className={styles.section}>
+              <h2 className={styles.sectionTitle}>Mis pagos</h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {installmentPlan.installments.map((inst) => {
+                  const statusInfo = {
+                    PENDING: { label: 'Pendiente de pago', color: '#64748b', bg: '#f1f5f9' },
+                    SUBMITTED: { label: 'Comprobante enviado — pendiente de acreditación', color: '#b45309', bg: '#fef9c3' },
+                    ACCEPTED: { label: 'Acreditado ✓', color: '#15803d', bg: '#dcfce7' },
+                    REJECTED: { label: 'Rechazado — contactate con nosotras', color: '#dc2626', bg: '#fee2e2' },
+                  }[inst.status] ?? { label: inst.status, color: '#64748b', bg: '#f1f5f9' };
+
+                  return (
+                    <div key={inst.id} style={{ border: '1.5px solid #e8e3ff', borderRadius: 14, padding: '14px 18px', background: 'white', display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
+                      <div style={{ width: 32, height: 32, borderRadius: 8, background: '#6c5ce7', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.82rem', flexShrink: 0 }}>
+                        {inst.number}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontWeight: 700, fontSize: '0.95rem', color: '#1a004f' }}>
+                          Cuota {inst.number} — {inst.amount.toLocaleString('es-AR')} {installmentPlan.currency}
+                        </div>
+                        {inst.dueDate && (
+                          <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: 2 }}>
+                            Vence: {new Date(inst.dueDate).toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                          </div>
+                        )}
+                      </div>
+                      <span style={{ fontSize: '0.78rem', fontWeight: 700, padding: '4px 10px', borderRadius: 20, background: statusInfo.bg, color: statusInfo.color, whiteSpace: 'nowrap' }}>
+                        {statusInfo.label}
+                      </span>
+                      {inst.status === 'PENDING' && (
+                        <label style={{ cursor: 'pointer' }}>
+                          <input
+                            type="file"
+                            accept="image/*,.pdf"
+                            style={{ display: 'none' }}
+                            disabled={uploadingCuota === inst.id}
+                            onChange={e => { const f = e.target.files?.[0]; if (f) handleInstallmentUpload(inst.id, f); e.target.value = ''; }}
+                          />
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 14px', borderRadius: 10, background: '#6c5ce7', color: 'white', fontSize: '0.82rem', fontWeight: 700, opacity: uploadingCuota === inst.id ? 0.6 : 1 }}>
+                            {uploadingCuota === inst.id ? '...' : <><Upload size={13} /> Subir comprobante</>}
+                          </span>
+                        </label>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </section>
           )}

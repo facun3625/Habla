@@ -19,6 +19,10 @@ type PublicSettings = {
   transfer_ext_enabled?: string;
   transfer_ext_bank?: string; transfer_ext_cbu?: string;
   transfer_ext_alias?: string; transfer_ext_holder?: string;
+  cuotas_ar_enabled?: string;
+  cuotas_ext_enabled?: string;
+  max_cuotas?: string;
+  cuotas_due_day?: string;
 };
 
 type Step = 'auth' | 'profile' | 'credential' | 'payment' | 'done';
@@ -72,6 +76,8 @@ export default function EnrollModal({ course, session: initialSession, onClose, 
 
   // Payment state
   const [transferMethod, setTransferMethod] = useState<TransferMethod>(null);
+  const [paymentMode, setPaymentMode] = useState<'single' | 'cuotas'>('single');
+  const [selectedCuotas, setSelectedCuotas] = useState(2);
 
   // Get both ARS and USD prices for selected profile
   const priceARS = selectedProfileId
@@ -101,6 +107,10 @@ export default function EnrollModal({ course, session: initialSession, onClose, 
 
   const arEnabled = cfg.transfer_ar_enabled === 'true';
   const extEnabled = cfg.transfer_ext_enabled === 'true';
+  const cuotasArEnabled = cfg.cuotas_ar_enabled === 'true';
+  const cuotasExtEnabled = cfg.cuotas_ext_enabled === 'true';
+  const maxCuotas = parseInt(cfg.max_cuotas ?? '3');
+  const cuotasEnabled = transferMethod === 'AR' ? cuotasArEnabled : transferMethod === 'EXT' ? cuotasExtEnabled : false;
 
   useEffect(() => {
     if (step === 'payment') {
@@ -187,10 +197,20 @@ export default function EnrollModal({ course, session: initialSession, onClose, 
     setUploading(true); setError('');
     const paymentMethod = transferMethod === 'AR' ? 'TRANSFERENCIA_AR' : 'TRANSFERENCIA_EXT';
     try {
+      const isCuotas = paymentMode === 'cuotas' && cuotasEnabled;
+      const cuotaAmount = activePrice ? activePrice.amount / (isCuotas ? selectedCuotas : 1) : 0;
       const enrollRes = await fetch('/api/enrollments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ courseId: course.id, paymentMethod, credentialUrl, selectedProfileId }),
+        body: JSON.stringify({
+          courseId: course.id, paymentMethod, credentialUrl, selectedProfileId,
+          ...(isCuotas ? {
+            numInstallments: selectedCuotas,
+            amountPerInstallment: cuotaAmount,
+            installmentCurrency: activePrice?.currency ?? 'ARS',
+            cuotasDueDay: cfg.cuotas_due_day || null,
+          } : {}),
+        }),
       });
       const enrollData = await enrollRes.json();
       if (!enrollRes.ok) { setError(enrollData.error ?? 'Error al inscribirse.'); setUploading(false); e.target.value = ''; return; }
@@ -394,6 +414,50 @@ export default function EnrollModal({ course, session: initialSession, onClose, 
 
             {transferMethod && (
               <>
+                {/* Cuotas selector */}
+                {cuotasEnabled && (
+                  <div style={{ marginBottom: 16 }}>
+                    <p className={styles.stepLabel} style={{ marginBottom: 10 }}>¿Cómo querés pagar?</p>
+                    <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+                      <button
+                        type="button"
+                        onClick={() => setPaymentMode('single')}
+                        style={{ flex: 1, padding: '10px 8px', borderRadius: 10, border: `2px solid ${paymentMode === 'single' ? '#6c5ce7' : '#e2e8f0'}`, background: paymentMode === 'single' ? '#f5f3ff' : 'white', fontWeight: 700, fontSize: '0.88rem', cursor: 'pointer', color: paymentMode === 'single' ? '#6c5ce7' : '#64748b' }}
+                      >
+                        Un solo pago
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPaymentMode('cuotas')}
+                        style={{ flex: 1, padding: '10px 8px', borderRadius: 10, border: `2px solid ${paymentMode === 'cuotas' ? '#6c5ce7' : '#e2e8f0'}`, background: paymentMode === 'cuotas' ? '#f5f3ff' : 'white', fontWeight: 700, fontSize: '0.88rem', cursor: 'pointer', color: paymentMode === 'cuotas' ? '#6c5ce7' : '#64748b' }}
+                      >
+                        En cuotas
+                      </button>
+                    </div>
+                    {paymentMode === 'cuotas' && (
+                      <div style={{ background: '#faf9ff', border: '1.5px solid #e4dcff', borderRadius: 10, padding: '12px 14px' }}>
+                        <label style={{ fontSize: '0.82rem', fontWeight: 700, color: '#64748b', display: 'block', marginBottom: 8 }}>
+                          Cantidad de cuotas
+                        </label>
+                        <select
+                          value={selectedCuotas}
+                          onChange={e => setSelectedCuotas(Number(e.target.value))}
+                          style={{ width: '100%', padding: '8px 10px', borderRadius: 8, border: '1.5px solid #d1d5db', fontSize: '0.9rem', fontFamily: 'inherit' }}
+                        >
+                          {Array.from({ length: maxCuotas - 1 }, (_, i) => i + 2).map(n => (
+                            <option key={n} value={n}>{n} cuotas</option>
+                          ))}
+                        </select>
+                        {activePrice && activePrice.amount > 0 && (
+                          <p style={{ marginTop: 8, fontSize: '0.85rem', color: '#6c5ce7', fontWeight: 700 }}>
+                            {selectedCuotas} cuotas de {(activePrice.amount / selectedCuotas).toLocaleString('es-AR', { maximumFractionDigits: 0 })} {activePrice.currency}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 <div className={styles.bankInfo}>
                   <h3>{transferMethod === 'AR' ? '🇦🇷 Transferencia desde Argentina' : '🌍 Transferencia desde el exterior'}</h3>
                   {transferMethod === 'AR' ? (

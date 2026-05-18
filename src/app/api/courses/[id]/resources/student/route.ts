@@ -18,7 +18,14 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   }
 
   const enrollment = await prisma.enrollment.findFirst({
-    where: { courseId, userId, status: 'CONFIRMADA' },
+    where: {
+      courseId, userId,
+      OR: [
+        { status: 'CONFIRMADA' },
+        { status: 'COMPROBANTE_SUBIDO', installmentPlan: { isNot: null } },
+      ],
+    },
+    include: { installmentPlan: true },
   });
   if (!enrollment) return NextResponse.json({ error: 'Sin acceso' }, { status: 403 });
 

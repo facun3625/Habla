@@ -23,7 +23,17 @@ export async function POST(req: NextRequest, { params }: P) {
   const enrollment = await prisma.enrollment.update({
     where: { id: Number(id) },
     data: { receiptUrl, status: 'COMPROBANTE_SUBIDO' },
+    include: { installmentPlan: { include: { installments: { orderBy: { number: 'asc' }, take: 1 } } } },
   });
+
+  // Link receipt to first installment if plan exists
+  if (enrollment.installmentPlan?.installments[0]) {
+    const first = enrollment.installmentPlan.installments[0];
+    await prisma.installment.update({
+      where: { id: first.id },
+      data: { proofUrl: receiptUrl, status: 'SUBMITTED', submittedAt: new Date() },
+    });
+  }
 
   return NextResponse.json(enrollment);
 }

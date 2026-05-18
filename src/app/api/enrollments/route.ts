@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
   });
   if (!user) return NextResponse.json({ error: 'Usuario no encontrado.' }, { status: 404 });
 
-  const { courseId, paymentMethod, credentialUrl, selectedProfileId } = await req.json();
+  const { courseId, paymentMethod, credentialUrl, selectedProfileId, numInstallments, amountPerInstallment, installmentCurrency, cuotasDueDay } = await req.json();
   const effectiveProfileId = selectedProfileId ? Number(selectedProfileId) : (user.profileId ?? null);
   if (!courseId) return NextResponse.json({ error: 'Curso requerido.' }, { status: 400 });
 
@@ -82,6 +82,35 @@ export async function POST(req: NextRequest) {
     },
     include: { profile: true },
   });
+
+  // Create installment plan if paying in installments
+  if (numInstallments && numInstallments > 1 && amountPerInstallment) {
+    const dueDay = cuotasDueDay ? Number(cuotasDueDay) : null;
+    const plan = await prisma.installmentPlan.create({
+      data: {
+        enrollmentId: enrollment.id,
+        numInstallments: Number(numInstallments),
+        amountPerInstallment: Number(amountPerInstallment),
+        currency: installmentCurrency ?? 'ARS',
+        dueDay,
+        installments: {
+          create: Array.from({ length: Number(numInstallments) }, (_, i) => {
+            let dueDate: Date | null = null;
+            if (dueDay) {
+              const d = new Date();
+              d.setDate(1);
+              d.setMonth(d.getMonth() + i);
+              const lastDay = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+              d.setDate(Math.min(dueDay, lastDay));
+              dueDate = d;
+            }
+            return { number: i + 1, amount: Number(amountPerInstallment), dueDate };
+          }),
+        },
+      },
+    });
+    return NextResponse.json({ ...enrollment, installmentPlanId: plan.id }, { status: 201 });
+  }
 
   return NextResponse.json(enrollment, { status: 201 });
 }

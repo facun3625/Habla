@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { CheckCircle, XCircle, ExternalLink, Trash2, X } from 'lucide-react';
+import { CheckCircle, XCircle, ExternalLink, Trash2, X, ChevronDown } from 'lucide-react';
+import React from 'react';
 import styles from '../courseAdmin.module.css';
 import ConfirmModal from '../../../components/ConfirmModal';
 
@@ -46,6 +47,8 @@ function FileLink({ url, label = 'Ver' }: { url: string; label?: string }) {
 }
 
 type Profile = { name: string };
+type Installment = { id: number; number: number; amount: number; dueDate: string | null; status: string; proofUrl: string | null; notes: string | null };
+type InstallmentPlan = { id: number; numInstallments: number; amountPerInstallment: number; currency: string; installments: Installment[] };
 type Enrollment = {
   id: number;
   userName: string;
@@ -58,6 +61,7 @@ type Enrollment = {
   paidAt: string | null;
   createdAt: string;
   notes: string | null;
+  installmentPlan: InstallmentPlan | null;
 };
 
 const STATUS_LABEL: Record<string, string> = {
@@ -82,11 +86,22 @@ const METHOD_LABEL: Record<string, string> = {
   TRANSFERENCIA_EXT: 'Transferencia Exterior',
 };
 
+const INST_STATUS: Record<string, string> = {
+  PENDING: 'Pendiente', SUBMITTED: 'Enviado', ACCEPTED: 'Acreditado', REJECTED: 'Rechazado',
+};
+const INST_COLOR: Record<string, string> = {
+  PENDING: '#94a3b8', SUBMITTED: '#b45309', ACCEPTED: '#15803d', REJECTED: '#dc2626',
+};
+const INST_BG: Record<string, string> = {
+  PENDING: '#f1f5f9', SUBMITTED: '#fef9c3', ACCEPTED: '#dcfce7', REJECTED: '#fee2e2',
+};
+
 export default function Enrollments({ courseId }: { courseId: string }) {
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>('all');
   const [confirmModal, setConfirmModal] = useState<{ message: string; onConfirm: () => void } | null>(null);
+  const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
 
   const refetch = () =>
     fetch(`/api/courses/${courseId}/enrollments`)
@@ -116,6 +131,18 @@ export default function Enrollments({ courseId }: { courseId: string }) {
       await refetch();
       window.dispatchEvent(new CustomEvent('refreshNotifications'));
     }
+  };
+
+  const toggleExpand = (id: number) =>
+    setExpandedIds(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
+
+  const updateInstallment = async (installmentId: number, status: string) => {
+    await fetch(`/api/installments/${installmentId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status }),
+    });
+    await refetch();
   };
 
   const deleteEnrollment = (id: number) => {
@@ -194,63 +221,102 @@ export default function Enrollments({ courseId }: { courseId: string }) {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((e) => (
-                <tr key={e.id}>
-                  <td>
-                    <div className={styles.userCell}>
-                      <span className={styles.userName}>{e.userName || '—'}</span>
-                      <span className={styles.userEmail}>{e.email}</span>
-                    </div>
-                  </td>
-                  <td>{e.profile?.name ?? '—'}</td>
-                  <td>{e.paymentMethod ? METHOD_LABEL[e.paymentMethod] ?? e.paymentMethod : '—'}</td>
-                  <td>
-                    <span className={`${styles.enrollStatusBadge} ${STATUS_CLASS[e.status] ?? ''}`}>
-                      {STATUS_LABEL[e.status] ?? e.status}
-                    </span>
-                  </td>
-                  <td>{e.receiptUrl ? <FileLink url={e.receiptUrl} /> : '—'}</td>
-                  <td>{e.credentialUrl ? <FileLink url={e.credentialUrl} /> : '—'}</td>
-                  <td>
-                    <div style={{ display: 'flex', gap: 6 }}>
-                      {e.status === 'COMPROBANTE_SUBIDO' && (
-                        <>
-                          <button
-                            className={styles.actionBtnConfirm}
-                            title="Confirmar inscripción"
-                            onClick={() => updateStatus(e.id, 'CONFIRMADA')}
-                          >
-                            <CheckCircle size={15} />
-                          </button>
-                          <button
-                            className={styles.actionBtnDelete}
-                            title="Rechazar"
-                            onClick={() => updateStatus(e.id, 'CANCELADA')}
-                          >
-                            <XCircle size={15} />
-                          </button>
-                        </>
-                      )}
-                      {e.status === 'PENDIENTE_PAGO' && (
-                        <button
-                          className={styles.actionBtnConfirm}
-                          title="Marcar como confirmada (pago verificado)"
-                          onClick={() => updateStatus(e.id, 'CONFIRMADA')}
-                        >
-                          <CheckCircle size={15} />
-                        </button>
-                      )}
-                      <button
-                        className={styles.actionBtnDelete}
-                        title="Eliminar inscripción"
-                        onClick={() => deleteEnrollment(e.id)}
-                      >
-                        <Trash2 size={15} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {filtered.map((e) => {
+                const hasPlan = !!e.installmentPlan;
+                const isExpanded = expandedIds.has(e.id);
+                const pendingInstallments = e.installmentPlan?.installments.filter(i => i.status === 'SUBMITTED').length ?? 0;
+                return (
+                  <React.Fragment key={e.id}>
+                    <tr>
+                      <td>
+                        <div className={styles.userCell}>
+                          <span className={styles.userName}>{e.userName || '—'}</span>
+                          <span className={styles.userEmail}>{e.email}</span>
+                        </div>
+                      </td>
+                      <td>{e.profile?.name ?? '—'}</td>
+                      <td>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                          <span>{e.paymentMethod ? METHOD_LABEL[e.paymentMethod] ?? e.paymentMethod : '—'}</span>
+                          {hasPlan && (
+                            <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#6c5ce7', background: '#f0ebff', borderRadius: 10, padding: '2px 7px', width: 'fit-content' }}>
+                              {e.installmentPlan!.numInstallments} cuotas
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td>
+                        <span className={`${styles.enrollStatusBadge} ${STATUS_CLASS[e.status] ?? ''}`}>
+                          {STATUS_LABEL[e.status] ?? e.status}
+                        </span>
+                      </td>
+                      <td>{e.receiptUrl ? <FileLink url={e.receiptUrl} /> : '—'}</td>
+                      <td>{e.credentialUrl ? <FileLink url={e.credentialUrl} /> : '—'}</td>
+                      <td>
+                        <div style={{ display: 'flex', gap: 6 }}>
+                          {hasPlan ? (
+                            <button
+                              className={styles.actionBtnConfirm}
+                              title="Ver cuotas"
+                              onClick={() => toggleExpand(e.id)}
+                              style={{ position: 'relative', background: pendingInstallments > 0 ? '#6c5ce7' : undefined }}
+                            >
+                              <ChevronDown size={15} style={{ transform: isExpanded ? 'rotate(180deg)' : undefined, transition: 'transform 0.2s' }} />
+                              {pendingInstallments > 0 && <span style={{ position: 'absolute', top: -4, right: -4, background: '#ef4444', color: 'white', borderRadius: '50%', width: 14, height: 14, fontSize: '0.6rem', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800 }}>{pendingInstallments}</span>}
+                            </button>
+                          ) : (
+                            <>
+                              {e.status === 'COMPROBANTE_SUBIDO' && (
+                                <>
+                                  <button className={styles.actionBtnConfirm} title="Confirmar" onClick={() => updateStatus(e.id, 'CONFIRMADA')}><CheckCircle size={15} /></button>
+                                  <button className={styles.actionBtnDelete} title="Rechazar" onClick={() => updateStatus(e.id, 'CANCELADA')}><XCircle size={15} /></button>
+                                </>
+                              )}
+                              {e.status === 'PENDIENTE_PAGO' && (
+                                <button className={styles.actionBtnConfirm} title="Confirmar" onClick={() => updateStatus(e.id, 'CONFIRMADA')}><CheckCircle size={15} /></button>
+                              )}
+                            </>
+                          )}
+                          <button className={styles.actionBtnDelete} title="Eliminar" onClick={() => deleteEnrollment(e.id)}><Trash2 size={15} /></button>
+                        </div>
+                      </td>
+                    </tr>
+                    {hasPlan && isExpanded && (
+                      <tr>
+                        <td colSpan={7} style={{ padding: '0 0 12px 0', background: '#faf9ff' }}>
+                          <div style={{ margin: '0 12px', border: '1.5px solid #e4dcff', borderRadius: 12, overflow: 'hidden' }}>
+                            <div style={{ padding: '10px 16px', background: '#f0ebff', fontWeight: 700, fontSize: '0.82rem', color: '#4c3a8a', display: 'flex', justifyContent: 'space-between' }}>
+                              <span>Cuenta corriente — {e.installmentPlan!.numInstallments} cuotas de {e.installmentPlan!.amountPerInstallment.toLocaleString('es-AR')} {e.installmentPlan!.currency}</span>
+                              <span style={{ fontWeight: 400, color: '#7c6fa0' }}>{e.userName}</span>
+                            </div>
+                            {e.installmentPlan!.installments.map(inst => (
+                              <div key={inst.id} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 16px', borderTop: '1px solid #ede8ff', background: 'white', flexWrap: 'wrap' }}>
+                                <span style={{ fontWeight: 800, fontSize: '0.82rem', color: '#6c5ce7', width: 22 }}>#{inst.number}</span>
+                                <span style={{ fontSize: '0.88rem', color: '#1e293b', fontWeight: 600 }}>{inst.amount.toLocaleString('es-AR')} {e.installmentPlan!.currency}</span>
+                                {inst.dueDate && <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{new Date(inst.dueDate).toLocaleDateString('es-AR')}</span>}
+                                <span style={{ fontSize: '0.75rem', fontWeight: 700, padding: '3px 9px', borderRadius: 20, background: INST_BG[inst.status] ?? '#f1f5f9', color: INST_COLOR[inst.status] ?? '#64748b' }}>
+                                  {INST_STATUS[inst.status] ?? inst.status}
+                                </span>
+                                <div style={{ marginLeft: 'auto', display: 'flex', gap: 6, alignItems: 'center' }}>
+                                  {inst.proofUrl && <FileLink url={inst.proofUrl} label="Ver comprobante" />}
+                                  {inst.status === 'SUBMITTED' && (
+                                    <>
+                                      <button className={styles.actionBtnConfirm} title="Acreditar" onClick={() => updateInstallment(inst.id, 'ACCEPTED')}><CheckCircle size={14} /></button>
+                                      <button className={styles.actionBtnDelete} title="Rechazar" onClick={() => updateInstallment(inst.id, 'REJECTED')}><XCircle size={14} /></button>
+                                    </>
+                                  )}
+                                  {inst.status === 'ACCEPTED' && <CheckCircle size={16} color="#15803d" />}
+                                  {inst.status === 'REJECTED' && <XCircle size={16} color="#dc2626" />}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                );
+              })}
             </tbody>
           </table>
         )}

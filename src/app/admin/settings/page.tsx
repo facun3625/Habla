@@ -34,6 +34,11 @@ const DEFAULTS: Settings = {
   transfer_ext_cbu: '',
   transfer_ext_alias: '',
   transfer_ext_holder: '',
+  // Cuotas
+  cuotas_ar_enabled: 'false',
+  cuotas_ext_enabled: 'false',
+  max_cuotas: '3',
+  cuotas_due_day: '',
   // SMTP
   smtp_host: '',
   smtp_port: '587',
@@ -314,6 +319,47 @@ export default function SettingsPage() {
               </div>
             </div>
           )}
+        </section>
+
+        {/* ── CUOTAS ── */}
+        <div className={styles.groupLabel}>Cuotas</div>
+        <section className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <div className={styles.sectionIcon} style={{ background: '#f0fdf4' }}>
+              <span style={{ fontSize: '1.5rem' }}>📆</span>
+            </div>
+            <div style={{ flex: 1 }}>
+              <h3>Pagos en cuotas</h3>
+              <p>Permitir que las alumnas paguen en cuotas mensuales vía transferencia.</p>
+            </div>
+          </div>
+          <div className={styles.fields}>
+            <div className={styles.field}>
+              <label>Cuotas — Transferencia Argentina</label>
+              <Toggle id="cuotas_ar_enabled" />
+            </div>
+            <div className={styles.field}>
+              <label>Cuotas — Transferencia Exterior</label>
+              <Toggle id="cuotas_ext_enabled" />
+            </div>
+            {(settings.cuotas_ar_enabled === 'true' || settings.cuotas_ext_enabled === 'true') && (
+              <>
+                <div className={styles.field}>
+                  <label>Máximo de cuotas</label>
+                  <select className={styles.input} value={settings.max_cuotas ?? '3'} onChange={set('max_cuotas')}>
+                    {[2, 3, 4, 6, 8, 10, 12].map(n => (
+                      <option key={n} value={String(n)}>{n} cuotas</option>
+                    ))}
+                  </select>
+                </div>
+                <div className={styles.field}>
+                  <label>Día de vencimiento (opcional)</label>
+                  <input type="number" min="1" max="31" className={styles.input} value={settings.cuotas_due_day ?? ''} onChange={set('cuotas_due_day')} placeholder="Ej: 10" />
+                  <span className={styles.hint}>Día del mes en que vence cada cuota. Dejalo vacío si no querés mostrar fechas.</span>
+                </div>
+              </>
+            )}
+          </div>
         </section>
 
         {/* ── EMAIL ── */}

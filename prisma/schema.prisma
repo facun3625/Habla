@@ -107,23 +107,50 @@ model Price {
 }
 
 model Enrollment {
-  id            Int              @id @default(autoincrement())
-  courseId      Int
-  userName      String
-  email         String
-  createdAt     DateTime         @default(now())
-  userId        Int?
-  notes         String?
-  paidAt        DateTime?
-  paymentMethod String?
-  paymentRef    String?
-  profileId     Int?
-  receiptUrl    String?
-  status        EnrollmentStatus @default(PENDIENTE_PAGO)
-  credentialUrl String?
-  course        Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  profile       Profile?         @relation(fields: [profileId], references: [id])
-  user          User?            @relation(fields: [userId], references: [id])
+  id              Int              @id @default(autoincrement())
+  courseId        Int
+  userName        String
+  email           String
+  createdAt       DateTime         @default(now())
+  userId          Int?
+  notes           String?
+  paidAt          DateTime?
+  paymentMethod   String?
+  paymentRef      String?
+  profileId       Int?
+  receiptUrl      String?
+  status          EnrollmentStatus @default(PENDIENTE_PAGO)
+  credentialUrl   String?
+  course          Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  profile         Profile?         @relation(fields: [profileId], references: [id])
+  user            User?            @relation(fields: [userId], references: [id])
+  installmentPlan InstallmentPlan?
+}
+
+model InstallmentPlan {
+  id                   Int           @id @default(autoincrement())
+  enrollmentId         Int           @unique
+  numInstallments      Int
+  amountPerInstallment Float
+  currency             String        @default("ARS")
+  dueDay               Int?
+  createdAt            DateTime      @default(now())
+  enrollment           Enrollment    @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  installments         Installment[]
+}
+
+model Installment {
+  id          Int               @id @default(autoincrement())
+  planId      Int
+  number      Int
+  amount      Float
+  dueDate     DateTime?
+  status      InstallmentStatus @default(PENDING)
+  proofUrl    String?
+  submittedAt DateTime?
+  reviewedAt  DateTime?
+  notes       String?
+  plan        InstallmentPlan   @relation(fields: [planId], references: [id], onDelete: Cascade)
 }
 
 model CourseResource {
@@ -211,4 +238,11 @@ enum EnrollmentStatus {
   COMPROBANTE_SUBIDO
   CONFIRMADA
   CANCELADA
+}
+
+enum InstallmentStatus {
+  PENDING
+  SUBMITTED
+  ACCEPTED
+  REJECTED
 }
