@@ -129,7 +129,7 @@ export default function AnalyticsPage() {
                     {stats.topPages.map((p, i) => (
                       <tr key={p.path}>
                         <td><span className={styles.rankNum}>{i + 1}</span></td>
-                        <td>{PAGE_LABELS[p.path] ?? p.path.split('/').filter(Boolean).join(' › ') || 'Inicio'}</td>
+                        <td>{PAGE_LABELS[p.path] ?? (p.path.split('/').filter(Boolean).join(' › ') || 'Inicio')}</td>
                         <td><span className={styles.pathCell}>{p.path}</span></td>
                         <td><span className={styles.countBadge}>{fmtNum(p.count)}</span></td>
                       </tr>
