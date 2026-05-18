@@ -44,7 +44,7 @@ export default function Installments({ courseId }: { courseId: string }) {
       body: JSON.stringify(configs.map(c => ({
         profileId: c.profileId,
         installmentsEnabled: c.installmentsEnabled,
-        maxInstallments: c.maxInstallments,
+        maxInstallments: c.maxInstallments ?? 3,
       }))),
     });
     setSaving(false);
@@ -109,21 +109,6 @@ export default function Installments({ courseId }: { courseId: string }) {
                   </span>
                 </div>
 
-                {/* Max cuotas */}
-                {c.installmentsEnabled && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ fontSize: '0.82rem', color: '#64748b', fontWeight: 600, whiteSpace: 'nowrap' }}>Máx. cuotas</span>
-                    <select
-                      value={c.maxInstallments}
-                      onChange={e => update(c.profileId, 'maxInstallments', Number(e.target.value))}
-                      style={{ padding: '5px 10px', borderRadius: 8, border: '1.5px solid #d1d5db', fontSize: '0.88rem', fontFamily: 'inherit', color: '#1e293b' }}
-                    >
-                      {[2, 3, 4, 6, 8, 10, 12].map(n => (
-                        <option key={n} value={n}>{n} cuotas</option>
-                      ))}
-                    </select>
-                  </div>
-                )}
               </div>
             </div>
           ))}

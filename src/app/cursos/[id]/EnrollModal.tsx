@@ -110,9 +110,9 @@ export default function EnrollModal({ course, session: initialSession, onClose, 
   const cuotasArEnabled = cfg.cuotas_ar_enabled === 'true';
   const cuotasExtEnabled = cfg.cuotas_ext_enabled === 'true';
   const globalCuotasEnabled = transferMethod === 'AR' ? cuotasArEnabled : transferMethod === 'EXT' ? cuotasExtEnabled : false;
-  const profileCuotas = selectedCp as (typeof selectedCp & { installmentsEnabled?: boolean; maxInstallments?: number }) | null;
+  const profileCuotas = selectedCp as (typeof selectedCp & { installmentsEnabled?: boolean }) | null;
   const cuotasEnabled = globalCuotasEnabled && (profileCuotas?.installmentsEnabled ?? false);
-  const maxCuotas = profileCuotas?.maxInstallments ?? 3;
+  const maxCuotas = parseInt(cfg.max_cuotas ?? '3');
 
   useEffect(() => {
     if (step === 'payment') {
