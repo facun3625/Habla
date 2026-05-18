@@ -62,13 +62,15 @@ model Course {
 }
 
 model CourseProfile {
-  id                Int     @id @default(autoincrement())
-  courseId          Int
-  profileId         Int
-  capacity          Int     @default(0)
-  requireCredential Boolean @default(false)
-  course            Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  profile           Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  id                  Int     @id @default(autoincrement())
+  courseId            Int
+  profileId           Int
+  capacity            Int     @default(0)
+  requireCredential   Boolean @default(false)
+  installmentsEnabled Boolean @default(false)
+  maxInstallments     Int     @default(3)
+  course              Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  profile             Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   @@unique([courseId, profileId])
 }

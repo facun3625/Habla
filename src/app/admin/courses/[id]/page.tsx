@@ -3,7 +3,7 @@
 import { useState, use, useEffect } from 'react';
 import AdminLayout from '../../components/AdminLayout';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Info, Layers, Users as UsersIcon, DollarSign, Mail, BookOpen } from 'lucide-react';
+import { ArrowLeft, Info, Layers, Users as UsersIcon, DollarSign, Mail, BookOpen, CreditCard } from 'lucide-react';
 import styles from './courseAdmin.module.css';
 import Link from 'next/link';
 
@@ -13,8 +13,9 @@ import Enrollments from './tabs/Enrollments';
 import Prices from './tabs/Prices';
 import ConfirmationEmail from './tabs/ConfirmationEmail';
 import Repository from './tabs/Repository';
+import Installments from './tabs/Installments';
 
-type TabType = 'general' | 'modules' | 'prices' | 'enrollments' | 'confirmEmail' | 'repository';
+type TabType = 'general' | 'modules' | 'prices' | 'enrollments' | 'confirmEmail' | 'repository' | 'installments';
 
 export default function CourseAdminPage({ params }: { params: Promise<{ id: string }> }) {
   const { id: courseId } = use(params);
@@ -63,7 +64,8 @@ export default function CourseAdminPage({ params }: { params: Promise<{ id: stri
     { id: 'prices',       label: 'Precios',                icon: DollarSign },
     { id: 'enrollments',  label: 'Inscripciones',          icon: UsersIcon },
     { id: 'confirmEmail', label: 'Email de confirmación',  icon: Mail },
-    { id: 'repository',   label: 'Repositorio',             icon: BookOpen },
+    { id: 'repository',    label: 'Repositorio',             icon: BookOpen },
+    { id: 'installments',  label: 'Cuotas',                  icon: CreditCard },
   ];
 
   const renderTabContent = () => {
@@ -73,8 +75,9 @@ export default function CourseAdminPage({ params }: { params: Promise<{ id: stri
       case 'prices':       return <Prices courseId={courseId} />;
       case 'enrollments':  return <Enrollments courseId={courseId} />;
       case 'confirmEmail': return <ConfirmationEmail courseId={courseId} />;
-      case 'repository':   return <Repository courseId={courseId} />;
-      default:             return null;
+      case 'repository':    return <Repository courseId={courseId} />;
+      case 'installments':  return <Installments courseId={courseId} />;
+      default:              return null;
     }
   };
 

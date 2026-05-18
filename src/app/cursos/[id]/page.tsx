@@ -12,7 +12,7 @@ type Profile = { id: number; name: string };
 type Price = { id: number; name: string; amount: number; currency: string; profile: Profile | null };
 type ModuleAccess = { profileId: number; profile: Profile };
 type Module = { id: number; name: string; order: number; date: string | null; accessAll: boolean; accessProfiles: ModuleAccess[]; topics: string[] };
-type CourseProfile = { profileId: number; capacity: number; requireCredential: boolean; profile: Profile };
+type CourseProfile = { profileId: number; capacity: number; requireCredential: boolean; profile: Profile; installmentsEnabled: boolean; maxInstallments: number };
 type Course = {
   id: number;
   title: string;

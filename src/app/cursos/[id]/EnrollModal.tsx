@@ -8,7 +8,7 @@ import {
 import styles from './enroll.module.css';
 
 type Profile = { id: number; name: string };
-type CourseProfile = { profileId: number; requireCredential: boolean; profile: Profile };
+type CourseProfile = { profileId: number; requireCredential: boolean; profile: Profile; installmentsEnabled: boolean; maxInstallments: number };
 type Price = { id: number; amount: number; currency: string; profile: Profile | null };
 type Course = { id: number; title: string; courseProfiles: CourseProfile[]; prices: Price[] };
 type Session = { userId?: number; profileId?: number | null; name?: string | null } | null;
@@ -109,8 +109,10 @@ export default function EnrollModal({ course, session: initialSession, onClose, 
   const extEnabled = cfg.transfer_ext_enabled === 'true';
   const cuotasArEnabled = cfg.cuotas_ar_enabled === 'true';
   const cuotasExtEnabled = cfg.cuotas_ext_enabled === 'true';
-  const maxCuotas = parseInt(cfg.max_cuotas ?? '3');
-  const cuotasEnabled = transferMethod === 'AR' ? cuotasArEnabled : transferMethod === 'EXT' ? cuotasExtEnabled : false;
+  const globalCuotasEnabled = transferMethod === 'AR' ? cuotasArEnabled : transferMethod === 'EXT' ? cuotasExtEnabled : false;
+  const profileCuotas = selectedCp as (typeof selectedCp & { installmentsEnabled?: boolean; maxInstallments?: number }) | null;
+  const cuotasEnabled = globalCuotasEnabled && (profileCuotas?.installmentsEnabled ?? false);
+  const maxCuotas = profileCuotas?.maxInstallments ?? 3;
 
   useEffect(() => {
     if (step === 'payment') {
