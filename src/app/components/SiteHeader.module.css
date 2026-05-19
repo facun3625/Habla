@@ -1,7 +1,7 @@
 .stickyWrap {
   position: sticky;
   top: 0;
-  z-index: 200;
+  z-index: 500;
   background: rgba(255, 255, 255, 0.97);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -31,7 +31,7 @@
   box-shadow: 0 12px 40px rgba(108, 92, 231, 0.15);
   border: 1px solid #f0eeff;
   min-width: 200px;
-  z-index: 300;
+  z-index: 600;
   overflow: hidden;
   animation: dropIn 0.15s ease;
 }
