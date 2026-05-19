@@ -1233,7 +1233,12 @@
   .heroContent {
     flex-direction: column;
   }
-  
+
+  .heroImageContainer {
+    height: 300px !important;
+    width: 100%;
+  }
+
   .topHeader {
     /* Opcional: display: none si no se quiere en mobile */
   }
@@ -1261,19 +1266,47 @@
     left: 0;
     width: 100%;
     height: 100vh;
-    background: rgba(255, 255, 255, 0.98);
+    background: #fff;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 30px;
-    transform: translateY(-100%);
-    transition: transform 0.3s ease-in-out;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 0;
+    transform: translateX(-100%);
+    transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
     z-index: 450;
-    padding-top: 80px;
+    padding: 110px 0 40px 36px;
+    box-shadow: 6px 0 40px rgba(108,92,231,0.10);
+    max-width: 320px;
+    overflow-y: auto;
   }
 
   .nav.navOpen {
-    transform: translateY(0);
+    transform: translateX(0);
+  }
+
+  .nav .navLink {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1a004f;
+    padding: 10px 0;
+    width: 100%;
+    border-bottom: 1px solid #f0eeff;
+    transition: color 0.15s, padding-left 0.15s;
+  }
+
+  .nav .navLink:hover {
+    color: #6c5ce7;
+    padding-left: 8px;
+  }
+
+  .mobileActions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-top: 28px;
+    width: 100%;
+    padding-right: 36px;
   }
 }
 

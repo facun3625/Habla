@@ -136,6 +136,13 @@ export default function SiteHeader() {
 
   return (
     <>
+      {isMenuOpen && (
+        <div
+          className={headerStyles.mobileBackdrop}
+          style={{ display: 'block' }}
+          onClick={() => setIsMenuOpen(false)}
+        />
+      )}
       <div className={headerStyles.stickyWrap}>
       <div className={styles.topHeader}>
         <div className={styles.topHeaderInner}>

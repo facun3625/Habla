@@ -85,7 +85,7 @@ export default function Home() {
                   {latestCourse ? 'Inscribirme al curso' : 'Ver Cursos'} <ArrowRight size={16} />
                 </Link>
               </div>
-              <div className={styles.heroImageContainer} style={{ minHeight: '500px' }}>
+              <div className={styles.heroImageContainer} style={{ height: '500px' }}>
                 <Image
                   src="/hero.png"
                   alt="Apraxia del Habla Infantil"
