@@ -496,3 +496,107 @@
 
 @keyframes spin { to { transform: rotate(360deg); } }
 .spinner { animation: spin 1s linear infinite; }
+
+/* Questionnaire step */
+.questionnaireHeader {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: #f5f3ff;
+  border-radius: 14px;
+  padding: 14px 16px;
+  color: #4c3a8a;
+}
+
+.questionnaireHeader svg { flex-shrink: 0; margin-top: 2px; color: #6c5ce7; }
+
+.questionnaireHeader strong {
+  display: block;
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+}
+
+.questionnaireHeader p {
+  font-size: 0.8rem;
+  margin: 0;
+  opacity: 0.8;
+  line-height: 1.5;
+}
+
+.qForm {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.qField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.qLabel {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #475569;
+}
+
+.qInput {
+  padding: 10px 14px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 0.92rem;
+  font-family: inherit;
+  color: #2c3e50;
+  background: #f8fafc;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.qInput:focus { border-color: #a29bfe; background: white; }
+
+.qRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.qAgeDisplay {
+  padding: 10px 14px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #6c5ce7;
+  background: #f8fafc;
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+}
+
+.qYesNo {
+  display: flex;
+  gap: 8px;
+}
+
+.qYesNoBtn {
+  flex: 1;
+  padding: 9px 0;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  background: #f8fafc;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #64748b;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+
+.qYesNoBtn:hover { border-color: #a29bfe; color: #6c5ce7; }
+
+.qYesNoBtnActive {
+  border-color: #6c5ce7;
+  background: #f5f3ff;
+  color: #6c5ce7;
+}

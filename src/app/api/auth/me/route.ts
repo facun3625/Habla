@@ -15,6 +15,9 @@ export async function GET(req: NextRequest) {
         phone: true, profession: true, profileId: true,
         profile: { select: { id: true, name: true } },
         createdAt: true,
+        questionnaireCompleted: true,
+        birthDate: true, dni: true, city: true,
+        hasApraxiaExperience: true, hasOtherTraining: true, specificMethod: true,
       },
     });
     if (!user) return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 });

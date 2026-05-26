@@ -13,13 +13,20 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: 'Sesión inválida' }, { status: 401 });
   }
 
-  const { name, phone, profession, profileId } = await req.json();
+  const { name, phone, profession, profileId, birthDate, dni, city, hasApraxiaExperience, hasOtherTraining, specificMethod, questionnaireCompleted } = await req.json();
 
   // Only allow profile change if no active enrollments
   const data: Record<string, unknown> = {};
   if (name !== undefined) data.name = name;
   if (phone !== undefined) data.phone = phone;
   if (profession !== undefined) data.profession = profession;
+  if (birthDate !== undefined) data.birthDate = birthDate ? new Date(birthDate) : null;
+  if (dni !== undefined) data.dni = dni;
+  if (city !== undefined) data.city = city;
+  if (hasApraxiaExperience !== undefined) data.hasApraxiaExperience = hasApraxiaExperience;
+  if (hasOtherTraining !== undefined) data.hasOtherTraining = hasOtherTraining;
+  if (specificMethod !== undefined) data.specificMethod = specificMethod;
+  if (questionnaireCompleted !== undefined) data.questionnaireCompleted = questionnaireCompleted;
 
   if (profileId !== undefined) {
     const activeEnrollments = await prisma.enrollment.count({
@@ -40,6 +47,8 @@ export async function PATCH(req: NextRequest) {
     select: {
       id: true, name: true, email: true, phone: true, profession: true,
       profileId: true, profile: { select: { id: true, name: true } },
+      questionnaireCompleted: true, birthDate: true, dni: true, city: true,
+      hasApraxiaExperience: true, hasOtherTraining: true, specificMethod: true,
     },
   });
 

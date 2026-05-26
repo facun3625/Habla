@@ -6,12 +6,16 @@ import {
   ArrowRight, CreditCard, Mail, Lock, User, Eye, EyeOff,
 } from 'lucide-react';
 import styles from './enroll.module.css';
+import QuestionnaireModal from '@/app/components/QuestionnaireModal';
 
 type Profile = { id: number; name: string };
 type CourseProfile = { profileId: number; requireCredential: boolean; profile: Profile; installmentsEnabled: boolean; maxInstallments: number };
 type Price = { id: number; amount: number; currency: string; profile: Profile | null };
 type Course = { id: number; title: string; courseProfiles: CourseProfile[]; prices: Price[] };
-type Session = { userId?: number; profileId?: number | null; name?: string | null } | null;
+type Session = {
+  userId?: number; profileId?: number | null; name?: string | null;
+  questionnaireCompleted?: boolean;
+} | null;
 type PublicSettings = {
   transfer_ar_enabled?: string;
   transfer_bank?: string; transfer_cbu?: string; transfer_alias?: string;
@@ -25,7 +29,7 @@ type PublicSettings = {
   cuotas_due_day?: string;
 };
 
-type Step = 'auth' | 'profile' | 'credential' | 'payment' | 'done';
+type Step = 'auth' | 'questionnaire' | 'profile' | 'credential' | 'payment' | 'done';
 type AuthView = 'login' | 'register';
 type TransferMethod = 'AR' | 'EXT' | null;
 
@@ -36,14 +40,15 @@ interface Props {
   onSuccess: (newSession?: Session) => void;
 }
 
+function needsQuestionnaire(s: Session) {
+  return !!s && !s.questionnaireCompleted;
+}
+
 export default function EnrollModal({ course, session: initialSession, onClose, onSuccess }: Props) {
   const [session, setSession] = useState<Session>(initialSession);
   const [step, setStep] = useState<Step>(() => {
     if (!initialSession) return 'auth';
-    if (initialSession.profileId) {
-      const cp = course.courseProfiles.find(c => c.profileId === initialSession.profileId);
-      if (cp) return 'profile'; // still show profile step so user confirms
-    }
+    if (needsQuestionnaire(initialSession)) return 'questionnaire';
     return 'profile';
   });
 
@@ -55,6 +60,7 @@ export default function EnrollModal({ course, session: initialSession, onClose, 
   const [showPass, setShowPass] = useState(false);
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState('');
+
 
   // Profile state — pre-select if session has matching profile
   const [selectedProfileId, setSelectedProfileId] = useState<number | null>(() => {
@@ -127,6 +133,16 @@ export default function EnrollModal({ course, session: initialSession, onClose, 
 
   // ── Auth ───────────────────────────────────────────────
 
+  const afterAuth = (me: Session) => {
+    setSession(me);
+    if (me?.profileId) setSelectedProfileId(me.profileId);
+    if (needsQuestionnaire(me)) {
+      setStep('questionnaire');
+    } else {
+      setStep('profile');
+    }
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthLoading(true); setAuthError('');
@@ -139,9 +155,7 @@ export default function EnrollModal({ course, session: initialSession, onClose, 
     setAuthLoading(false);
     if (!res.ok) { setAuthError(data.error ?? 'Email o contraseña incorrectos.'); return; }
     const me = await fetch('/api/auth/me').then(r => r.ok ? r.json() : null);
-    setSession(me);
-    if (me?.profileId) setSelectedProfileId(me.profileId);
-    setStep('profile');
+    afterAuth(me);
   };
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -156,9 +170,9 @@ export default function EnrollModal({ course, session: initialSession, onClose, 
     setAuthLoading(false);
     if (!res.ok) { setAuthError(data.error ?? 'Error al registrarse.'); return; }
     const me = await fetch('/api/auth/me').then(r => r.ok ? r.json() : null);
-    setSession(me);
-    setStep('profile');
+    afterAuth(me);
   };
+
 
   // ── Profile → next ─────────────────────────────────────
 
@@ -231,6 +245,18 @@ export default function EnrollModal({ course, session: initialSession, onClose, 
   };
 
   // ── Render ─────────────────────────────────────────────
+
+  if (step === 'questionnaire') {
+    return (
+      <QuestionnaireModal
+        initialName={session?.name}
+        onDone={(updatedName) => {
+          setSession(prev => prev ? { ...prev, questionnaireCompleted: true, name: updatedName } : prev);
+          setStep('profile');
+        }}
+      />
+    );
+  }
 
   return (
     <div className={styles.overlay}>

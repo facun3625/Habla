@@ -5,10 +5,12 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { LayoutDashboard, BookOpen, UserCircle, LogOut, ArrowLeft } from 'lucide-react';
 import styles from './account.module.css';
+import QuestionnaireModal from '@/app/components/QuestionnaireModal';
 
 type User = {
   id: number; name: string | null; email: string;
   profile: { name: string } | null;
+  questionnaireCompleted: boolean;
 };
 
 const NAV = [
@@ -47,6 +49,12 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
 
   return (
     <div className={styles.shell}>
+      {!user.questionnaireCompleted && (
+        <QuestionnaireModal
+          initialName={user.name}
+          onDone={(updatedName) => setUser(u => u ? { ...u, name: updatedName, questionnaireCompleted: true } : u)}
+        />
+      )}
       <aside className={styles.sidebar}>
         <div className={styles.sidebarTop}>
           <div className={styles.avatar}>{initials}</div>

@@ -20,21 +20,28 @@ model Profile {
 }
 
 model User {
-  id               Int          @id @default(autoincrement())
-  email            String       @unique
-  password         String?
-  name             String?
-  createdAt        DateTime     @default(now())
-  phone            String?
-  profession       String?
-  updatedAt        DateTime     @updatedAt
-  role             UserRole     @default(STUDENT)
-  googleId         String?      @unique
-  resetToken       String?      @unique
-  resetTokenExpiry DateTime?
-  profileId        Int?
-  enrollments      Enrollment[]
-  profile          Profile?     @relation(fields: [profileId], references: [id])
+  id                      Int          @id @default(autoincrement())
+  email                   String       @unique
+  password                String?
+  name                    String?
+  createdAt               DateTime     @default(now())
+  phone                   String?
+  profession              String?
+  updatedAt               DateTime     @updatedAt
+  role                    UserRole     @default(STUDENT)
+  googleId                String?      @unique
+  resetToken              String?      @unique
+  resetTokenExpiry        DateTime?
+  profileId               Int?
+  birthDate               DateTime?
+  dni                     String?
+  city                    String?
+  hasApraxiaExperience    Boolean?
+  hasOtherTraining        Boolean?
+  specificMethod          String?
+  questionnaireCompleted  Boolean      @default(false)
+  enrollments             Enrollment[]
+  profile                 Profile?     @relation(fields: [profileId], references: [id])
 }
 
 model Course {
