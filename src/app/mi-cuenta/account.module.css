@@ -466,6 +466,54 @@
 @keyframes spin { to { transform: rotate(360deg); } }
 .spin { animation: spin 1s linear infinite; }
 
+/* ── Card title ─────────────────────────────────────────────── */
+.cardTitle {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #1e1b4b;
+  margin: 0 0 20px;
+  padding-bottom: 14px;
+  border-bottom: 1.5px solid #f0eeff;
+}
+
+/* ── Yes/No toggles ─────────────────────────────────────────── */
+.yesNo {
+  display: flex;
+  gap: 8px;
+}
+
+.yesNoBtn {
+  flex: 1;
+  padding: 9px 0;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fafafa;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #64748b;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+
+.yesNoBtn:hover { border-color: #a29bfe; color: #6c5ce7; }
+
+.yesNoBtnActive {
+  border-color: #6c5ce7;
+  background: #f5f3ff;
+  color: #6c5ce7;
+}
+
+.ageDisplay {
+  padding: 11px 14px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #6c5ce7;
+  background: #f8fafc;
+}
+
 /* ── Repository ─────────────────────────────────────────────── */
 .repoSection {
   margin-top: 32px;
