@@ -23,13 +23,14 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
   const pathname = usePathname();
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
+  const [showQuestionnaire, setShowQuestionnaire] = useState(false);
 
   useEffect(() => {
     fetch('/api/auth/me')
       .then((r) => r.ok ? r.json() : null)
       .then((d) => {
         if (!d) router.push('/');
-        else setUser(d);
+        else { setUser(d); if (!d.questionnaireCompleted) setShowQuestionnaire(true); }
       });
   }, [router]);
 
@@ -49,10 +50,11 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
 
   return (
     <div className={styles.shell}>
-      {!user.questionnaireCompleted && (
+      {showQuestionnaire && (
         <QuestionnaireModal
           initialName={user.name}
-          onDone={(updatedName) => setUser(u => u ? { ...u, name: updatedName, questionnaireCompleted: true } : u)}
+          onDone={(updatedName) => { setUser(u => u ? { ...u, name: updatedName, questionnaireCompleted: true } : u); setShowQuestionnaire(false); }}
+          onClose={() => setShowQuestionnaire(false)}
         />
       )}
       <aside className={styles.sidebar}>

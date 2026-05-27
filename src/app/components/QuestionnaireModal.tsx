@@ -1,12 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { ClipboardList, ArrowRight, Loader } from 'lucide-react';
+import { ClipboardList, ArrowRight, Loader, X } from 'lucide-react';
 import styles from './QuestionnaireModal.module.css';
 
 interface Props {
   initialName?: string | null;
   onDone: (updatedName: string) => void;
+  onClose?: () => void;
 }
 
 function calcAge(dateStr: string): number | null {
@@ -19,7 +20,7 @@ function calcAge(dateStr: string): number | null {
   return age >= 0 ? age : null;
 }
 
-export default function QuestionnaireModal({ initialName, onDone }: Props) {
+export default function QuestionnaireModal({ initialName, onDone, onClose }: Props) {
   const [name, setName] = useState(initialName ?? '');
   const [birthDate, setBirthDate] = useState('');
   const [dni, setDni] = useState('');
@@ -68,8 +69,11 @@ export default function QuestionnaireModal({ initialName, onDone }: Props) {
   };
 
   return (
-    <div className={styles.overlay}>
+    <div className={styles.overlay} onClick={onClose ? (e) => { if (e.target === e.currentTarget) onClose(); } : undefined}>
       <div className={styles.card}>
+        {onClose && (
+          <button className={styles.closeBtn} onClick={onClose} aria-label="Cerrar"><X size={18} /></button>
+        )}
         <div className={styles.header}>
           <div className={styles.headerIcon}>
             <ClipboardList size={22} />

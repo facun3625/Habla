@@ -21,6 +21,25 @@
   overflow-y: auto;
 }
 
+.closeBtn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1f5f9;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #64748b;
+  transition: background 0.15s, color 0.15s;
+}
+
+.closeBtn:hover { background: #e2e8f0; color: #1e293b; }
+
 .header {
   display: flex;
   gap: 14px;

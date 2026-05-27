@@ -254,6 +254,7 @@ export default function EnrollModal({ course, session: initialSession, onClose, 
           setSession(prev => prev ? { ...prev, questionnaireCompleted: true, name: updatedName } : prev);
           setStep('profile');
         }}
+        onClose={onClose}
       />
     );
   }
