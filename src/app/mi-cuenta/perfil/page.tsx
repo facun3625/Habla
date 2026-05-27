@@ -10,7 +10,8 @@ type User = {
   phone: string | null; profession: string | null;
   profileId: number | null; profile: Profile | null;
   birthDate: string | null; dni: string | null; city: string | null;
-  hasApraxiaExperience: boolean | null; hasOtherTraining: boolean | null;
+  hasApraxiaExperience: boolean | null; apraxiaExperienceDetail: string | null;
+  hasOtherTraining: boolean | null; otherTrainingDetail: string | null;
   specificMethod: string | null;
 };
 
@@ -37,7 +38,9 @@ export default function ProfilePage() {
   const [qForm, setQForm] = useState({
     birthDate: '', dni: '', city: '',
     hasApraxiaExperience: null as boolean | null,
+    apraxiaExperienceDetail: '',
     hasOtherTraining: null as boolean | null,
+    otherTrainingDetail: '',
     methodYes: null as boolean | null,
     specificMethod: '',
   });
@@ -64,8 +67,10 @@ export default function ProfilePage() {
           dni: u.dni ?? '',
           city: u.city ?? '',
           hasApraxiaExperience: u.hasApraxiaExperience ?? null,
+          apraxiaExperienceDetail: u.apraxiaExperienceDetail ?? '',
           hasOtherTraining: u.hasOtherTraining ?? null,
-          methodYes: u.specificMethod !== null && u.specificMethod !== undefined ? true : null,
+          otherTrainingDetail: u.otherTrainingDetail ?? '',
+          methodYes: u.specificMethod != null ? true : null,
           specificMethod: u.specificMethod ?? '',
         });
       }
@@ -116,7 +121,9 @@ export default function ProfilePage() {
         dni: qForm.dni.trim() || null,
         city: qForm.city.trim() || null,
         hasApraxiaExperience: qForm.hasApraxiaExperience,
+        apraxiaExperienceDetail: qForm.hasApraxiaExperience ? qForm.apraxiaExperienceDetail.trim() || null : null,
         hasOtherTraining: qForm.hasOtherTraining,
+        otherTrainingDetail: qForm.hasOtherTraining ? qForm.otherTrainingDetail.trim() || null : null,
         specificMethod: qForm.methodYes ? qForm.specificMethod.trim() || null : null,
         questionnaireCompleted: true,
       }),
@@ -279,16 +286,22 @@ export default function ProfilePage() {
               <label className={styles.label}>¿Tenés experiencia trabajando con niños con apraxia?</label>
               <div className={styles.yesNo}>
                 <button type="button" className={`${styles.yesNoBtn} ${qForm.hasApraxiaExperience === true ? styles.yesNoBtnActive : ''}`} onClick={() => setQForm(p => ({ ...p, hasApraxiaExperience: true }))}>Sí</button>
-                <button type="button" className={`${styles.yesNoBtn} ${qForm.hasApraxiaExperience === false ? styles.yesNoBtnActive : ''}`} onClick={() => setQForm(p => ({ ...p, hasApraxiaExperience: false }))}>No</button>
+                <button type="button" className={`${styles.yesNoBtn} ${qForm.hasApraxiaExperience === false ? styles.yesNoBtnActive : ''}`} onClick={() => setQForm(p => ({ ...p, hasApraxiaExperience: false, apraxiaExperienceDetail: '' }))}>No</button>
               </div>
+              {qForm.hasApraxiaExperience && (
+                <input type="text" className={styles.input} style={{ marginTop: 10 }} placeholder="Contanos brevemente tu experiencia" value={qForm.apraxiaExperienceDetail} onChange={e => setQForm(p => ({ ...p, apraxiaExperienceDetail: e.target.value }))} />
+              )}
             </div>
 
             <div className={`${styles.field} ${styles.fieldFull}`}>
               <label className={styles.label}>¿Tomaste otras formaciones en la temática?</label>
               <div className={styles.yesNo}>
                 <button type="button" className={`${styles.yesNoBtn} ${qForm.hasOtherTraining === true ? styles.yesNoBtnActive : ''}`} onClick={() => setQForm(p => ({ ...p, hasOtherTraining: true }))}>Sí</button>
-                <button type="button" className={`${styles.yesNoBtn} ${qForm.hasOtherTraining === false ? styles.yesNoBtnActive : ''}`} onClick={() => setQForm(p => ({ ...p, hasOtherTraining: false }))}>No</button>
+                <button type="button" className={`${styles.yesNoBtn} ${qForm.hasOtherTraining === false ? styles.yesNoBtnActive : ''}`} onClick={() => setQForm(p => ({ ...p, hasOtherTraining: false, otherTrainingDetail: '' }))}>No</button>
               </div>
+              {qForm.hasOtherTraining && (
+                <input type="text" className={styles.input} style={{ marginTop: 10 }} placeholder="¿Cuáles?" value={qForm.otherTrainingDetail} onChange={e => setQForm(p => ({ ...p, otherTrainingDetail: e.target.value }))} />
+              )}
             </div>
 
             <div className={`${styles.field} ${styles.fieldFull}`}>

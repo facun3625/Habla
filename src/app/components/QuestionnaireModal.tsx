@@ -25,7 +25,9 @@ export default function QuestionnaireModal({ initialName, onDone }: Props) {
   const [dni, setDni] = useState('');
   const [city, setCity] = useState('');
   const [apraxia, setApraxia] = useState<boolean | null>(null);
+  const [apraxiaDetail, setApraxiaDetail] = useState('');
   const [otherTraining, setOtherTraining] = useState<boolean | null>(null);
+  const [otherTrainingDetail, setOtherTrainingDetail] = useState('');
   const [methodYes, setMethodYes] = useState<boolean | null>(null);
   const [methodText, setMethodText] = useState('');
   const [loading, setLoading] = useState(false);
@@ -42,7 +44,6 @@ export default function QuestionnaireModal({ initialName, onDone }: Props) {
     if (apraxia === null) { setError('Respondé la pregunta sobre experiencia con apraxia.'); return; }
     if (otherTraining === null) { setError('Respondé si tomaste otras formaciones.'); return; }
     if (methodYes === null) { setError('Respondé si estás entrenado en algún método específico.'); return; }
-    if (methodYes && !methodText.trim()) { setError('Especificá el método en que estás entrenado.'); return; }
 
     setLoading(true); setError('');
     const res = await fetch('/api/users/me', {
@@ -54,8 +55,10 @@ export default function QuestionnaireModal({ initialName, onDone }: Props) {
         dni: dni.trim(),
         city: city.trim(),
         hasApraxiaExperience: apraxia,
+        apraxiaExperienceDetail: apraxia ? apraxiaDetail.trim() || null : null,
         hasOtherTraining: otherTraining,
-        specificMethod: methodYes ? methodText.trim() : null,
+        otherTrainingDetail: otherTraining ? otherTrainingDetail.trim() || null : null,
+        specificMethod: methodYes ? methodText.trim() || null : null,
         questionnaireCompleted: true,
       }),
     });
@@ -94,30 +97,37 @@ export default function QuestionnaireModal({ initialName, onDone }: Props) {
             </div>
           </div>
 
-          <div className={styles.field}>
-            <label className={styles.label}>DNI</label>
-            <input type="text" className={styles.input} placeholder="Ej: 30123456" value={dni} onChange={e => setDni(e.target.value)} />
-          </div>
-
-          <div className={styles.field}>
-            <label className={styles.label}>Ciudad donde ejercés la profesión</label>
-            <input type="text" className={styles.input} placeholder="Ej: Buenos Aires" value={city} onChange={e => setCity(e.target.value)} />
+          <div className={styles.row}>
+            <div className={styles.field}>
+              <label className={styles.label}>DNI</label>
+              <input type="text" className={styles.input} placeholder="Ej: 30123456" value={dni} onChange={e => setDni(e.target.value)} />
+            </div>
+            <div className={styles.field}>
+              <label className={styles.label}>Ciudad donde ejercés</label>
+              <input type="text" className={styles.input} placeholder="Ej: Buenos Aires" value={city} onChange={e => setCity(e.target.value)} />
+            </div>
           </div>
 
           <div className={styles.field}>
             <label className={styles.label}>¿Tenés experiencia trabajando con niños con apraxia?</label>
             <div className={styles.yesNo}>
               <button type="button" className={`${styles.yesNoBtn} ${apraxia === true ? styles.yesNoBtnActive : ''}`} onClick={() => setApraxia(true)}>Sí</button>
-              <button type="button" className={`${styles.yesNoBtn} ${apraxia === false ? styles.yesNoBtnActive : ''}`} onClick={() => setApraxia(false)}>No</button>
+              <button type="button" className={`${styles.yesNoBtn} ${apraxia === false ? styles.yesNoBtnActive : ''}`} onClick={() => { setApraxia(false); setApraxiaDetail(''); }}>No</button>
             </div>
+            {apraxia && (
+              <input type="text" className={styles.input} style={{ marginTop: 8 }} placeholder="Contanos brevemente tu experiencia" value={apraxiaDetail} onChange={e => setApraxiaDetail(e.target.value)} />
+            )}
           </div>
 
           <div className={styles.field}>
             <label className={styles.label}>¿Tomaste otras formaciones en la temática?</label>
             <div className={styles.yesNo}>
               <button type="button" className={`${styles.yesNoBtn} ${otherTraining === true ? styles.yesNoBtnActive : ''}`} onClick={() => setOtherTraining(true)}>Sí</button>
-              <button type="button" className={`${styles.yesNoBtn} ${otherTraining === false ? styles.yesNoBtnActive : ''}`} onClick={() => setOtherTraining(false)}>No</button>
+              <button type="button" className={`${styles.yesNoBtn} ${otherTraining === false ? styles.yesNoBtnActive : ''}`} onClick={() => { setOtherTraining(false); setOtherTrainingDetail(''); }}>No</button>
             </div>
+            {otherTraining && (
+              <input type="text" className={styles.input} style={{ marginTop: 8 }} placeholder="¿Cuáles?" value={otherTrainingDetail} onChange={e => setOtherTrainingDetail(e.target.value)} />
+            )}
           </div>
 
           <div className={styles.field}>

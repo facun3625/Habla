@@ -37,7 +37,9 @@ model User {
   dni                     String?
   city                    String?
   hasApraxiaExperience    Boolean?
+  apraxiaExperienceDetail String?
   hasOtherTraining        Boolean?
+  otherTrainingDetail     String?
   specificMethod          String?
   questionnaireCompleted  Boolean      @default(false)
   enrollments             Enrollment[]

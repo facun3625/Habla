@@ -13,7 +13,7 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: 'Sesión inválida' }, { status: 401 });
   }
 
-  const { name, phone, profession, profileId, birthDate, dni, city, hasApraxiaExperience, hasOtherTraining, specificMethod, questionnaireCompleted } = await req.json();
+  const { name, phone, profession, profileId, birthDate, dni, city, hasApraxiaExperience, apraxiaExperienceDetail, hasOtherTraining, otherTrainingDetail, specificMethod, questionnaireCompleted } = await req.json();
 
   // Only allow profile change if no active enrollments
   const data: Record<string, unknown> = {};
@@ -24,7 +24,9 @@ export async function PATCH(req: NextRequest) {
   if (dni !== undefined) data.dni = dni;
   if (city !== undefined) data.city = city;
   if (hasApraxiaExperience !== undefined) data.hasApraxiaExperience = hasApraxiaExperience;
+  if (apraxiaExperienceDetail !== undefined) data.apraxiaExperienceDetail = apraxiaExperienceDetail;
   if (hasOtherTraining !== undefined) data.hasOtherTraining = hasOtherTraining;
+  if (otherTrainingDetail !== undefined) data.otherTrainingDetail = otherTrainingDetail;
   if (specificMethod !== undefined) data.specificMethod = specificMethod;
   if (questionnaireCompleted !== undefined) data.questionnaireCompleted = questionnaireCompleted;
 
@@ -48,7 +50,8 @@ export async function PATCH(req: NextRequest) {
       id: true, name: true, email: true, phone: true, profession: true,
       profileId: true, profile: { select: { id: true, name: true } },
       questionnaireCompleted: true, birthDate: true, dni: true, city: true,
-      hasApraxiaExperience: true, hasOtherTraining: true, specificMethod: true,
+      hasApraxiaExperience: true, apraxiaExperienceDetail: true,
+      hasOtherTraining: true, otherTrainingDetail: true, specificMethod: true,
     },
   });
 
