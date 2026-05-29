@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { CheckCircle, XCircle, ExternalLink, Trash2, X, ChevronDown } from 'lucide-react';
+import { CheckCircle, XCircle, ExternalLink, Trash2, X, ChevronDown, Bell } from 'lucide-react';
 import React from 'react';
 import styles from '../courseAdmin.module.css';
 import ConfirmModal from '../../../components/ConfirmModal';
@@ -83,6 +83,7 @@ const METHOD_LABEL: Record<string, string> = {
   PAYPAL: 'PayPal',
   TRANSFERENCIA: 'Transferencia',
   TRANSFERENCIA_AR: 'Transferencia AR',
+  TRANSFERENCIA_UY: 'Transferencia UY',
   TRANSFERENCIA_EXT: 'Transferencia Exterior',
 };
 
@@ -143,6 +144,11 @@ export default function Enrollments({ courseId }: { courseId: string }) {
       body: JSON.stringify({ status }),
     });
     await refetch();
+    window.dispatchEvent(new CustomEvent('refreshNotifications'));
+  };
+
+  const remindInstallment = async (installmentId: number) => {
+    await fetch(`/api/installments/${installmentId}/remind`, { method: 'POST' });
   };
 
   const deleteEnrollment = (id: number) => {
@@ -304,6 +310,15 @@ export default function Enrollments({ courseId }: { courseId: string }) {
                                       <button className={styles.actionBtnConfirm} title="Acreditar" onClick={() => updateInstallment(inst.id, 'ACCEPTED')}><CheckCircle size={14} /></button>
                                       <button className={styles.actionBtnDelete} title="Rechazar" onClick={() => updateInstallment(inst.id, 'REJECTED')}><XCircle size={14} /></button>
                                     </>
+                                  )}
+                                  {inst.status === 'PENDING' && (
+                                    <button
+                                      title="Enviar recordatorio"
+                                      onClick={() => remindInstallment(inst.id)}
+                                      style={{ background: 'none', border: '1px solid #e2e8f0', borderRadius: 7, padding: '3px 7px', cursor: 'pointer', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.75rem' }}
+                                    >
+                                      <Bell size={12} /> Recordar
+                                    </button>
                                   )}
                                   {inst.status === 'ACCEPTED' && <CheckCircle size={16} color="#15803d" />}
                                   {inst.status === 'REJECTED' && <XCircle size={16} color="#dc2626" />}
