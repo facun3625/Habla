@@ -165,7 +165,13 @@ export default function Enrollments({ courseId }: { courseId: string }) {
     });
   };
 
-  const filtered = filter === 'all' ? enrollments : enrollments.filter((e) => e.status === filter);
+  const withPendingInstallments = enrollments.filter(e =>
+    e.installmentPlan?.installments.some(i => i.status === 'PENDING' || i.status === 'SUBMITTED')
+  );
+
+  const filtered = filter === 'all' ? enrollments
+    : filter === 'CUOTAS_PENDIENTES' ? withPendingInstallments
+    : enrollments.filter((e) => e.status === filter);
   const pendingReceipts = enrollments.filter((e) => e.status === 'COMPROBANTE_SUBIDO').length;
 
   if (loading) return <p style={{ padding: '1rem', color: '#888' }}>Cargando...</p>;
@@ -187,11 +193,12 @@ export default function Enrollments({ courseId }: { courseId: string }) {
       {/* Filter tabs */}
       <div className={styles.filterTabs}>
         {[
-          { key: 'all', label: 'Todas' },
-          { key: 'COMPROBANTE_SUBIDO', label: 'Para revisar' },
-          { key: 'CONFIRMADA', label: 'Confirmadas' },
-          { key: 'PENDIENTE_PAGO', label: 'Pendientes' },
-          { key: 'CANCELADA', label: 'Canceladas' },
+          { key: 'all', label: 'Todas', count: enrollments.length },
+          { key: 'COMPROBANTE_SUBIDO', label: 'Para revisar', count: enrollments.filter(e => e.status === 'COMPROBANTE_SUBIDO').length },
+          { key: 'CONFIRMADA', label: 'Confirmadas', count: enrollments.filter(e => e.status === 'CONFIRMADA').length },
+          { key: 'CUOTAS_PENDIENTES', label: 'Cuotas pendientes', count: withPendingInstallments.length },
+          { key: 'PENDIENTE_PAGO', label: 'Pendientes', count: enrollments.filter(e => e.status === 'PENDIENTE_PAGO').length },
+          { key: 'CANCELADA', label: 'Canceladas', count: enrollments.filter(e => e.status === 'CANCELADA').length },
         ].map((f) => (
           <button
             key={f.key}
@@ -199,11 +206,7 @@ export default function Enrollments({ courseId }: { courseId: string }) {
             onClick={() => setFilter(f.key)}
           >
             {f.label}
-            {f.key !== 'all' && (
-              <span className={styles.filterCount}>
-                {f.key === 'all' ? enrollments.length : enrollments.filter((e) => e.status === f.key).length}
-              </span>
-            )}
+            <span className={styles.filterCount}>{f.count}</span>
           </button>
         ))}
       </div>
