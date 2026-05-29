@@ -35,9 +35,16 @@ const DEFAULTS: Settings = {
   transfer_ext_cbu: '',
   transfer_ext_alias: '',
   transfer_ext_holder: '',
+  // Transferencia Uruguay (Prex)
+  transfer_uy_enabled: 'false',
+  transfer_uy_bank: '',
+  transfer_uy_account: '',
+  transfer_uy_alias: '',
+  transfer_uy_holder: '',
   // Cuotas
   cuotas_ar_enabled: 'false',
   cuotas_ext_enabled: 'false',
+  cuotas_uy_enabled: 'false',
   max_cuotas: '3',
   cuotas_due_day: '',
   // Popup promocional
@@ -329,6 +336,41 @@ export default function SettingsPage() {
           )}
         </section>
 
+        {/* Transferencia Uruguay → Prex */}
+        <section className={`${styles.section} ${settings.transfer_uy_enabled !== 'true' ? styles.sectionOff : ''}`}>
+          <div className={styles.sectionHeader}>
+            <div className={styles.sectionIcon} style={{ background: '#e8f5f0' }}>
+              <span style={{ fontSize: '1.5rem' }}>🇺🇾</span>
+            </div>
+            <div style={{ flex: 1 }}>
+              <h3>Transferencia desde Uruguay</h3>
+              <p>Depósito vía Prex u otra billetera uruguaya.</p>
+            </div>
+            <Toggle id="transfer_uy_enabled" />
+          </div>
+
+          {settings.transfer_uy_enabled === 'true' && (
+            <div className={styles.fields}>
+              <div className={styles.field}>
+                <label>Banco / Entidad</label>
+                <input type="text" className={styles.input} value={settings.transfer_uy_bank} onChange={set('transfer_uy_bank')} placeholder="Prex / Abitab / etc." />
+              </div>
+              <div className={styles.field}>
+                <label>Titular</label>
+                <input type="text" className={styles.input} value={settings.transfer_uy_holder} onChange={set('transfer_uy_holder')} placeholder="Nombre Apellido" />
+              </div>
+              <div className={styles.field}>
+                <label>Cuenta / Teléfono Prex</label>
+                <input type="text" className={styles.input} value={settings.transfer_uy_account} onChange={set('transfer_uy_account')} placeholder="09X XXX XXX" />
+              </div>
+              <div className={styles.field}>
+                <label>Alias (opcional)</label>
+                <input type="text" className={styles.input} value={settings.transfer_uy_alias} onChange={set('transfer_uy_alias')} placeholder="hablapraxia" />
+              </div>
+            </div>
+          )}
+        </section>
+
         {/* ── CUOTAS ── */}
         <div className={styles.groupLabel}>Cuotas</div>
         <section className={styles.section}>
@@ -347,10 +389,14 @@ export default function SettingsPage() {
               <Toggle id="cuotas_ar_enabled" />
             </div>
             <div className={styles.field}>
+              <label>Cuotas — Transferencia Uruguay</label>
+              <Toggle id="cuotas_uy_enabled" />
+            </div>
+            <div className={styles.field}>
               <label>Cuotas — Transferencia Exterior</label>
               <Toggle id="cuotas_ext_enabled" />
             </div>
-            {(settings.cuotas_ar_enabled === 'true' || settings.cuotas_ext_enabled === 'true') && (
+            {(settings.cuotas_ar_enabled === 'true' || settings.cuotas_ext_enabled === 'true' || settings.cuotas_uy_enabled === 'true') && (
               <>
                 <div className={styles.field}>
                   <label>Máximo de cuotas</label>

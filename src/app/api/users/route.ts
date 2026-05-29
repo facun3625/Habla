@@ -14,6 +14,10 @@ export async function GET() {
       createdAt: true,
       profile: { select: { id: true, name: true } },
       _count: { select: { enrollments: true } },
+      birthDate: true, dni: true, city: true,
+      hasApraxiaExperience: true, apraxiaExperienceDetail: true,
+      hasOtherTraining: true, otherTrainingDetail: true,
+      specificMethod: true, questionnaireCompleted: true,
     },
   });
 

@@ -23,15 +23,19 @@ type PublicSettings = {
   transfer_ext_enabled?: string;
   transfer_ext_bank?: string; transfer_ext_cbu?: string;
   transfer_ext_alias?: string; transfer_ext_holder?: string;
+  transfer_uy_enabled?: string;
+  transfer_uy_bank?: string; transfer_uy_account?: string;
+  transfer_uy_alias?: string; transfer_uy_holder?: string;
   cuotas_ar_enabled?: string;
   cuotas_ext_enabled?: string;
+  cuotas_uy_enabled?: string;
   max_cuotas?: string;
   cuotas_due_day?: string;
 };
 
 type Step = 'auth' | 'questionnaire' | 'profile' | 'credential' | 'payment' | 'done';
 type AuthView = 'login' | 'register';
-type TransferMethod = 'AR' | 'EXT' | null;
+type TransferMethod = 'AR' | 'UY' | 'EXT' | null;
 
 interface Props {
   course: Course;
@@ -112,20 +116,26 @@ export default function EnrollModal({ course, session: initialSession, onClose, 
   }, []);
 
   const arEnabled = cfg.transfer_ar_enabled === 'true';
+  const uyEnabled = cfg.transfer_uy_enabled === 'true';
   const extEnabled = cfg.transfer_ext_enabled === 'true';
   const cuotasArEnabled = cfg.cuotas_ar_enabled === 'true';
+  const cuotasUyEnabled = cfg.cuotas_uy_enabled === 'true';
   const cuotasExtEnabled = cfg.cuotas_ext_enabled === 'true';
-  const globalCuotasEnabled = transferMethod === 'AR' ? cuotasArEnabled : transferMethod === 'EXT' ? cuotasExtEnabled : false;
+  const globalCuotasEnabled = transferMethod === 'AR' ? cuotasArEnabled : transferMethod === 'UY' ? cuotasUyEnabled : transferMethod === 'EXT' ? cuotasExtEnabled : false;
+  const enabledMethods = [arEnabled, uyEnabled, extEnabled].filter(Boolean).length;
   const profileCuotas = selectedCp as (typeof selectedCp & { installmentsEnabled?: boolean }) | null;
   const cuotasEnabled = globalCuotasEnabled && (profileCuotas?.installmentsEnabled ?? false);
   const maxCuotas = parseInt(cfg.max_cuotas ?? '3');
 
   useEffect(() => {
     if (step === 'payment') {
-      if (arEnabled && !extEnabled) setTransferMethod('AR');
-      else if (!arEnabled && extEnabled) setTransferMethod('EXT');
+      if (enabledMethods === 1) {
+        if (arEnabled) setTransferMethod('AR');
+        else if (uyEnabled) setTransferMethod('UY');
+        else if (extEnabled) setTransferMethod('EXT');
+      }
     }
-  }, [step, arEnabled, extEnabled]);
+  }, [step, arEnabled, uyEnabled, extEnabled, enabledMethods]);
 
   const referenceNote = (cfg.transfer_reference_note ?? 'Nombre completo - Nombre del curso')
     .replace('Nombre completo', session?.name ?? 'Tu nombre')
@@ -211,7 +221,7 @@ export default function EnrollModal({ course, session: initialSession, onClose, 
     const file = e.target.files?.[0];
     if (!file || !transferMethod) return;
     setUploading(true); setError('');
-    const paymentMethod = transferMethod === 'AR' ? 'TRANSFERENCIA_AR' : 'TRANSFERENCIA_EXT';
+    const paymentMethod = transferMethod === 'AR' ? 'TRANSFERENCIA_AR' : transferMethod === 'UY' ? 'TRANSFERENCIA_UY' : 'TRANSFERENCIA_EXT';
     try {
       const isCuotas = paymentMode === 'cuotas' && cuotasEnabled;
       const cuotaAmount = activePrice ? activePrice.amount / (isCuotas ? selectedCuotas : 1) : 0;
@@ -423,20 +433,31 @@ export default function EnrollModal({ course, session: initialSession, onClose, 
               )}
             </div>
 
-            {arEnabled && extEnabled && !transferMethod && (
+            {enabledMethods > 1 && !transferMethod && (
               <>
                 <p className={styles.stepLabel}>¿Desde dónde vas a transferir?</p>
                 <div className={styles.methodGrid}>
-                  <button className={styles.methodCard} onClick={() => setTransferMethod('AR')}>
-                    <span className={styles.methodFlag}>🇦🇷</span>
-                    <strong>Desde Argentina</strong>
-                    <span>CBU / Alias</span>
-                  </button>
-                  <button className={styles.methodCard} onClick={() => setTransferMethod('EXT')}>
-                    <span className={styles.methodFlag}>🌍</span>
-                    <strong>Desde el exterior</strong>
-                    <span>PayPal / SWIFT</span>
-                  </button>
+                  {arEnabled && (
+                    <button className={styles.methodCard} onClick={() => setTransferMethod('AR')}>
+                      <span className={styles.methodFlag}>🇦🇷</span>
+                      <strong>Desde Argentina</strong>
+                      <span>CBU / Alias</span>
+                    </button>
+                  )}
+                  {uyEnabled && (
+                    <button className={styles.methodCard} onClick={() => setTransferMethod('UY')}>
+                      <span className={styles.methodFlag}>🇺🇾</span>
+                      <strong>Desde Uruguay</strong>
+                      <span>Prex</span>
+                    </button>
+                  )}
+                  {extEnabled && (
+                    <button className={styles.methodCard} onClick={() => setTransferMethod('EXT')}>
+                      <span className={styles.methodFlag}>🌍</span>
+                      <strong>Desde el exterior</strong>
+                      <span>PayPal / SWIFT</span>
+                    </button>
+                  )}
                 </div>
               </>
             )}
@@ -488,15 +509,28 @@ export default function EnrollModal({ course, session: initialSession, onClose, 
                 )}
 
                 <div className={styles.bankInfo}>
-                  <h3>{transferMethod === 'AR' ? '🇦🇷 Transferencia desde Argentina' : '🌍 Transferencia desde el exterior'}</h3>
-                  {transferMethod === 'AR' ? (
+                  <h3>
+                    {transferMethod === 'AR' ? '🇦🇷 Transferencia desde Argentina'
+                      : transferMethod === 'UY' ? '🇺🇾 Transferencia desde Uruguay'
+                      : '🌍 Transferencia desde el exterior'}
+                  </h3>
+                  {transferMethod === 'AR' && (
                     <>
                       {cfg.transfer_bank && <p>Banco: <strong>{cfg.transfer_bank}</strong></p>}
                       {cfg.transfer_holder && <p>Titular: <strong>{cfg.transfer_holder}</strong></p>}
                       {cfg.transfer_cbu && <p>CBU: <strong>{cfg.transfer_cbu}</strong></p>}
                       {cfg.transfer_alias && <p>Alias: <strong>{cfg.transfer_alias}</strong></p>}
                     </>
-                  ) : (
+                  )}
+                  {transferMethod === 'UY' && (
+                    <>
+                      {cfg.transfer_uy_bank && <p>Entidad: <strong>{cfg.transfer_uy_bank}</strong></p>}
+                      {cfg.transfer_uy_holder && <p>Titular: <strong>{cfg.transfer_uy_holder}</strong></p>}
+                      {cfg.transfer_uy_account && <p>Cuenta / Tel: <strong>{cfg.transfer_uy_account}</strong></p>}
+                      {cfg.transfer_uy_alias && <p>Alias: <strong>{cfg.transfer_uy_alias}</strong></p>}
+                    </>
+                  )}
+                  {transferMethod === 'EXT' && (
                     <>
                       {cfg.transfer_ext_bank && <p>Entidad: <strong>{cfg.transfer_ext_bank}</strong></p>}
                       {cfg.transfer_ext_holder && <p>Titular: <strong>{cfg.transfer_ext_holder}</strong></p>}
@@ -506,7 +540,7 @@ export default function EnrollModal({ course, session: initialSession, onClose, 
                   )}
                   <p>Referencia: <strong>{referenceNote}</strong></p>
                 </div>
-                {arEnabled && extEnabled && (
+                {enabledMethods > 1 && (
                   <button className={styles.changeMethod} onClick={() => setTransferMethod(null)}>← Cambiar método</button>
                 )}
                 <div className={styles.uploadArea} onClick={() => receiptRef.current?.click()}>
