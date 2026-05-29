@@ -169,8 +169,15 @@ export default function Enrollments({ courseId }: { courseId: string }) {
     e.installmentPlan?.installments.some(i => i.status === 'PENDING' || i.status === 'SUBMITTED')
   );
 
+  const withCompletedPlan = enrollments.filter(e =>
+    e.installmentPlan &&
+    e.installmentPlan.installments.length > 0 &&
+    e.installmentPlan.installments.every(i => i.status === 'ACCEPTED')
+  );
+
   const filtered = filter === 'all' ? enrollments
     : filter === 'CUOTAS_PENDIENTES' ? withPendingInstallments
+    : filter === 'CUOTAS_COMPLETAS' ? withCompletedPlan
     : enrollments.filter((e) => e.status === filter);
   const pendingReceipts = enrollments.filter((e) => e.status === 'COMPROBANTE_SUBIDO').length;
 
@@ -197,6 +204,7 @@ export default function Enrollments({ courseId }: { courseId: string }) {
           { key: 'COMPROBANTE_SUBIDO', label: 'Para revisar', count: enrollments.filter(e => e.status === 'COMPROBANTE_SUBIDO').length },
           { key: 'CONFIRMADA', label: 'Confirmadas', count: enrollments.filter(e => e.status === 'CONFIRMADA').length },
           { key: 'CUOTAS_PENDIENTES', label: 'Cuotas pendientes', count: withPendingInstallments.length },
+          { key: 'CUOTAS_COMPLETAS', label: 'Plan completo', count: withCompletedPlan.length },
           { key: 'PENDIENTE_PAGO', label: 'Pendientes', count: enrollments.filter(e => e.status === 'PENDIENTE_PAGO').length },
           { key: 'CANCELADA', label: 'Canceladas', count: enrollments.filter(e => e.status === 'CANCELADA').length },
         ].map((f) => (
