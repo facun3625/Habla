@@ -12,7 +12,10 @@ const PUBLIC_KEYS = new Set([
   'transfer_uy_enabled',
   'transfer_uy_bank', 'transfer_uy_account', 'transfer_uy_alias', 'transfer_uy_holder',
   'instagram_url', 'youtube_url',
-  'cuotas_ar_enabled', 'cuotas_ext_enabled', 'cuotas_uy_enabled', 'max_cuotas', 'cuotas_due_day',
+  'cuotas_ar_enabled', 'cuotas_ar_note',
+  'cuotas_uy_enabled', 'cuotas_uy_note',
+  'cuotas_ext_enabled', 'cuotas_ext_note',
+  'max_cuotas', 'cuotas_due_day',
   'popup_enabled', 'popup_title', 'popup_content', 'popup_cta_text', 'popup_cta_url',
 ]);
 

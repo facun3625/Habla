@@ -43,8 +43,11 @@ const DEFAULTS: Settings = {
   transfer_uy_holder: '',
   // Cuotas
   cuotas_ar_enabled: 'false',
-  cuotas_ext_enabled: 'false',
+  cuotas_ar_note: '',
   cuotas_uy_enabled: 'false',
+  cuotas_uy_note: '',
+  cuotas_ext_enabled: 'false',
+  cuotas_ext_note: '',
   max_cuotas: '3',
   cuotas_due_day: '',
   // Popup promocional
@@ -387,14 +390,24 @@ export default function SettingsPage() {
             <div className={styles.field}>
               <label>Cuotas — Transferencia Argentina</label>
               <Toggle id="cuotas_ar_enabled" />
+              {settings.cuotas_ar_enabled === 'true' && (
+                <input type="text" className={styles.input} value={settings.cuotas_ar_note ?? ''} onChange={set('cuotas_ar_note')} placeholder="Ej: 3 cuotas sin interés con transferencia" style={{ marginTop: 8 }} />
+              )}
+              <span className={styles.hint}>Este texto aparece en el modal de inscripción junto al precio cuando las cuotas están activas.</span>
             </div>
             <div className={styles.field}>
               <label>Cuotas — Transferencia Uruguay</label>
               <Toggle id="cuotas_uy_enabled" />
+              {settings.cuotas_uy_enabled === 'true' && (
+                <input type="text" className={styles.input} value={settings.cuotas_uy_note ?? ''} onChange={set('cuotas_uy_note')} placeholder="Ej: 3 cuotas sin interés con Prex" style={{ marginTop: 8 }} />
+              )}
             </div>
             <div className={styles.field}>
               <label>Cuotas — Transferencia Exterior</label>
               <Toggle id="cuotas_ext_enabled" />
+              {settings.cuotas_ext_enabled === 'true' && (
+                <input type="text" className={styles.input} value={settings.cuotas_ext_note ?? ''} onChange={set('cuotas_ext_note')} placeholder="Ej: 3 cuotas sin interés con PayPal" style={{ marginTop: 8 }} />
+              )}
             </div>
             {(settings.cuotas_ar_enabled === 'true' || settings.cuotas_ext_enabled === 'true' || settings.cuotas_uy_enabled === 'true') && (
               <>

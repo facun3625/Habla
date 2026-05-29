@@ -26,9 +26,9 @@ type PublicSettings = {
   transfer_uy_enabled?: string;
   transfer_uy_bank?: string; transfer_uy_account?: string;
   transfer_uy_alias?: string; transfer_uy_holder?: string;
-  cuotas_ar_enabled?: string;
-  cuotas_ext_enabled?: string;
-  cuotas_uy_enabled?: string;
+  cuotas_ar_enabled?: string; cuotas_ar_note?: string;
+  cuotas_uy_enabled?: string; cuotas_uy_note?: string;
+  cuotas_ext_enabled?: string; cuotas_ext_note?: string;
   max_cuotas?: string;
   cuotas_due_day?: string;
 };
@@ -124,7 +124,23 @@ export default function EnrollModal({ course, session: initialSession, onClose, 
   const globalCuotasEnabled = transferMethod === 'AR' ? cuotasArEnabled : transferMethod === 'UY' ? cuotasUyEnabled : transferMethod === 'EXT' ? cuotasExtEnabled : false;
   const enabledMethods = [arEnabled, uyEnabled, extEnabled].filter(Boolean).length;
   const profileCuotas = selectedCp as (typeof selectedCp & { installmentsEnabled?: boolean }) | null;
-  const cuotasEnabled = globalCuotasEnabled && (profileCuotas?.installmentsEnabled ?? false);
+  const profileInstallmentsEnabled = profileCuotas?.installmentsEnabled ?? false;
+  const cuotasEnabled = globalCuotasEnabled && profileInstallmentsEnabled;
+
+  // Nota de cuotas: si hay método seleccionado → nota de ese método; si no → notas de métodos activos con cuotas
+  const cuotasNote = (() => {
+    if (transferMethod) {
+      const note = transferMethod === 'AR' ? cfg.cuotas_ar_note : transferMethod === 'UY' ? cfg.cuotas_uy_note : cfg.cuotas_ext_note;
+      return cuotasEnabled && note ? note : null;
+    }
+    if (!profileInstallmentsEnabled) return null;
+    const notes = [
+      arEnabled && cuotasArEnabled && cfg.cuotas_ar_note,
+      uyEnabled && cuotasUyEnabled && cfg.cuotas_uy_note,
+      extEnabled && cuotasExtEnabled && cfg.cuotas_ext_note,
+    ].filter(Boolean) as string[];
+    return notes.length > 0 ? notes[0] : null;
+  })();
   const maxCuotas = parseInt(cfg.max_cuotas ?? '3');
 
   useEffect(() => {
@@ -430,6 +446,9 @@ export default function EnrollModal({ course, session: initialSession, onClose, 
               {priceLabel}
               {selectedProfileId && profilesFromPrices.find(p => p.id === selectedProfileId) && (
                 <span> · {profilesFromPrices.find(p => p.id === selectedProfileId)!.name}</span>
+              )}
+              {cuotasNote && (
+                <div style={{ fontSize: '0.8rem', fontWeight: 600, marginTop: 6, opacity: 0.85 }}>({cuotasNote})</div>
               )}
             </div>
 
