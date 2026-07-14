@@ -5,9 +5,10 @@ const secret = new TextEncoder().encode(
 );
 
 const COOKIE = 'hp_token';
+const IMPERSONATOR_COOKIE = 'hp_impersonator';
 const EXPIRES = '7d';
 
-export { COOKIE };
+export { COOKIE, IMPERSONATOR_COOKIE };
 
 export async function signToken(payload: { userId: number; email: string; name?: string | null }) {
   return new SignJWT(payload)

@@ -19,6 +19,11 @@ export async function GET(req: NextRequest) {
           },
         },
         profile: { select: { id: true, name: true } },
+        installmentPlan: {
+          include: {
+            installments: { orderBy: { number: 'asc' } },
+          },
+        },
       },
     });
     return NextResponse.json(enrollments);

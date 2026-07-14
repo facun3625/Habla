@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Fragment, useState, useEffect } from 'react';
 import AdminLayout from '../components/AdminLayout';
-import { Search, User, Trash2, ShieldCheck, BookOpen, ChevronDown, ChevronUp } from 'lucide-react';
+import { Search, User, Trash2, ShieldCheck, BookOpen, ChevronDown, ChevronUp, Eye } from 'lucide-react';
 import styles from '../courses/courses.module.css';
 import ConfirmModal from '../components/ConfirmModal';
 
@@ -120,6 +120,16 @@ export default function UsersAdminPage() {
     }
   };
 
+  const impersonate = async (id: number) => {
+    const res = await fetch(`/api/users/${id}/impersonate`, { method: 'POST' });
+    if (res.ok) {
+      window.location.href = '/mi-cuenta';
+    } else {
+      const data = await res.json().catch(() => ({}));
+      alert(data.error || 'No se pudo ingresar como este usuario.');
+    }
+  };
+
   const deleteUser = (id: number, email: string) => {
     setConfirmModal({
       message: `¿Eliminar el usuario "${email}"? Esta acción no se puede deshacer.`,
@@ -207,8 +217,8 @@ export default function UsersAdminPage() {
               </thead>
               <tbody>
                 {filtered.map((u) => (
-                  <>
-                    <tr key={u.id} style={{ cursor: 'pointer' }} onClick={() => setExpanded(expanded === u.id ? null : u.id)}>
+                  <Fragment key={u.id}>
+                    <tr style={{ cursor: 'pointer' }} onClick={() => setExpanded(expanded === u.id ? null : u.id)}>
                       <td className={styles.courseCell}>
                         <div className={styles.courseIcon}>
                           <User size={18} />
@@ -272,6 +282,13 @@ export default function UsersAdminPage() {
                             {expanded === u.id ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
                           </button>
                           <button
+                            onClick={() => impersonate(u.id)}
+                            style={{ background: 'none', border: '1px solid #e2e8f0', borderRadius: 8, padding: '4px 8px', cursor: 'pointer', color: '#6c5ce7', display: 'flex', alignItems: 'center' }}
+                            title="Ingresar como este usuario"
+                          >
+                            <Eye size={15} />
+                          </button>
+                          <button
                             onClick={() => deleteUser(u.id, u.email)}
                             className={styles.actionBtnAdmin}
                             style={{ color: '#ff4d4f', border: '1px solid #ff4d4f' }}
@@ -283,7 +300,7 @@ export default function UsersAdminPage() {
                       </td>
                     </tr>
                     {expanded === u.id && <UserDetail u={u} />}
-                  </>
+                  </Fragment>
                 ))}
               </tbody>
             </table>

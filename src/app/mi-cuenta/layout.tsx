@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, BookOpen, UserCircle, LogOut, ArrowLeft } from 'lucide-react';
+import { LayoutDashboard, BookOpen, UserCircle, LogOut, ArrowLeft, Eye } from 'lucide-react';
 import styles from './account.module.css';
 import QuestionnaireModal from '@/app/components/QuestionnaireModal';
 
@@ -11,6 +11,7 @@ type User = {
   id: number; name: string | null; email: string;
   profile: { name: string } | null;
   questionnaireCompleted: boolean;
+  impersonating?: boolean;
 };
 
 const NAV = [
@@ -39,6 +40,11 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
     router.push('/');
   };
 
+  const stopImpersonating = async () => {
+    await fetch('/api/auth/stop-impersonation', { method: 'POST' });
+    window.location.href = '/admin/users';
+  };
+
   const initials = user?.name
     ? user.name.split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase()
     : '?';
@@ -49,7 +55,26 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
   if (!user) return null;
 
   return (
-    <div className={styles.shell}>
+    <div className={styles.shell} style={user.impersonating ? { paddingTop: 44 } : undefined}>
+      {user.impersonating && (
+        <div
+          style={{
+            position: 'fixed', top: 0, left: 0, right: 0, zIndex: 10000,
+            background: '#1e1b4b', color: 'white', padding: '10px 20px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12,
+            fontSize: '0.85rem', fontWeight: 600,
+          }}
+        >
+          <Eye size={16} />
+          Estás viendo la cuenta de {user.name ?? user.email} como administrador.
+          <button
+            onClick={stopImpersonating}
+            style={{ background: '#6c5ce7', border: 'none', color: 'white', borderRadius: 8, padding: '5px 14px', fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer', fontFamily: 'inherit' }}
+          >
+            Volver a admin
+          </button>
+        </div>
+      )}
       {showQuestionnaire && (
         <QuestionnaireModal
           initialName={user.name}

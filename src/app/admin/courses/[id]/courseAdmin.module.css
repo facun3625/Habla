@@ -716,6 +716,28 @@
   font-weight: 700;
 }
 
+.searchBox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #f8fafc;
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1.5px solid #e2e8f0;
+  color: #94a3b8;
+  margin-bottom: 14px;
+}
+
+.searchBox input {
+  background: none;
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 0.88rem;
+  color: #475569;
+  font-family: inherit;
+}
+
 .filterTabs {
   display: flex;
   gap: 6px;

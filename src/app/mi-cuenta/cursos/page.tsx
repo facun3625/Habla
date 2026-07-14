@@ -2,13 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { BookOpen, ArrowRight, Upload } from 'lucide-react';
+import { BookOpen, ArrowRight, Upload, ChevronDown } from 'lucide-react';
 import styles from '../account.module.css';
 
+type Installment = { id: number; number: number; amount: number; dueDate: string | null; status: string };
+type InstallmentPlan = { id: number; numInstallments: number; amountPerInstallment: number; currency: string; installments: Installment[] };
 type Enrollment = {
   id: number; status: string; createdAt: string; paymentMethod: string | null;
   course: { id: number; title: string; coverImage: string | null; startDate: string | null; modality: string };
   profile: { name: string } | null;
+  installmentPlan: InstallmentPlan | null;
 };
 
 const STATUS_LABEL: Record<string, string> = {
@@ -25,9 +28,18 @@ const STATUS_BADGE: Record<string, string> = {
   CANCELADA: 'badgeCancelled',
 };
 
+const INST_STATUS_LABEL: Record<string, string> = {
+  PENDING: 'Pendiente', SUBMITTED: 'En revisión', ACCEPTED: 'Pagada', REJECTED: 'Rechazada',
+};
+
+const INST_BADGE: Record<string, string> = {
+  PENDING: 'instPending', SUBMITTED: 'instSubmitted', ACCEPTED: 'instAccepted', REJECTED: 'instRejected',
+};
+
 export default function MyCourses() {
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     fetch('/api/enrollments')
@@ -35,6 +47,13 @@ export default function MyCourses() {
       .then((d) => setEnrollments(Array.isArray(d) ? d : []))
       .finally(() => setLoading(false));
   }, []);
+
+  const toggleExpand = (id: number) =>
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
 
   if (loading) return <p style={{ color: '#94a3b8', padding: '40px 0' }}>Cargando…</p>;
 
@@ -59,9 +78,11 @@ export default function MyCourses() {
             const isConfirmed = e.status === 'CONFIRMADA';
             const isPending = e.status === 'PENDIENTE_PAGO';
             const badgeKey = STATUS_BADGE[e.status] ?? 'badgePending';
+            const hasPlan = !!e.installmentPlan;
+            const isExpanded = expandedIds.has(e.id);
 
             return (
-              <div key={e.id} className={styles.enrollCard} style={{ textDecoration: 'none' }}>
+              <div key={e.id} className={styles.enrollCard} style={{ textDecoration: 'none', flexWrap: 'wrap' }}>
                 <div className={styles.enrollCover}>
                   {e.course.coverImage
                     ? <img src={e.course.coverImage} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -80,6 +101,13 @@ export default function MyCourses() {
                   </div>
                 </div>
 
+                {hasPlan && (
+                  <button className={styles.installmentToggle} onClick={() => toggleExpand(e.id)}>
+                    <ChevronDown size={15} style={{ transform: isExpanded ? 'rotate(180deg)' : undefined, transition: 'transform 0.2s' }} />
+                    Ver cuotas
+                  </button>
+                )}
+
                 {isConfirmed && (
                   <Link href={`/mi-cuenta/cursos/${e.course.id}`} className={styles.enrollAction}>
                     <ArrowRight size={16} /> Entrar
@@ -94,6 +122,30 @@ export default function MyCourses() {
                   >
                     <Upload size={16} /> Subir comprobante
                   </Link>
+                )}
+
+                {hasPlan && isExpanded && (
+                  <div className={styles.installmentPanel}>
+                    <div className={styles.installmentHeader}>
+                      {e.installmentPlan!.numInstallments} cuotas de {e.installmentPlan!.amountPerInstallment.toLocaleString('es-AR')} {e.installmentPlan!.currency}
+                    </div>
+                    {e.installmentPlan!.installments.map((inst) => (
+                      <div key={inst.id} className={styles.installmentRow}>
+                        <span className={styles.installmentNum}>#{inst.number}</span>
+                        <span className={styles.installmentAmount}>
+                          {inst.amount.toLocaleString('es-AR')} {e.installmentPlan!.currency}
+                        </span>
+                        {inst.dueDate && (
+                          <span className={styles.installmentDue}>
+                            Vence: {new Date(inst.dueDate).toLocaleDateString('es-AR')}
+                          </span>
+                        )}
+                        <span className={`${styles.instBadge} ${styles[INST_BADGE[inst.status] ?? 'instPending']}`}>
+                          {INST_STATUS_LABEL[inst.status] ?? inst.status}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
             );

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { CheckCircle, XCircle, ExternalLink, Trash2, X, ChevronDown, Bell } from 'lucide-react';
+import { CheckCircle, XCircle, ExternalLink, Trash2, X, ChevronDown, Bell, Search, Mail } from 'lucide-react';
 import React from 'react';
 import styles from '../courseAdmin.module.css';
 import ConfirmModal from '../../../components/ConfirmModal';
@@ -101,8 +101,13 @@ export default function Enrollments({ courseId }: { courseId: string }) {
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>('all');
+  const [search, setSearch] = useState('');
   const [confirmModal, setConfirmModal] = useState<{ message: string; onConfirm: () => void } | null>(null);
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
+  const [resendModal, setResendModal] = useState<{ id: number; email: string } | null>(null);
+  const [extraEmail, setExtraEmail] = useState('');
+  const [resendStatus, setResendStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+  const [resendError, setResendError] = useState('');
 
   const refetch = () =>
     fetch(`/api/courses/${courseId}/enrollments`)
@@ -151,6 +156,47 @@ export default function Enrollments({ courseId }: { courseId: string }) {
     await fetch(`/api/installments/${installmentId}/remind`, { method: 'POST' });
   };
 
+  const openResendModal = (id: number, email: string) => {
+    setResendModal({ id, email });
+    setExtraEmail('');
+    setResendStatus('idle');
+    setResendError('');
+  };
+
+  const closeResendModal = () => {
+    setResendModal(null);
+    setResendStatus('idle');
+  };
+
+  const sendResendConfirmation = async () => {
+    if (!resendModal) return;
+    setResendStatus('sending');
+    setResendError('');
+    const timeout = AbortSignal.timeout(30000);
+    try {
+      const res = await fetch(`/api/enrollments/${resendModal.id}/resend-confirmation`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ extraEmail: extraEmail.trim() || undefined }),
+        signal: timeout,
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setResendStatus('error');
+        setResendError(data.error || 'Error al reenviar el mail');
+        return;
+      }
+      setResendStatus('sent');
+    } catch (err) {
+      setResendStatus('error');
+      setResendError(
+        err instanceof DOMException && err.name === 'TimeoutError'
+          ? 'El envío está tardando demasiado. Puede que el mail haya salido igual — revisá la casilla antes de reintentar.'
+          : 'Error al reenviar el mail'
+      );
+    }
+  };
+
   const deleteEnrollment = (id: number) => {
     setConfirmModal({
       message: '¿Eliminar esta inscripción? Esta acción no se puede deshacer.',
@@ -179,11 +225,19 @@ export default function Enrollments({ courseId }: { courseId: string }) {
     e.status === 'CONFIRMADA' && !e.installmentPlan
   );
 
-  const filtered = filter === 'all' ? enrollments
+  const filteredByStatus = filter === 'all' ? enrollments
     : filter === 'CUOTAS_PENDIENTES' ? withPendingInstallments
     : filter === 'CUOTAS_COMPLETAS' ? withCompletedPlan
     : filter === 'PAGO_UNICO' ? singlePayment
     : enrollments.filter((e) => e.status === filter);
+
+  const searchTerm = search.trim().toLowerCase();
+  const filtered = searchTerm
+    ? filteredByStatus.filter((e) =>
+        e.userName.toLowerCase().includes(searchTerm) || e.email.toLowerCase().includes(searchTerm)
+      )
+    : filteredByStatus;
+
   const pendingReceipts = enrollments.filter((e) => e.status === 'COMPROBANTE_SUBIDO').length;
 
   if (loading) return <p style={{ padding: '1rem', color: '#888' }}>Cargando...</p>;
@@ -200,6 +254,16 @@ export default function Enrollments({ courseId }: { courseId: string }) {
             {pendingReceipts} comprobante{pendingReceipts > 1 ? 's' : ''} para revisar
           </div>
         )}
+      </div>
+
+      <div className={styles.searchBox}>
+        <Search size={16} />
+        <input
+          type="text"
+          placeholder="Buscar por nombre o email..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
       </div>
 
       {/* Filter tabs */}
@@ -300,6 +364,15 @@ export default function Enrollments({ courseId }: { courseId: string }) {
                               )}
                             </>
                           )}
+                          {e.status === 'CONFIRMADA' && (
+                            <button
+                              title="Reenviar confirmación por mail"
+                              onClick={() => openResendModal(e.id, e.email)}
+                              style={{ background: 'none', border: '1px solid #e2e8f0', borderRadius: 7, padding: '4px 7px', cursor: 'pointer', color: '#6c5ce7', display: 'flex', alignItems: 'center' }}
+                            >
+                              <Mail size={15} />
+                            </button>
+                          )}
                           <button className={styles.actionBtnDelete} title="Eliminar" onClick={() => deleteEnrollment(e.id)}><Trash2 size={15} /></button>
                         </div>
                       </td>
@@ -359,6 +432,55 @@ export default function Enrollments({ courseId }: { courseId: string }) {
           onConfirm={confirmModal.onConfirm}
           onCancel={() => setConfirmModal(null)}
         />
+      )}
+      {resendModal && (
+        <div
+          style={{ position: 'fixed', inset: 0, background: 'rgba(15,20,40,0.55)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}
+          onClick={closeResendModal}
+        >
+          <div
+            style={{ background: 'white', borderRadius: 18, padding: '32px 32px 28px', maxWidth: 440, width: '100%', boxShadow: '0 24px 64px rgba(0,0,0,0.18)' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#1e293b', margin: '0 0 6px' }}>Reenviar confirmación</h3>
+            <p style={{ fontSize: '0.88rem', color: '#64748b', marginBottom: 20, lineHeight: 1.6 }}>
+              Se enviará a <strong>{resendModal.email}</strong>. Opcionalmente podés agregar un email adicional para que le llegue también a otra casilla.
+            </p>
+            <label style={{ fontSize: '0.82rem', fontWeight: 700, color: '#475569', marginBottom: 6, display: 'block' }}>
+              Email adicional (opcional)
+            </label>
+            <input
+              type="email"
+              value={extraEmail}
+              onChange={(e) => setExtraEmail(e.target.value)}
+              placeholder="otro@email.com"
+              style={{ width: '100%', padding: '10px 14px', border: '1.5px solid #e2e8f0', borderRadius: 10, fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box', marginBottom: 16, fontFamily: 'inherit' }}
+            />
+            {resendStatus === 'error' && (
+              <p style={{ color: '#dc2626', fontSize: '0.85rem', marginBottom: 12 }}>{resendError}</p>
+            )}
+            {resendStatus === 'sent' && (
+              <p style={{ color: '#15803d', fontSize: '0.85rem', marginBottom: 12, fontWeight: 700 }}>Mail enviado correctamente.</p>
+            )}
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+              <button
+                onClick={closeResendModal}
+                style={{ padding: '10px 22px', border: '1.5px solid #e2e8f0', borderRadius: 10, cursor: 'pointer', background: 'white', color: '#64748b', fontWeight: 600, fontSize: '0.9rem' }}
+              >
+                {resendStatus === 'sent' ? 'Cerrar' : 'Cancelar'}
+              </button>
+              {resendStatus !== 'sent' && (
+                <button
+                  onClick={sendResendConfirmation}
+                  disabled={resendStatus === 'sending'}
+                  style={{ padding: '10px 22px', border: 'none', borderRadius: 10, cursor: resendStatus === 'sending' ? 'default' : 'pointer', background: '#6c5ce7', color: 'white', fontWeight: 700, fontSize: '0.9rem', opacity: resendStatus === 'sending' ? 0.7 : 1 }}
+                >
+                  {resendStatus === 'sending' ? 'Enviando...' : 'Enviar'}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

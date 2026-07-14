@@ -302,6 +302,84 @@
   white-space: nowrap;
 }
 
+/* ── Installments (cuotas) ──────────────────────────────────── */
+.installmentToggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: none;
+  border: 1.5px solid #ede9fe;
+  border-radius: 10px;
+  color: #6c5ce7;
+  font-size: 0.82rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  flex-shrink: 0;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.installmentToggle:hover { background: #f5f3ff; }
+
+.installmentPanel {
+  width: 100%;
+  margin-top: 12px;
+  border: 1.5px solid #ede9fe;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.installmentHeader {
+  padding: 10px 16px;
+  background: #f5f3ff;
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: #4c3a8a;
+}
+
+.installmentRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-top: 1px solid #f0eeff;
+  background: white;
+  flex-wrap: wrap;
+}
+
+.installmentNum {
+  font-weight: 800;
+  font-size: 0.82rem;
+  color: #6c5ce7;
+  width: 22px;
+}
+
+.installmentAmount {
+  font-size: 0.88rem;
+  color: #1e1b4b;
+  font-weight: 600;
+}
+
+.installmentDue {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.instBadge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 20px;
+  margin-left: auto;
+}
+
+.instPending  { background: #f1f5f9; color: #64748b; }
+.instSubmitted { background: #fef9c3; color: #b45309; }
+.instAccepted { background: #dcfce7; color: #15803d; }
+.instRejected { background: #fee2e2; color: #dc2626; }
+
 /* ── Modules list ───────────────────────────────────────────── */
 .courseHeader {
   display: flex;

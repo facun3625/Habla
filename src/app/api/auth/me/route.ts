@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyToken, COOKIE } from '@/lib/auth';
+import { verifyToken, COOKIE, IMPERSONATOR_COOKIE } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
 export async function GET(req: NextRequest) {
@@ -22,7 +22,8 @@ export async function GET(req: NextRequest) {
       },
     });
     if (!user) return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 });
-    return NextResponse.json(user);
+    const impersonating = !!req.cookies.get(IMPERSONATOR_COOKIE)?.value;
+    return NextResponse.json({ ...user, impersonating });
   } catch {
     return NextResponse.json({ error: 'Token inválido' }, { status: 401 });
   }
