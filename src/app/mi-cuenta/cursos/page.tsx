@@ -13,6 +13,20 @@ type Enrollment = {
   profile: { name: string } | null;
   installmentPlan: InstallmentPlan | null;
 };
+type PublicSettings = {
+  transfer_bank?: string; transfer_cbu?: string; transfer_alias?: string; transfer_holder?: string;
+  transfer_ext_bank?: string; transfer_ext_cbu?: string; transfer_ext_alias?: string; transfer_ext_holder?: string;
+  transfer_uy_bank?: string; transfer_uy_account?: string; transfer_uy_alias?: string; transfer_uy_holder?: string;
+  transfer_reference_note?: string;
+};
+
+function transferMethodOf(paymentMethod: string | null): 'AR' | 'UY' | 'EXT' | null {
+  if (!paymentMethod) return null;
+  if (paymentMethod === 'TRANSFERENCIA_UY') return 'UY';
+  if (paymentMethod === 'TRANSFERENCIA_EXT') return 'EXT';
+  if (paymentMethod === 'TRANSFERENCIA_AR' || paymentMethod === 'TRANSFERENCIA') return 'AR';
+  return null;
+}
 
 const STATUS_LABEL: Record<string, string> = {
   PENDIENTE_PAGO: 'Pendiente de pago',
@@ -42,6 +56,7 @@ export default function MyCourses() {
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
   const [uploadingId, setUploadingId] = useState<number | null>(null);
   const [uploadError, setUploadError] = useState<{ id: number; message: string } | null>(null);
+  const [cfg, setCfg] = useState<PublicSettings>({});
 
   const refetch = () =>
     fetch('/api/enrollments')
@@ -50,6 +65,7 @@ export default function MyCourses() {
 
   useEffect(() => {
     refetch().finally(() => setLoading(false));
+    fetch('/api/settings?public=1').then((r) => r.ok ? r.json() : {}).then(setCfg).catch(() => {});
   }, []);
 
   const toggleExpand = (id: number) =>
@@ -104,6 +120,12 @@ export default function MyCourses() {
             const badgeKey = STATUS_BADGE[e.status] ?? 'badgePending';
             const hasPlan = !!e.installmentPlan;
             const isExpanded = expandedIds.has(e.id);
+            const method = transferMethodOf(e.paymentMethod);
+            const payableInstallments = e.installmentPlan?.installments
+              .filter((i) => i.status === 'PENDING' || i.status === 'REJECTED')
+              .sort((a, b) => a.number - b.number) ?? [];
+            const nextPayable = payableInstallments[0] ?? null;
+            const isUploadingNext = nextPayable ? uploadingId === nextPayable.id : false;
 
             return (
               <div key={e.id} className={styles.enrollCard} style={{ textDecoration: 'none', flexWrap: 'wrap' }}>
@@ -125,6 +147,29 @@ export default function MyCourses() {
                   </div>
                 </div>
 
+                {nextPayable && (
+                  <label
+                    className={styles.enrollAction}
+                    style={{ background: '#f59e0b', opacity: isUploadingNext ? 0.6 : 1, pointerEvents: isUploadingNext ? 'none' : undefined }}
+                  >
+                    <Upload size={16} /> {isUploadingNext ? 'Subiendo…' : `Agregar comprobante (cuota ${nextPayable.number})`}
+                    <input
+                      type="file"
+                      accept="image/*,application/pdf"
+                      style={{ display: 'none' }}
+                      onChange={(ev) => {
+                        const file = ev.target.files?.[0];
+                        if (file) uploadInstallmentProof(nextPayable.id, file);
+                        ev.target.value = '';
+                      }}
+                    />
+                  </label>
+                )}
+
+                {nextPayable && uploadError?.id === nextPayable.id && (
+                  <span style={{ width: '100%', fontSize: '0.78rem', color: '#dc2626' }}>{uploadError.message}</span>
+                )}
+
                 {hasPlan && (
                   <button className={styles.installmentToggle} onClick={() => toggleExpand(e.id)}>
                     <ChevronDown size={15} style={{ transform: isExpanded ? 'rotate(180deg)' : undefined, transition: 'transform 0.2s' }} />
@@ -138,7 +183,7 @@ export default function MyCourses() {
                   </Link>
                 )}
 
-                {isPending && e.paymentMethod === 'TRANSFERENCIA' && (
+                {isPending && method && (
                   <Link
                     href={`/cursos/${e.course.id}`}
                     className={styles.enrollAction}
@@ -153,6 +198,38 @@ export default function MyCourses() {
                     <div className={styles.installmentHeader}>
                       {e.installmentPlan!.numInstallments} cuotas de {e.installmentPlan!.amountPerInstallment.toLocaleString('es-AR')} {e.installmentPlan!.currency}
                     </div>
+                    {nextPayable && method && (
+                      <div className={styles.bankInfoBox}>
+                        <p className={styles.bankInfoTitle}>
+                          {method === 'AR' ? '🇦🇷 Transferencia desde Argentina' : method === 'UY' ? '🇺🇾 Transferencia desde Uruguay' : '🌍 Transferencia desde el exterior'}
+                        </p>
+                        {method === 'AR' && (
+                          <>
+                            {cfg.transfer_bank && <p>Banco: <strong>{cfg.transfer_bank}</strong></p>}
+                            {cfg.transfer_holder && <p>Titular: <strong>{cfg.transfer_holder}</strong></p>}
+                            {cfg.transfer_cbu && <p>CBU: <strong>{cfg.transfer_cbu}</strong></p>}
+                            {cfg.transfer_alias && <p>Alias: <strong>{cfg.transfer_alias}</strong></p>}
+                          </>
+                        )}
+                        {method === 'UY' && (
+                          <>
+                            {cfg.transfer_uy_bank && <p>Entidad: <strong>{cfg.transfer_uy_bank}</strong></p>}
+                            {cfg.transfer_uy_holder && <p>Titular: <strong>{cfg.transfer_uy_holder}</strong></p>}
+                            {cfg.transfer_uy_account && <p>Cuenta / Tel: <strong>{cfg.transfer_uy_account}</strong></p>}
+                            {cfg.transfer_uy_alias && <p>Alias: <strong>{cfg.transfer_uy_alias}</strong></p>}
+                          </>
+                        )}
+                        {method === 'EXT' && (
+                          <>
+                            {cfg.transfer_ext_bank && <p>Entidad: <strong>{cfg.transfer_ext_bank}</strong></p>}
+                            {cfg.transfer_ext_holder && <p>Titular: <strong>{cfg.transfer_ext_holder}</strong></p>}
+                            {cfg.transfer_ext_cbu && <p>Cuenta / Email: <strong>{cfg.transfer_ext_cbu}</strong></p>}
+                            {cfg.transfer_ext_alias && <p>Alias / PayPal.me: <strong>{cfg.transfer_ext_alias}</strong></p>}
+                          </>
+                        )}
+                        <p>Referencia: <strong>{cfg.transfer_reference_note || 'Nombre completo - Nombre del curso'}</strong></p>
+                      </div>
+                    )}
                     {e.installmentPlan!.installments.map((inst) => {
                       const canUpload = inst.status === 'PENDING' || inst.status === 'REJECTED';
                       const isUploading = uploadingId === inst.id;
