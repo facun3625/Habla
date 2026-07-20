@@ -2,7 +2,7 @@
 
 import { Fragment, useState, useEffect } from 'react';
 import AdminLayout from '../components/AdminLayout';
-import { Search, User, Trash2, ShieldCheck, BookOpen, ChevronDown, ChevronUp, Eye } from 'lucide-react';
+import { Search, User, Trash2, ShieldCheck, BookOpen, ChevronDown, ChevronUp, Eye, Pencil } from 'lucide-react';
 import styles from '../courses/courses.module.css';
 import ConfirmModal from '../components/ConfirmModal';
 
@@ -85,6 +85,9 @@ export default function UsersAdminPage() {
   const [filterProfile, setFilterProfile] = useState('');
   const [expanded, setExpanded] = useState<number | null>(null);
   const [confirmModal, setConfirmModal] = useState<{ message: string; onConfirm: () => void } | null>(null);
+  const [editModal, setEditModal] = useState<{ id: number; name: string; email: string } | null>(null);
+  const [editSaving, setEditSaving] = useState(false);
+  const [editError, setEditError] = useState('');
 
   useEffect(() => {
     Promise.all([
@@ -128,6 +131,25 @@ export default function UsersAdminPage() {
       const data = await res.json().catch(() => ({}));
       alert(data.error || 'No se pudo ingresar como este usuario.');
     }
+  };
+
+  const saveEdit = async () => {
+    if (!editModal) return;
+    setEditSaving(true);
+    setEditError('');
+    const res = await fetch(`/api/users/${editModal.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: editModal.name.trim(), email: editModal.email.trim() }),
+    });
+    const data = await res.json().catch(() => ({}));
+    setEditSaving(false);
+    if (!res.ok) {
+      setEditError(data.error || 'Error al guardar los cambios.');
+      return;
+    }
+    setUsers((prev) => prev.map((u) => u.id === editModal.id ? { ...u, name: data.name, email: data.email } : u));
+    setEditModal(null);
   };
 
   const deleteUser = (id: number, email: string) => {
@@ -282,6 +304,13 @@ export default function UsersAdminPage() {
                             {expanded === u.id ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
                           </button>
                           <button
+                            onClick={() => { setEditModal({ id: u.id, name: u.name ?? '', email: u.email }); setEditError(''); }}
+                            style={{ background: 'none', border: '1px solid #e2e8f0', borderRadius: 8, padding: '4px 8px', cursor: 'pointer', color: '#64748b', display: 'flex', alignItems: 'center' }}
+                            title="Editar nombre / email"
+                          >
+                            <Pencil size={15} />
+                          </button>
+                          <button
                             onClick={() => impersonate(u.id)}
                             style={{ background: 'none', border: '1px solid #e2e8f0', borderRadius: 8, padding: '4px 8px', cursor: 'pointer', color: '#6c5ce7', display: 'flex', alignItems: 'center' }}
                             title="Ingresar como este usuario"
@@ -313,6 +342,53 @@ export default function UsersAdminPage() {
           onConfirm={confirmModal.onConfirm}
           onCancel={() => setConfirmModal(null)}
         />
+      )}
+      {editModal && (
+        <div
+          style={{ position: 'fixed', inset: 0, background: 'rgba(15,20,40,0.55)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}
+          onClick={() => setEditModal(null)}
+        >
+          <div
+            style={{ background: 'white', borderRadius: 18, padding: '32px 32px 28px', maxWidth: 420, width: '100%', boxShadow: '0 24px 64px rgba(0,0,0,0.18)' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#1e293b', margin: '0 0 20px' }}>Editar usuario</h3>
+
+            <label style={{ fontSize: '0.82rem', fontWeight: 700, color: '#475569', marginBottom: 6, display: 'block' }}>Nombre</label>
+            <input
+              type="text"
+              value={editModal.name}
+              onChange={(e) => setEditModal((m) => m && { ...m, name: e.target.value })}
+              style={{ width: '100%', padding: '10px 14px', border: '1.5px solid #e2e8f0', borderRadius: 10, fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box', marginBottom: 14, fontFamily: 'inherit' }}
+            />
+
+            <label style={{ fontSize: '0.82rem', fontWeight: 700, color: '#475569', marginBottom: 6, display: 'block' }}>Email</label>
+            <input
+              type="email"
+              value={editModal.email}
+              onChange={(e) => setEditModal((m) => m && { ...m, email: e.target.value })}
+              style={{ width: '100%', padding: '10px 14px', border: '1.5px solid #e2e8f0', borderRadius: 10, fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box', marginBottom: 16, fontFamily: 'inherit' }}
+            />
+
+            {editError && <p style={{ color: '#dc2626', fontSize: '0.85rem', marginBottom: 12 }}>{editError}</p>}
+
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => setEditModal(null)}
+                style={{ padding: '10px 22px', border: '1.5px solid #e2e8f0', borderRadius: 10, cursor: 'pointer', background: 'white', color: '#64748b', fontWeight: 600, fontSize: '0.9rem' }}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={saveEdit}
+                disabled={editSaving}
+                style={{ padding: '10px 22px', border: 'none', borderRadius: 10, cursor: editSaving ? 'default' : 'pointer', background: '#6c5ce7', color: 'white', fontWeight: 700, fontSize: '0.9rem', opacity: editSaving ? 0.7 : 1 }}
+              >
+                {editSaving ? 'Guardando...' : 'Guardar'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </AdminLayout>
   );
