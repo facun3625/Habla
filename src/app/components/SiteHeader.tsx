@@ -97,6 +97,24 @@ export default function SiteHeader() {
     setShowDropdown(false);
   };
 
+  // Mobile: rendered inline in the fullscreen nav instead of a floating dropdown,
+  // whose absolute positioning gets clipped by the page's overflow-x:clip near the left edge.
+  const mobileAuthSection = session ? (
+    <div className={headerStyles.mobileAccountBlock}>
+      <p className={headerStyles.mobileAccountName}>{session.name || 'Mi cuenta'}</p>
+      {session.role !== 'ADMIN' ? (
+        <Link href="/mi-cuenta" className={styles.navLink} onClick={() => setIsMenuOpen(false)}>Mi cuenta</Link>
+      ) : (
+        <Link href="/admin/courses" className={styles.navLink} onClick={() => setIsMenuOpen(false)}>Panel de administración</Link>
+      )}
+      <button className={`${styles.navLink} ${headerStyles.mobileLogout}`} onClick={handleLogout}>Cerrar sesión</button>
+    </div>
+  ) : (
+    <button className={styles.adminLink} onClick={() => { setShowAuth(true); setIsMenuOpen(false); }}>
+      Ingresar
+    </button>
+  );
+
   const authButton = session ? (
     <div className={headerStyles.userMenu} ref={dropdownRef}>
       <button className={`${styles.adminLink} ${headerStyles.userBtn}`} onClick={() => setShowDropdown(v => !v)}>
@@ -221,7 +239,7 @@ export default function SiteHeader() {
             <Link href="/blog" className={styles.navLink} onClick={() => setIsMenuOpen(false)}>Blog</Link>
             <div className={styles.mobileActions}>
               <Link href="/cursos" className={styles.primaryButton} onClick={() => setIsMenuOpen(false)}><ShoppingCart size={18} />Ver Cursos</Link>
-              {authButton}
+              {mobileAuthSection}
             </div>
           </nav>
 

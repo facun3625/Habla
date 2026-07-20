@@ -97,3 +97,25 @@
   background: #fff5f5;
   color: #c0392b;
 }
+
+.mobileAccountBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  padding-top: 8px;
+  border-top: 1px solid #f0eeff;
+}
+
+.mobileAccountName {
+  font-size: 13px;
+  font-weight: 800;
+  color: #a5b1c2;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 10px 0 4px;
+}
+
+.mobileLogout {
+  color: #e74c3c !important;
+}

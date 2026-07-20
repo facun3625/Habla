@@ -40,12 +40,16 @@ export default function MyCourses() {
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
+  const [uploadingId, setUploadingId] = useState<number | null>(null);
+  const [uploadError, setUploadError] = useState<{ id: number; message: string } | null>(null);
 
-  useEffect(() => {
+  const refetch = () =>
     fetch('/api/enrollments')
       .then((r) => r.ok ? r.json() : [])
-      .then((d) => setEnrollments(Array.isArray(d) ? d : []))
-      .finally(() => setLoading(false));
+      .then((d) => setEnrollments(Array.isArray(d) ? d : []));
+
+  useEffect(() => {
+    refetch().finally(() => setLoading(false));
   }, []);
 
   const toggleExpand = (id: number) =>
@@ -54,6 +58,26 @@ export default function MyCourses() {
       next.has(id) ? next.delete(id) : next.add(id);
       return next;
     });
+
+  const uploadInstallmentProof = async (installmentId: number, file: File) => {
+    setUploadingId(installmentId);
+    setUploadError(null);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await fetch(`/api/installments/${installmentId}/proof`, { method: 'POST', body: fd });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setUploadError({ id: installmentId, message: data.error || 'Error al subir el comprobante.' });
+        return;
+      }
+      await refetch();
+    } catch {
+      setUploadError({ id: installmentId, message: 'Error de conexión. Intentá de nuevo.' });
+    } finally {
+      setUploadingId(null);
+    }
+  };
 
   if (loading) return <p style={{ color: '#94a3b8', padding: '40px 0' }}>Cargando…</p>;
 
@@ -129,22 +153,44 @@ export default function MyCourses() {
                     <div className={styles.installmentHeader}>
                       {e.installmentPlan!.numInstallments} cuotas de {e.installmentPlan!.amountPerInstallment.toLocaleString('es-AR')} {e.installmentPlan!.currency}
                     </div>
-                    {e.installmentPlan!.installments.map((inst) => (
-                      <div key={inst.id} className={styles.installmentRow}>
-                        <span className={styles.installmentNum}>#{inst.number}</span>
-                        <span className={styles.installmentAmount}>
-                          {inst.amount.toLocaleString('es-AR')} {e.installmentPlan!.currency}
-                        </span>
-                        {inst.dueDate && (
-                          <span className={styles.installmentDue}>
-                            Vence: {new Date(inst.dueDate).toLocaleDateString('es-AR')}
+                    {e.installmentPlan!.installments.map((inst) => {
+                      const canUpload = inst.status === 'PENDING' || inst.status === 'REJECTED';
+                      const isUploading = uploadingId === inst.id;
+                      return (
+                        <div key={inst.id} className={styles.installmentRow}>
+                          <span className={styles.installmentNum}>#{inst.number}</span>
+                          <span className={styles.installmentAmount}>
+                            {inst.amount.toLocaleString('es-AR')} {e.installmentPlan!.currency}
                           </span>
-                        )}
-                        <span className={`${styles.instBadge} ${styles[INST_BADGE[inst.status] ?? 'instPending']}`}>
-                          {INST_STATUS_LABEL[inst.status] ?? inst.status}
-                        </span>
-                      </div>
-                    ))}
+                          {inst.dueDate && (
+                            <span className={styles.installmentDue}>
+                              Vence: {new Date(inst.dueDate).toLocaleDateString('es-AR')}
+                            </span>
+                          )}
+                          <span className={`${styles.instBadge} ${styles[INST_BADGE[inst.status] ?? 'instPending']}`} style={canUpload ? { marginLeft: 0 } : undefined}>
+                            {INST_STATUS_LABEL[inst.status] ?? inst.status}
+                          </span>
+                          {canUpload && (
+                            <label className={styles.installmentUploadBtn} style={{ marginLeft: 'auto', opacity: isUploading ? 0.6 : 1, pointerEvents: isUploading ? 'none' : undefined }}>
+                              <Upload size={13} /> {isUploading ? 'Subiendo…' : 'Subir comprobante'}
+                              <input
+                                type="file"
+                                accept="image/*,application/pdf"
+                                style={{ display: 'none' }}
+                                onChange={(ev) => {
+                                  const file = ev.target.files?.[0];
+                                  if (file) uploadInstallmentProof(inst.id, file);
+                                  ev.target.value = '';
+                                }}
+                              />
+                            </label>
+                          )}
+                          {uploadError?.id === inst.id && (
+                            <span style={{ width: '100%', fontSize: '0.75rem', color: '#dc2626' }}>{uploadError.message}</span>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>

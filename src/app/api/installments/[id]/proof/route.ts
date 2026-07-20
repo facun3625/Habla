@@ -12,10 +12,21 @@ export async function POST(req: NextRequest, { params }: P) {
   const token = req.cookies.get(COOKIE)?.value;
   if (!token) return NextResponse.json({ error: 'No autenticado' }, { status: 401 });
 
+  let payload;
   try {
-    await verifyToken(token);
+    payload = await verifyToken(token);
   } catch {
     return NextResponse.json({ error: 'Sesión inválida' }, { status: 401 });
+  }
+
+  const existing = await prisma.installment.findUnique({
+    where: { id: Number(id) },
+    include: { plan: { include: { enrollment: { select: { userId: true } } } } },
+  });
+  if (!existing) return NextResponse.json({ error: 'Cuota no encontrada' }, { status: 404 });
+  if (existing.plan.enrollment.userId !== payload.userId) {
+    const admin = await prisma.user.findUnique({ where: { id: payload.userId } });
+    if (admin?.role !== 'ADMIN') return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
   }
 
   const formData = await req.formData();
