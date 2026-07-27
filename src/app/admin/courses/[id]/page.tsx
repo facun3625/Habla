@@ -3,7 +3,7 @@
 import { useState, use, useEffect } from 'react';
 import AdminLayout from '../../components/AdminLayout';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Info, Layers, Users as UsersIcon, DollarSign, Mail, BookOpen, CreditCard } from 'lucide-react';
+import { ArrowLeft, Info, Layers, Users as UsersIcon, DollarSign, Mail, BookOpen, CreditCard, Video } from 'lucide-react';
 import styles from './courseAdmin.module.css';
 import Link from 'next/link';
 
@@ -14,8 +14,9 @@ import Prices from './tabs/Prices';
 import ConfirmationEmail from './tabs/ConfirmationEmail';
 import Repository from './tabs/Repository';
 import Installments from './tabs/Installments';
+import ConnectionGate from './tabs/ConnectionGate';
 
-type TabType = 'general' | 'modules' | 'prices' | 'enrollments' | 'confirmEmail' | 'repository' | 'installments';
+type TabType = 'general' | 'modules' | 'connectionGate' | 'prices' | 'enrollments' | 'confirmEmail' | 'repository' | 'installments';
 
 export default function CourseAdminPage({ params }: { params: Promise<{ id: string }> }) {
   const { id: courseId } = use(params);
@@ -61,6 +62,7 @@ export default function CourseAdminPage({ params }: { params: Promise<{ id: stri
   const tabs = [
     { id: 'general',      label: 'Datos Generales',       icon: Info },
     { id: 'modules',      label: 'Módulos',                icon: Layers },
+    { id: 'connectionGate', label: 'Acceso a Clases',       icon: Video },
     { id: 'prices',       label: 'Precios',                icon: DollarSign },
     { id: 'enrollments',  label: 'Inscripciones',          icon: UsersIcon },
     { id: 'confirmEmail', label: 'Email de confirmación',  icon: Mail },
@@ -72,6 +74,7 @@ export default function CourseAdminPage({ params }: { params: Promise<{ id: stri
     switch (activeTab) {
       case 'general':      return <GeneralData courseId={courseId} onTitleChange={(t) => setCourseTitle(t)} />;
       case 'modules':      return <Modules courseId={courseId} />;
+      case 'connectionGate': return <ConnectionGate courseId={courseId} />;
       case 'prices':       return <Prices courseId={courseId} />;
       case 'enrollments':  return <Enrollments courseId={courseId} />;
       case 'confirmEmail': return <ConfirmationEmail courseId={courseId} />;

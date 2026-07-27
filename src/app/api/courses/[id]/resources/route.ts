@@ -41,7 +41,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       type: body.type,
       title: body.title,
       fileUrl: body.fileUrl ?? null,
-      visible: false,
+      // Las secciones son solo un título organizador: nacen visibles.
+      // Los archivos nacen ocultos hasta que el admin los revise y publique.
+      visible: body.type === 'SECTION',
       order: (last?.order ?? -1) + 1,
     },
   });

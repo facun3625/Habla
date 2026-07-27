@@ -44,6 +44,7 @@ model User {
   questionnaireCompleted  Boolean      @default(false)
   enrollments             Enrollment[]
   profile                 Profile?     @relation(fields: [profileId], references: [id])
+  connectionGateProgress  ConnectionGateProgress[]
 }
 
 model Course {
@@ -63,11 +64,17 @@ model Course {
   confirmationEmail        String?
   confirmationEmailSubject String?
   objectives               String?
+  gateStep1Content         String?
+  gateTerm1Title           String?
+  gateTerm1Body            String?
+  gateTerm2Title           String?
+  gateTerm2Body            String?
   courseProfiles           CourseProfile[]
   resources                CourseResource[]
   enrollments              Enrollment[]
   modules                  Module[]
   prices                   Price[]
+  connectionGateProgress   ConnectionGateProgress[]
 }
 
 model CourseProfile {
@@ -92,6 +99,8 @@ model Module {
   date           String?
   accessAll      Boolean        @default(true)
   topics         String[]
+  connectionLink String?
+  connectionInfo String?
   course         Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
   accessProfiles ModuleAccess[]
 }
@@ -162,6 +171,22 @@ model Installment {
   reviewedAt  DateTime?
   notes       String?
   plan        InstallmentPlan   @relation(fields: [planId], references: [id], onDelete: Cascade)
+}
+
+model ConnectionGateProgress {
+  id              Int       @id @default(autoincrement())
+  courseId        Int
+  userId          Int
+  step1At         DateTime?
+  term1AcceptedAt DateTime?
+  term2AcceptedAt DateTime?
+  completedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  course          Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([courseId, userId])
 }
 
 model CourseResource {

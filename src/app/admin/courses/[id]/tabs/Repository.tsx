@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import {
   FolderOpen, FileText, Eye, EyeOff, Trash2, Plus,
-  ChevronUp, ChevronDown, Upload, Loader, CheckCircle,
+  ChevronUp, ChevronDown, Upload, Loader, CheckCircle, Edit2, Check, X,
 } from 'lucide-react';
 import styles from '../courseAdmin.module.css';
 import ConfirmModal from '../../../components/ConfirmModal';
@@ -41,6 +41,10 @@ export default function Repository({ courseId }: { courseId: string }) {
   const [error, setError] = useState('');
   const [confirmModal, setConfirmModal] = useState<{ message: string; onConfirm: () => void } | null>(null);
 
+  // Rename título
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editTitle, setEditTitle] = useState('');
+
   // "Nueva sección" form
   const [showAddSection, setShowAddSection] = useState(false);
   const [newSectionTitle, setNewSectionTitle] = useState('');
@@ -70,6 +74,19 @@ export default function Repository({ courseId }: { courseId: string }) {
       body: JSON.stringify({ visible: !r.visible }),
     });
     setResources(prev => prev.map(x => x.id === r.id ? { ...x, visible: !r.visible } : x));
+  };
+
+  const startEditTitle = (r: Resource) => { setEditingId(r.id); setEditTitle(r.title); };
+  const cancelEditTitle = () => { setEditingId(null); setEditTitle(''); };
+  const saveTitle = async (id: number) => {
+    if (!editTitle.trim()) return;
+    await fetch(`/api/courses/${courseId}/resources/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: editTitle.trim() }),
+    });
+    setResources(prev => prev.map(x => x.id === id ? { ...x, title: editTitle.trim() } : x));
+    setEditingId(null);
   };
 
   const deleteResource = (id: number) => {
@@ -226,9 +243,27 @@ export default function Repository({ courseId }: { courseId: string }) {
                     </div>
                     <div className={styles.repoItemIcon}><FolderOpen size={16} /></div>
                     <div className={styles.repoItemInfo}>
-                      <span className={styles.repoItemTitle}>{group.section.title}</span>
+                      {editingId === group.section.id ? (
+                        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                          <input
+                            className={styles.input}
+                            value={editTitle}
+                            onChange={e => setEditTitle(e.target.value)}
+                            autoFocus
+                            onKeyDown={e => e.key === 'Enter' && saveTitle(group.section!.id)}
+                            style={{ flex: 1 }}
+                          />
+                          <button className={styles.iconBtnSuccess} onClick={() => saveTitle(group.section!.id)}><Check size={14} /></button>
+                          <button className={styles.actionBtn} onClick={cancelEditTitle}><X size={14} /></button>
+                        </div>
+                      ) : (
+                        <span className={styles.repoItemTitle}>{group.section.title}</span>
+                      )}
                     </div>
                     <div className={styles.repoItemActions}>
+                      {editingId !== group.section.id && (
+                        <button className={styles.actionBtn} onClick={() => startEditTitle(group.section!)}><Edit2 size={14} /></button>
+                      )}
                       <button
                         className={`${styles.repoVisibleBtn} ${group.section.visible ? styles.repoVisibleOn : ''}`}
                         onClick={() => toggleVisible(group.section!)}
@@ -255,12 +290,32 @@ export default function Repository({ courseId }: { courseId: string }) {
                         </div>
                         <div className={styles.repoItemIcon}><FileText size={16} /></div>
                         <div className={styles.repoItemInfo}>
-                          <span className={styles.repoItemTitle}>{file.title}</span>
-                          {file.fileUrl && (
-                            <a href={file.fileUrl} target="_blank" rel="noreferrer" className={styles.repoItemLink}>Ver archivo</a>
+                          {editingId === file.id ? (
+                            <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                              <input
+                                className={styles.input}
+                                value={editTitle}
+                                onChange={e => setEditTitle(e.target.value)}
+                                autoFocus
+                                onKeyDown={e => e.key === 'Enter' && saveTitle(file.id)}
+                                style={{ flex: 1 }}
+                              />
+                              <button className={styles.iconBtnSuccess} onClick={() => saveTitle(file.id)}><Check size={14} /></button>
+                              <button className={styles.actionBtn} onClick={cancelEditTitle}><X size={14} /></button>
+                            </div>
+                          ) : (
+                            <>
+                              <span className={styles.repoItemTitle}>{file.title}</span>
+                              {file.fileUrl && (
+                                <a href={file.fileUrl} target="_blank" rel="noreferrer" className={styles.repoItemLink}>Ver archivo</a>
+                              )}
+                            </>
                           )}
                         </div>
                         <div className={styles.repoItemActions}>
+                          {editingId !== file.id && (
+                            <button className={styles.actionBtn} onClick={() => startEditTitle(file)}><Edit2 size={14} /></button>
+                          )}
                           <button
                             className={`${styles.repoVisibleBtn} ${file.visible ? styles.repoVisibleOn : ''}`}
                             onClick={() => toggleVisible(file)}

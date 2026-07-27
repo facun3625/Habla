@@ -2,15 +2,15 @@
 
 import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
-import { BookOpen, Lock, Calendar, ArrowLeft, FolderOpen, FileText, Download, ExternalLink } from 'lucide-react';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { BookOpen, Calendar, ArrowLeft, Layers, Video, FolderOpen, PlayCircle, Award } from 'lucide-react';
 import styles from '../../account.module.css';
+import { canAccess, type Module } from './courseAccess';
+import ModulesTab from './tabs/ModulesTab';
+import ContentTab from './tabs/ContentTab';
+import ConnectionTab from './tabs/ConnectionTab';
+import ComingSoonTab from './tabs/ComingSoonTab';
 
-type Profile = { id: number; name: string };
-type ModuleAccess = { profile: Profile };
-type Module = {
-  id: number; name: string; order: number; date: string | null;
-  accessAll: boolean; accessProfiles: ModuleAccess[];
-};
 type Resource = {
   id: number;
   type: 'SECTION' | 'FILE';
@@ -19,7 +19,6 @@ type Resource = {
   visible: boolean;
   order: number;
 };
-type Group = { section: Resource | null; files: Resource[] };
 
 type Course = {
   id: number; title: string; coverImage: string | null;
@@ -28,27 +27,17 @@ type Course = {
   resources: Resource[];
 };
 
-function groupResources(resources: Resource[]): Group[] {
-  const groups: Group[] = [];
-  let current: Group = { section: null, files: [] };
-  for (const r of resources) {
-    if (r.type === 'SECTION') {
-      if (current.section !== null || current.files.length > 0) groups.push(current);
-      current = { section: r, files: [] };
-    } else {
-      current.files.push(r);
-    }
-  }
-  groups.push(current);
-  return groups.filter(g => g.section !== null || g.files.length > 0);
-}
+type TabType = 'modules' | 'connection' | 'content' | 'videos' | 'certificate';
 
 export default function CourseModulesPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [course, setCourse] = useState<Course | null>(null);
   const [profileId, setProfileId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [activeTab, setActiveTab] = useState<TabType>((searchParams.get('tab') as TabType) || 'modules');
 
   useEffect(() => {
     Promise.all([
@@ -61,10 +50,16 @@ export default function CourseModulesPage({ params }: { params: Promise<{ id: st
     }).finally(() => setLoading(false));
   }, [id]);
 
-  const canAccess = (mod: Module) => {
-    if (mod.accessAll) return true;
-    if (!profileId) return false;
-    return mod.accessProfiles.some((a) => a.profile.id === profileId);
+  useEffect(() => {
+    const tab = searchParams.get('tab') as TabType;
+    if (tab && tab !== activeTab) setActiveTab(tab);
+  }, [searchParams, activeTab]);
+
+  const handleTabChange = (tab: TabType) => {
+    setActiveTab(tab);
+    const newParams = new URLSearchParams(searchParams.toString());
+    newParams.set('tab', tab);
+    router.push(`/mi-cuenta/cursos/${id}?${newParams.toString()}`);
   };
 
   if (loading) return <p style={{ color: '#94a3b8', padding: '40px 0' }}>Cargando…</p>;
@@ -75,7 +70,15 @@ export default function CourseModulesPage({ params }: { params: Promise<{ id: st
     </div>
   );
 
-  const accessibleCount = course.modules.filter(canAccess).length;
+  const accessibleCount = course.modules.filter((m) => canAccess(m, profileId)).length;
+
+  const tabs: { id: TabType; label: string; icon: typeof Layers }[] = [
+    { id: 'modules', label: 'Módulos', icon: Layers },
+    { id: 'connection', label: 'Links de conexión', icon: Video },
+    { id: 'content', label: 'Material de Estudio', icon: FolderOpen },
+    { id: 'videos', label: 'Videos de módulos dictados', icon: PlayCircle },
+    { id: 'certificate', label: 'Certificado', icon: Award },
+  ];
 
   return (
     <>
@@ -107,75 +110,24 @@ export default function CourseModulesPage({ params }: { params: Promise<{ id: st
         </div>
       </div>
 
-      {/* Modules */}
-      <div className={styles.card}>
-        <h2 style={{ margin: '0 0 20px', fontSize: '1.05rem', fontWeight: 800, color: '#1e1b4b' }}>
-          Módulos del curso
-        </h2>
-
-        {course.modules.length === 0 ? (
-          <p style={{ color: '#94a3b8', textAlign: 'center', padding: '24px 0' }}>Este curso todavía no tiene módulos cargados.</p>
-        ) : (
-          <div className={styles.moduleList}>
-            {course.modules.map((mod, i) => {
-              const accessible = canAccess(mod);
-              return (
-                <div key={mod.id} className={`${styles.moduleItem} ${!accessible ? styles.moduleItemLocked : ''}`}>
-                  <div className={`${styles.moduleNum} ${accessible ? styles.moduleNumActive : ''}`}>
-                    {accessible ? i + 1 : <Lock size={13} />}
-                  </div>
-                  <span className={styles.moduleName}>{mod.name}</span>
-                  {mod.date && <span className={styles.moduleDate}>📅 {mod.date}</span>}
-                  {!accessible && (
-                    <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 600 }}>Sin acceso</span>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
+      <div className={styles.courseTabs}>
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            className={`${styles.courseTab} ${activeTab === tab.id ? styles.courseTabActive : ''}`}
+            onClick={() => handleTabChange(tab.id)}
+          >
+            <tab.icon size={16} />
+            {tab.label}
+          </button>
+        ))}
       </div>
 
-      {/* Repository */}
-      {course.resources && course.resources.length > 0 && (
-        <div className={styles.repoSection}>
-          <h2 style={{ margin: '0 0 20px', fontSize: '1.05rem', fontWeight: 800, color: '#1e1b4b' }}>
-            Repositorio de materiales
-          </h2>
-          
-          <div className={styles.repoGroups}>
-            {groupResources(course.resources).map((group) => (
-              <div key={group.section?.id ?? 'none'} className={styles.repoGroup}>
-                {group.section && (
-                  <div className={styles.repoSectionHeader}>
-                    <FolderOpen size={16} />
-                    <span>{group.section.title}</span>
-                  </div>
-                )}
-                <div className={styles.repoFileList}>
-                  {group.files.map((file) => (
-                    <a 
-                      key={file.id} 
-                      href={file.fileUrl || '#'} 
-                      target="_blank" 
-                      rel="noreferrer" 
-                      className={styles.repoFileItem}
-                    >
-                      <div className={styles.repoFileInfo}>
-                        <FileText size={18} color="#6c5ce7" />
-                        <span className={styles.repoFileTitle}>{file.title}</span>
-                      </div>
-                      <span className={styles.repoFileLink}>
-                        <ExternalLink size={14} /> Ver
-                      </span>
-                    </a>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      {activeTab === 'modules' && <ModulesTab modules={course.modules} profileId={profileId} />}
+      {activeTab === 'connection' && <ConnectionTab courseId={id} profileId={profileId} />}
+      {activeTab === 'content' && <ContentTab resources={course.resources} />}
+      {activeTab === 'videos' && <ComingSoonTab message="Los videos de las clases dictadas van a estar disponibles próximamente." />}
+      {activeTab === 'certificate' && <ComingSoonTab message="Tu certificado va a estar disponible acá una vez finalizado el curso." />}
     </>
   );
 }

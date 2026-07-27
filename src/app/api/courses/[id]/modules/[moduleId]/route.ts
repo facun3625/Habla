@@ -1,9 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { verifyToken, COOKIE } from '@/lib/auth';
 
 type P = { params: Promise<{ id: string; moduleId: string }> };
 
+async function requireAdmin(req: NextRequest) {
+  const token = req.cookies.get(COOKIE)?.value;
+  if (!token) return null;
+  try {
+    const payload = await verifyToken(token);
+    const user = await prisma.user.findUnique({ where: { id: payload.userId }, select: { role: true } });
+    return user?.role === 'ADMIN' ? payload : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function PUT(req: NextRequest, { params }: P) {
+  if (!await requireAdmin(req)) return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
   try {
     const { id: courseId, moduleId } = await params;
     const body = await req.json();
@@ -16,6 +30,8 @@ export async function PUT(req: NextRequest, { params }: P) {
         date: body.date,
         accessAll: body.accessAll ?? true,
         topics: Array.isArray(body.topics) ? body.topics.filter((t: string) => t.trim()) : [],
+        connectionLink: body.connectionLink ?? null,
+        connectionInfo: body.connectionInfo ?? null,
       },
     });
 
@@ -43,7 +59,8 @@ export async function PUT(req: NextRequest, { params }: P) {
   }
 }
 
-export async function DELETE(_req: NextRequest, { params }: P) {
+export async function DELETE(req: NextRequest, { params }: P) {
+  if (!await requireAdmin(req)) return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
   try {
     const { moduleId } = await params;
     await prisma.module.delete({ where: { id: Number(moduleId) } });

@@ -43,6 +43,11 @@ export async function PUT(req: NextRequest, { params }: Params) {
         confirmationEmailSubject: body.confirmationEmailSubject ?? undefined,
         confirmationEmail: body.confirmationEmail ?? undefined,
         objectives: body.objectives ?? undefined,
+        gateStep1Content: body.gateStep1Content ?? undefined,
+        gateTerm1Title: body.gateTerm1Title ?? undefined,
+        gateTerm1Body: body.gateTerm1Body ?? undefined,
+        gateTerm2Title: body.gateTerm2Title ?? undefined,
+        gateTerm2Body: body.gateTerm2Body ?? undefined,
       },
     });
     return NextResponse.json(course);

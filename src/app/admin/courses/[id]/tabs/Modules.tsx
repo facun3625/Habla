@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, GripVertical, Edit2, Trash2, Calendar, Check, X, Lock, Globe } from 'lucide-react';
+import { Plus, GripVertical, Edit2, Trash2, Calendar, Check, X, Lock, Globe, Video } from 'lucide-react';
 import styles from '../courseAdmin.module.css';
 import RichEditor from '@/app/components/RichEditor';
 
@@ -15,6 +15,8 @@ type Module = {
   accessAll: boolean;
   accessProfiles: ModuleAccess[];
   topics: string[];
+  connectionLink: string | null;
+  connectionInfo: string | null;
 };
 
 export default function Modules({ courseId }: { courseId: string }) {
@@ -27,6 +29,8 @@ export default function Modules({ courseId }: { courseId: string }) {
   const [editAccessAll, setEditAccessAll] = useState(true);
   const [editProfileIds, setEditProfileIds] = useState<number[]>([]);
   const [editTopics, setEditTopics] = useState<string[]>([]);
+  const [editConnectionLink, setEditConnectionLink] = useState('');
+  const [editConnectionInfo, setEditConnectionInfo] = useState('');
   const [objectives, setObjectives] = useState('');
   const [objSaved, setObjSaved] = useState(false);
 
@@ -75,6 +79,8 @@ export default function Modules({ courseId }: { courseId: string }) {
     setEditAccessAll(m.accessAll);
     setEditProfileIds((m.accessProfiles ?? []).map((a) => a.profileId));
     setEditTopics(m.topics?.length ? [...m.topics] : ['']);
+    setEditConnectionLink(m.connectionLink ?? '');
+    setEditConnectionInfo(m.connectionInfo ?? '');
   };
 
   const saveEdit = async (id: number) => {
@@ -87,6 +93,8 @@ export default function Modules({ courseId }: { courseId: string }) {
         accessAll: editAccessAll,
         profileIds: editAccessAll ? [] : editProfileIds,
         topics: editTopics,
+        connectionLink: editConnectionLink.trim() || null,
+        connectionInfo: editConnectionInfo.trim() || null,
       }),
     });
     const updated = await res.json();
@@ -192,6 +200,25 @@ export default function Modules({ courseId }: { courseId: string }) {
                   </div>
                 )}
 
+                {/* Connection link */}
+                <div className={styles.topicsSection}>
+                  <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#64748b' }}>Link de conexión (Zoom, Meet, etc.):</span>
+                  <input
+                    value={editConnectionLink}
+                    onChange={(e) => setEditConnectionLink(e.target.value)}
+                    className={styles.input}
+                    placeholder="https://zoom.us/j/..."
+                    style={{ marginTop: 6 }}
+                  />
+                  <div style={{ marginTop: 10 }}>
+                    <RichEditor
+                      value={editConnectionInfo}
+                      onChange={setEditConnectionInfo}
+                      placeholder="Info adicional para esta clase (horario, contraseña, indicaciones)..."
+                    />
+                  </div>
+                </div>
+
                 {/* Topics */}
                 <div className={styles.topicsSection}>
                   <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#64748b' }}>Temas del módulo:</span>
@@ -237,6 +264,9 @@ export default function Modules({ courseId }: { courseId: string }) {
                         ) : (
                           <><Lock size={14} /><span>{m.accessProfiles.map((a) => a.profile.name).join(', ') || 'Sin perfiles'}</span></>
                         )}
+                      </div>
+                      <div className={styles.itemMeta} style={{ color: m.connectionLink ? '#16a34a' : '#94a3b8' }}>
+                        <Video size={14} /><span>{m.connectionLink ? 'Link cargado' : 'Sin link cargado'}</span>
                       </div>
                     </div>
                     {m.topics?.length > 0 && (

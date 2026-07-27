@@ -15,10 +15,33 @@ export async function GET(_req: NextRequest, { params }: Params) {
   const { id } = await params;
   const course = await prisma.course.findUnique({
     where: { id: Number(id) },
-    include: {
+    select: {
+      id: true,
+      title: true,
+      coverImage: true,
+      startDate: true,
+      endDate: true,
+      modality: true,
+      capacity: true,
+      schedule: true,
+      description: true,
+      targetAudience: true,
+      status: true,
+      objectives: true,
+      createdAt: true,
+      updatedAt: true,
       modules: {
         orderBy: { order: 'asc' },
-        include: { accessProfiles: { include: { profile: true } } },
+        select: {
+          id: true,
+          courseId: true,
+          name: true,
+          order: true,
+          date: true,
+          accessAll: true,
+          topics: true,
+          accessProfiles: { include: { profile: true } },
+        },
       },
       resources: {
         where: { visible: true },
