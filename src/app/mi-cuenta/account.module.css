@@ -102,6 +102,26 @@
   color: #6c5ce7;
 }
 
+.navItemAlert {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  font-weight: 700;
+  color: #ffffff;
+  background: #f59e0b;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.navItemAlert:hover { background: #d97706; }
+
 .navFooter {
   padding: 0 12px;
   display: flex;

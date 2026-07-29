@@ -22,10 +22,6 @@ export async function GET(req: NextRequest) {
     'installments_gate_message',
   ]);
 
-  if (settings.installments_gate_enabled !== 'true') {
-    return NextResponse.json({ enabled: false, title: '', message: '', courses: [] });
-  }
-
   const enrollments = await prisma.enrollment.findMany({
     where: {
       userId,
@@ -45,7 +41,7 @@ export async function GET(req: NextRequest) {
     .map((e) => ({ courseId: e.course.id, title: e.course.title }));
 
   return NextResponse.json({
-    enabled: true,
+    enabled: settings.installments_gate_enabled === 'true',
     title: settings.installments_gate_title ?? '',
     message: settings.installments_gate_message ?? '',
     courses,

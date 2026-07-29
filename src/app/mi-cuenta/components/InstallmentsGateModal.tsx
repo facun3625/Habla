@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { CreditCard, X } from 'lucide-react';
+import InstallmentsUploadButton from './InstallmentsUploadButton';
 import styles from './InstallmentsGateModal.module.css';
 
 type Data = {
@@ -15,7 +16,6 @@ type Data = {
 const STORAGE_KEY = 'hp_dismissed_installments_gate';
 
 export default function InstallmentsGateModal() {
-  const router = useRouter();
   const pathname = usePathname();
   const [data, setData] = useState<Data | null>(null);
   const [dismissed, setDismissed] = useState(false);
@@ -44,11 +44,6 @@ export default function InstallmentsGateModal() {
     } catch {
       // ignorar
     }
-  };
-
-  const goToCourses = () => {
-    dismiss();
-    router.push('/mi-cuenta/cursos');
   };
 
   return (
@@ -82,9 +77,7 @@ export default function InstallmentsGateModal() {
           ))}
         </div>
 
-        <button className={styles.goBtn} onClick={goToCourses}>
-          Ver estado de mis cuotas
-        </button>
+        <InstallmentsUploadButton courses={data.courses} className={styles.goBtn} onNavigate={dismiss} />
       </div>
     </div>
   );

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { BookOpen, ArrowRight, Upload, ChevronDown } from 'lucide-react';
 import styles from '../account.module.css';
 
@@ -51,6 +52,8 @@ const INST_BADGE: Record<string, string> = {
 };
 
 export default function MyCourses() {
+  const searchParams = useSearchParams();
+  const highlightCourseId = searchParams.get('highlight');
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
@@ -67,6 +70,18 @@ export default function MyCourses() {
     refetch().finally(() => setLoading(false));
     fetch('/api/settings?public=1').then((r) => r.ok ? r.json() : {}).then(setCfg).catch(() => {});
   }, []);
+
+  // Si venimos de un link con "?highlight=<courseId>" (ej: desde el popup de cuotas pendientes),
+  // abrimos el panel de cuotas de ese curso y hacemos scroll hasta él.
+  useEffect(() => {
+    if (!highlightCourseId || enrollments.length === 0) return;
+    const match = enrollments.find((e) => String(e.course.id) === highlightCourseId);
+    if (!match) return;
+    setExpandedIds((prev) => new Set(prev).add(match.id));
+    requestAnimationFrame(() => {
+      document.getElementById(`enroll-${match.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  }, [highlightCourseId, enrollments]);
 
   const toggleExpand = (id: number) =>
     setExpandedIds((prev) => {
@@ -127,8 +142,18 @@ export default function MyCourses() {
             const nextPayable = payableInstallments[0] ?? null;
             const isUploadingNext = nextPayable ? uploadingId === nextPayable.id : false;
 
+            const isHighlighted = highlightCourseId === String(e.course.id);
+
             return (
-              <div key={e.id} className={styles.enrollCard} style={{ textDecoration: 'none', flexWrap: 'wrap' }}>
+              <div
+                key={e.id}
+                id={`enroll-${e.id}`}
+                className={styles.enrollCard}
+                style={{
+                  textDecoration: 'none', flexWrap: 'wrap',
+                  ...(isHighlighted ? { outline: '2px solid #f59e0b', outlineOffset: 2 } : {}),
+                }}
+              >
                 <div className={styles.enrollCover}>
                   {e.course.coverImage
                     ? <img src={e.course.coverImage} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />

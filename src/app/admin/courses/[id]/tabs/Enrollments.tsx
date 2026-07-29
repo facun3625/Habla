@@ -144,13 +144,22 @@ export default function Enrollments({ courseId }: { courseId: string }) {
     setExpandedIds(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
 
   const updateInstallment = async (installmentId: number, status: string) => {
-    await fetch(`/api/installments/${installmentId}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status }),
-    });
-    await refetch();
-    window.dispatchEvent(new CustomEvent('refreshNotifications'));
+    try {
+      const res = await fetch(`/api/installments/${installmentId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        alert(data.error || 'No se pudo actualizar la cuota. Intentá de nuevo.');
+        return;
+      }
+      await refetch();
+      window.dispatchEvent(new CustomEvent('refreshNotifications'));
+    } catch {
+      alert('Error de conexión al actualizar la cuota. Intentá de nuevo.');
+    }
   };
 
   const remindInstallment = async (installmentId: number) => {

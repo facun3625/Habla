@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { after } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyToken, COOKIE } from '@/lib/auth';
 import { sendMail } from '@/lib/mailer';
@@ -53,52 +54,58 @@ export async function PATCH(req: NextRequest, { params }: P) {
   if (status === 'ACCEPTED') {
     const { plan } = installment;
     const { enrollment } = plan;
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const wasConfirmed = enrollment.status === 'CONFIRMADA';
 
     // Auto-confirm enrollment if not already confirmed
-    if (enrollment.status !== 'CONFIRMADA') {
+    if (!wasConfirmed) {
       await prisma.enrollment.update({
         where: { id: enrollment.id },
         data: { status: 'CONFIRMADA', paidAt: new Date() },
       });
     }
 
-    // Find next pending installment
-    const nextInst = plan.installments.find(i => i.number === installment.number + 1);
-    const isLast = !nextInst;
-    const allAccepted = plan.installments.every(i => i.id === installment.id ? true : i.status === 'ACCEPTED');
+    // El envío de mail no debe bloquear la respuesta: se dispara en segundo plano
+    // después de responder, para que "Acreditar" sea instantáneo aunque el SMTP esté lento o caído.
+    after(async () => {
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 
-    // Build email body
-    let body = `<p>Hola <strong>${enrollment.userName}</strong>,</p>`;
-    body += `<p>Acreditamos tu <strong>cuota ${installment.number} de ${plan.numInstallments}</strong> por ${installment.amount.toLocaleString('es-AR')} ${plan.currency} para el curso <strong>${enrollment.course.title}</strong>.</p>`;
+      // Find next pending installment
+      const nextInst = plan.installments.find(i => i.number === installment.number + 1);
+      const isLast = !nextInst;
+      const allAccepted = plan.installments.every(i => i.id === installment.id ? true : i.status === 'ACCEPTED');
 
-    if (enrollment.status !== 'CONFIRMADA') {
-      body += `<p>Tu inscripción está <strong>confirmada</strong>. ¡Ya tenés acceso al curso!</p>`;
-    }
+      // Build email body
+      let body = `<p>Hola <strong>${enrollment.userName}</strong>,</p>`;
+      body += `<p>Acreditamos tu <strong>cuota ${installment.number} de ${plan.numInstallments}</strong> por ${installment.amount.toLocaleString('es-AR')} ${plan.currency} para el curso <strong>${enrollment.course.title}</strong>.</p>`;
 
-    if (!isLast && nextInst) {
-      const dueStr = nextInst.dueDate
-        ? new Date(nextInst.dueDate).toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' })
-        : null;
-      body += `<p>Tu próxima cuota es la <strong>#${nextInst.number}</strong> por <strong>${nextInst.amount.toLocaleString('es-AR')} ${plan.currency}</strong>`;
-      if (dueStr) body += `, con vencimiento el <strong>${dueStr}</strong>`;
-      body += `.</p>`;
-    } else if (allAccepted) {
-      body += `<p>🎉 <strong>¡Completaste el pago total de tu inscripción!</strong></p>`;
-    }
+      if (!wasConfirmed) {
+        body += `<p>Tu inscripción está <strong>confirmada</strong>. ¡Ya tenés acceso al curso!</p>`;
+      }
 
-    body += `<p>Ante cualquier consulta respondé este email.<br/>Equipo Hablapraxia</p>`;
+      if (!isLast && nextInst) {
+        const dueStr = nextInst.dueDate
+          ? new Date(nextInst.dueDate).toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' })
+          : null;
+        body += `<p>Tu próxima cuota es la <strong>#${nextInst.number}</strong> por <strong>${nextInst.amount.toLocaleString('es-AR')} ${plan.currency}</strong>`;
+        if (dueStr) body += `, con vencimiento el <strong>${dueStr}</strong>`;
+        body += `.</p>`;
+      } else if (allAccepted) {
+        body += `<p>🎉 <strong>¡Completaste el pago total de tu inscripción!</strong></p>`;
+      }
 
-    try {
-      await sendMail({
-        to: enrollment.email,
-        subject: `Cuota ${installment.number}/${plan.numInstallments} acreditada — ${enrollment.course.title}`,
-        html: emailHtml(body, baseUrl),
-        type: 'TRANSACTIONAL',
-      });
-    } catch (e) {
-      console.error('Error sending installment email:', e);
-    }
+      body += `<p>Ante cualquier consulta respondé este email.<br/>Equipo Hablapraxia</p>`;
+
+      try {
+        await sendMail({
+          to: enrollment.email,
+          subject: `Cuota ${installment.number}/${plan.numInstallments} acreditada — ${enrollment.course.title}`,
+          html: emailHtml(body, baseUrl),
+          type: 'TRANSACTIONAL',
+        });
+      } catch (e) {
+        console.error('Error sending installment email:', e);
+      }
+    });
   }
 
   return NextResponse.json(installment);

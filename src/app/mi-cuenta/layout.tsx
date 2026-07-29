@@ -8,6 +8,7 @@ import styles from './account.module.css';
 import QuestionnaireModal from '@/app/components/QuestionnaireModal';
 import PendingGateModal from './components/PendingGateModal';
 import InstallmentsGateModal from './components/InstallmentsGateModal';
+import InstallmentsUploadButton from './components/InstallmentsUploadButton';
 
 type User = {
   id: number; name: string | null; email: string;
@@ -27,6 +28,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [showQuestionnaire, setShowQuestionnaire] = useState(false);
+  const [pendingInstallments, setPendingInstallments] = useState<{ courseId: number; title: string }[]>([]);
 
   useEffect(() => {
     fetch('/api/auth/me')
@@ -35,6 +37,10 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
         if (!d) router.push('/');
         else { setUser(d); if (!d.questionnaireCompleted) setShowQuestionnaire(true); }
       });
+    fetch('/api/mi-cuenta/installments-gate')
+      .then((r) => r.ok ? r.json() : null)
+      .then((d) => { if (Array.isArray(d?.courses)) setPendingInstallments(d.courses); })
+      .catch(() => {});
   }, [router]);
 
   const logout = async () => {
@@ -104,6 +110,9 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
               {label}
             </Link>
           ))}
+          {pendingInstallments.length > 0 && (
+            <InstallmentsUploadButton courses={pendingInstallments} className={styles.navItemAlert} />
+          )}
         </nav>
 
         <div className={styles.navFooter}>
