@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyToken, COOKIE } from '@/lib/auth';
+import { getSetting } from '@/lib/settings';
+import { isInstallmentPlanSettled } from '@/lib/installments';
 
 export async function GET(req: NextRequest) {
   const token = req.cookies.get(COOKIE)?.value;
@@ -14,6 +16,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Token inválido' }, { status: 401 });
   }
 
+  const gateOnInstallments = await getSetting('installments_gate_enabled');
+
   const enrollments = await prisma.enrollment.findMany({
     where: {
       userId,
@@ -26,10 +30,14 @@ export async function GET(req: NextRequest) {
       course: {
         select: { id: true, title: true, gateStep1Content: true },
       },
+      installmentPlan: { include: { installments: true } },
     },
   });
 
+  // Si el bloqueo por cuotas está activo, no mostrar el popup de "aceptar términos"
+  // para cursos donde el alumno todavía no saldó las cuotas: primero va a ver el popup de cuotas.
   const withGate = enrollments
+    .filter((e) => gateOnInstallments !== 'true' || isInstallmentPlanSettled(e.installmentPlan?.installments))
     .map((e) => e.course)
     .filter((c, i, arr) => arr.findIndex((x) => x.id === c.id) === i)
     .filter((c) => c.gateStep1Content && c.gateStep1Content.trim());

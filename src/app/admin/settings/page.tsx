@@ -56,6 +56,10 @@ const DEFAULTS: Settings = {
   popup_content: '',
   popup_cta_text: '',
   popup_cta_url: '',
+  // Bloqueo de links por cuotas pendientes
+  installments_gate_enabled: 'false',
+  installments_gate_title: '',
+  installments_gate_message: '',
   // SMTP
   smtp_host: '',
   smtp_port: '587',
@@ -427,6 +431,39 @@ export default function SettingsPage() {
               </>
             )}
           </div>
+        </section>
+
+        {/* ── BLOQUEO POR CUOTAS PENDIENTES ── */}
+        <div className={styles.groupLabel}>Acceso a links de conexión</div>
+        <section className={`${styles.section} ${settings.installments_gate_enabled !== 'true' ? styles.sectionOff : ''}`}>
+          <div className={styles.sectionHeader}>
+            <div className={styles.sectionIcon} style={{ background: '#fff7ed' }}>
+              <span style={{ fontSize: '1.5rem' }}>🔒</span>
+            </div>
+            <div style={{ flex: 1 }}>
+              <h3>Bloquear links hasta saldar las cuotas</h3>
+              <p>Si está activo, las alumnas que paguen en cuotas no van a ver los links de conexión ni el paso de aceptar los términos hasta tener todas las cuotas aprobadas. En su lugar, van a ver un popup al entrar a su cuenta.</p>
+            </div>
+            <Toggle id="installments_gate_enabled" />
+          </div>
+
+          {settings.installments_gate_enabled === 'true' && (
+            <div className={styles.fields}>
+              <div className={`${styles.field} ${styles.fieldFull}`}>
+                <label>Título del popup</label>
+                <input type="text" className={styles.input} value={settings.installments_gate_title ?? ''} onChange={set('installments_gate_title')} placeholder="Tenés cuotas pendientes" />
+              </div>
+              <div className={`${styles.field} ${styles.fieldFull}`}>
+                <label>Mensaje</label>
+                <RichEditor
+                  value={settings.installments_gate_message ?? ''}
+                  onChange={(html) => setSettings(prev => ({ ...prev, installments_gate_message: html }))}
+                  placeholder="Escribí el mensaje que va a ver la alumna..."
+                />
+                <span className={styles.hint}>Se muestra en el popup y podés dejarlo vacío para usar el mensaje por defecto.</span>
+              </div>
+            </div>
+          )}
         </section>
 
         {/* ── POPUP PROMOCIONAL ── */}

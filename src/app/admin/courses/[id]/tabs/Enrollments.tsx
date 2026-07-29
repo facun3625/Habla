@@ -62,6 +62,7 @@ type Enrollment = {
   createdAt: string;
   notes: string | null;
   installmentPlan: InstallmentPlan | null;
+  gateAccepted: boolean;
 };
 
 const STATUS_LABEL: Record<string, string> = {
@@ -302,6 +303,7 @@ export default function Enrollments({ courseId }: { courseId: string }) {
                 <th>Perfil</th>
                 <th>Pago</th>
                 <th>Estado</th>
+                <th title="Aceptó la información y los términos de 'Links de conexión'">Consent.</th>
                 <th>Comprobante</th>
                 <th>Título</th>
                 <th>Acciones</th>
@@ -336,6 +338,11 @@ export default function Enrollments({ courseId }: { courseId: string }) {
                         <span className={`${styles.enrollStatusBadge} ${STATUS_CLASS[e.status] ?? ''}`}>
                           {STATUS_LABEL[e.status] ?? e.status}
                         </span>
+                      </td>
+                      <td style={{ textAlign: 'center' }} title={e.gateAccepted ? 'Aceptó la información y los términos' : 'Todavía no aceptó'}>
+                        {e.gateAccepted
+                          ? <CheckCircle size={16} color="#15803d" />
+                          : <XCircle size={16} color="#cbd5e1" />}
                       </td>
                       <td>{e.receiptUrl ? <FileLink url={e.receiptUrl} /> : '—'}</td>
                       <td>{e.credentialUrl ? <FileLink url={e.credentialUrl} /> : '—'}</td>
@@ -379,7 +386,7 @@ export default function Enrollments({ courseId }: { courseId: string }) {
                     </tr>
                     {hasPlan && isExpanded && (
                       <tr>
-                        <td colSpan={7} style={{ padding: '0 0 12px 0', background: '#faf9ff' }}>
+                        <td colSpan={8} style={{ padding: '0 0 12px 0', background: '#faf9ff' }}>
                           <div style={{ margin: '0 12px', border: '1.5px solid #e4dcff', borderRadius: 12, overflow: 'hidden' }}>
                             <div style={{ padding: '10px 16px', background: '#f0ebff', fontWeight: 700, fontSize: '0.82rem', color: '#4c3a8a', display: 'flex', justifyContent: 'space-between' }}>
                               <span>Cuenta corriente — {e.installmentPlan!.numInstallments} cuotas de {e.installmentPlan!.amountPerInstallment.toLocaleString('es-AR')} {e.installmentPlan!.currency}</span>

@@ -7,6 +7,7 @@ import { LayoutDashboard, BookOpen, UserCircle, LogOut, ArrowLeft, Eye } from 'l
 import styles from './account.module.css';
 import QuestionnaireModal from '@/app/components/QuestionnaireModal';
 import PendingGateModal from './components/PendingGateModal';
+import InstallmentsGateModal from './components/InstallmentsGateModal';
 
 type User = {
   id: number; name: string | null; email: string;
@@ -83,6 +84,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
           onClose={() => setShowQuestionnaire(false)}
         />
       )}
+      {!showQuestionnaire && <InstallmentsGateModal />}
       {!showQuestionnaire && <PendingGateModal />}
       <aside className={styles.sidebar}>
         <div className={styles.sidebarTop}>

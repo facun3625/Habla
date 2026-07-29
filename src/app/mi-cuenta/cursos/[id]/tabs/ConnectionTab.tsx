@@ -29,14 +29,18 @@ type ConnectionData = {
 
 export default function ConnectionTab({ courseId, profileId }: { courseId: string; profileId: number | null }) {
   const [data, setData] = useState<ConnectionData | null>(null);
-  const [notEnrolled, setNotEnrolled] = useState(false);
+  const [blockReason, setBlockReason] = useState<'NOT_ENROLLED' | 'INSTALLMENTS_PENDING' | null>(null);
   const [loading, setLoading] = useState(true);
 
   const load = () => {
     setLoading(true);
     fetch(`/api/courses/${courseId}/connection`)
       .then(async (r) => {
-        if (r.status === 403) { setNotEnrolled(true); return; }
+        if (r.status === 403) {
+          const body = await r.json().catch(() => ({}));
+          setBlockReason(body.error === 'INSTALLMENTS_PENDING' ? 'INSTALLMENTS_PENDING' : 'NOT_ENROLLED');
+          return;
+        }
         if (!r.ok) return;
         setData(await r.json());
       })
@@ -56,11 +60,21 @@ export default function ConnectionTab({ courseId, profileId }: { courseId: strin
 
   if (loading) return <p style={{ color: '#94a3b8', padding: '40px 0' }}>Cargando…</p>;
 
-  if (notEnrolled) {
+  if (blockReason === 'NOT_ENROLLED') {
     return (
       <div className={styles.card}>
         <p style={{ color: '#64748b', textAlign: 'center', padding: '24px 0' }}>
           Todavía no tenés una inscripción confirmada en este curso. Una vez que tu pago sea confirmado vas a poder ver los links de conexión.
+        </p>
+      </div>
+    );
+  }
+
+  if (blockReason === 'INSTALLMENTS_PENDING') {
+    return (
+      <div className={styles.card}>
+        <p style={{ color: '#64748b', textAlign: 'center', padding: '24px 0' }}>
+          Para acceder a los links de conexión primero tenés que saldar todas las cuotas pendientes de este curso. Podés ver el estado de tus pagos en &quot;Mis Cursos&quot;.
         </p>
       </div>
     );

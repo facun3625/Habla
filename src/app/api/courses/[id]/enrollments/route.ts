@@ -10,12 +10,25 @@ export async function GET(_req: NextRequest, { params }: P) {
       where: { courseId: Number(id) },
       include: {
         profile: true,
-        user: { select: { name: true, email: true } },
+        user: {
+          select: {
+            name: true,
+            email: true,
+            connectionGateProgress: {
+              where: { courseId: Number(id) },
+              select: { completedAt: true },
+            },
+          },
+        },
         installmentPlan: { include: { installments: { orderBy: { number: 'asc' } } } },
       },
       orderBy: { createdAt: 'desc' },
     });
-    return NextResponse.json(enrollments);
+    const withGateStatus = enrollments.map((e) => ({
+      ...e,
+      gateAccepted: e.user?.connectionGateProgress?.[0]?.completedAt ? true : false,
+    }));
+    return NextResponse.json(withGateStatus);
   } catch (e) {
     console.error(e);
     return NextResponse.json([], { status: 200 });

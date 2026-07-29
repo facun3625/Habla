@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyToken, COOKIE } from '@/lib/auth';
+import { getSetting } from '@/lib/settings';
+import { isInstallmentPlanSettled } from '@/lib/installments';
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -27,9 +29,14 @@ export async function POST(req: NextRequest, { params }: Params) {
         { status: 'COMPROBANTE_SUBIDO', installmentPlan: { isNot: null } },
       ],
     },
-    include: { installmentPlan: true },
+    include: { installmentPlan: { include: { installments: true } } },
   });
   if (!enrollment) return NextResponse.json({ error: 'NOT_ENROLLED' }, { status: 403 });
+
+  const gateOnInstallments = await getSetting('installments_gate_enabled');
+  if (gateOnInstallments === 'true' && !isInstallmentPlanSettled(enrollment.installmentPlan?.installments)) {
+    return NextResponse.json({ error: 'INSTALLMENTS_PENDING' }, { status: 403 });
+  }
 
   const body = await req.json();
   const step = body.step;
