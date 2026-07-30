@@ -57,9 +57,16 @@ export async function PUT(req: NextRequest, { params }: Params) {
   }
 }
 
-export async function DELETE(_req: NextRequest, { params }: Params) {
+export async function DELETE(req: NextRequest, { params }: Params) {
   try {
     const { id } = await params;
+    const body = await req.json().catch(() => ({}));
+    // Eliminar un curso borra en cascada todas sus inscripciones, cuotas y comprobantes.
+    // Se exige esta confirmación también del lado del servidor (no solo en la UI) porque
+    // es una acción irreversible sobre datos de alumnas.
+    if (body?.confirm !== 'ELIMINAR') {
+      return NextResponse.json({ error: 'Confirmación requerida.' }, { status: 400 });
+    }
     await prisma.course.delete({ where: { id: Number(id) } });
     return NextResponse.json({ ok: true });
   } catch (e) {

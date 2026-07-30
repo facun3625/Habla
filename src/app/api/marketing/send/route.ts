@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { after } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { sendBulk } from '@/lib/mailer';
 
@@ -42,6 +43,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'No se encontraron destinatarios válidos.' }, { status: 400 });
   }
 
-  const { sent, failed } = await sendBulk(emails, subject, html);
-  return NextResponse.json({ sent, failed, total: emails.length });
+  // El envío se dispara en segundo plano: con muchos destinatarios, el loop de sendBulk
+  // (un mail a la vez + delay) puede tardar minutos y superar el timeout de la conexión
+  // del cliente/proxy. Si esperáramos acá, el admin ve "error de conexión" aunque el envío
+  // se complete igual del lado del servidor.
+  after(async () => {
+    try {
+      await sendBulk(emails, subject, html);
+    } catch (e) {
+      console.error('Error en envío de campaña:', e);
+    }
+  });
+
+  return NextResponse.json({ queued: true, total: emails.length });
 }

@@ -3,7 +3,7 @@
 import { useState, use, useEffect } from 'react';
 import AdminLayout from '../../components/AdminLayout';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Info, Layers, Users as UsersIcon, DollarSign, Mail, BookOpen, CreditCard, Video } from 'lucide-react';
+import { ArrowLeft, Info, Layers, Users as UsersIcon, DollarSign, Mail, BookOpen, CreditCard, Video, AlertTriangle } from 'lucide-react';
 import styles from './courseAdmin.module.css';
 import Link from 'next/link';
 
@@ -15,8 +15,9 @@ import ConfirmationEmail from './tabs/ConfirmationEmail';
 import Repository from './tabs/Repository';
 import Installments from './tabs/Installments';
 import ConnectionGate from './tabs/ConnectionGate';
+import DangerZone from './tabs/DangerZone';
 
-type TabType = 'general' | 'modules' | 'connectionGate' | 'prices' | 'enrollments' | 'confirmEmail' | 'repository' | 'installments';
+type TabType = 'general' | 'modules' | 'connectionGate' | 'prices' | 'enrollments' | 'confirmEmail' | 'repository' | 'installments' | 'danger';
 
 export default function CourseAdminPage({ params }: { params: Promise<{ id: string }> }) {
   const { id: courseId } = use(params);
@@ -68,6 +69,7 @@ export default function CourseAdminPage({ params }: { params: Promise<{ id: stri
     { id: 'confirmEmail', label: 'Email de confirmación',  icon: Mail },
     { id: 'repository',    label: 'Repositorio',             icon: BookOpen },
     { id: 'installments',  label: 'Cuotas',                  icon: CreditCard },
+    { id: 'danger',        label: 'Zona de riesgo',          icon: AlertTriangle },
   ];
 
   const renderTabContent = () => {
@@ -80,6 +82,7 @@ export default function CourseAdminPage({ params }: { params: Promise<{ id: stri
       case 'confirmEmail': return <ConfirmationEmail courseId={courseId} />;
       case 'repository':    return <Repository courseId={courseId} />;
       case 'installments':  return <Installments courseId={courseId} />;
+      case 'danger':        return <DangerZone courseId={courseId} courseTitle={courseTitle} />;
       default:              return null;
     }
   };
@@ -108,6 +111,7 @@ export default function CourseAdminPage({ params }: { params: Promise<{ id: stri
                 key={tab.id}
                 className={`${styles.tabItem} ${activeTab === tab.id ? styles.tabActive : ''}`}
                 onClick={() => handleTabChange(tab.id as TabType)}
+                style={tab.id === 'danger' ? { color: activeTab === 'danger' ? '#dc2626' : '#f87171', borderBottomColor: activeTab === 'danger' ? '#dc2626' : undefined } : undefined}
               >
                 <tab.icon size={18} />
                 {tab.label}

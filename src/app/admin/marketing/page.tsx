@@ -157,7 +157,7 @@ export default function MarketingPage() {
   const [footerText, setFooterText] = useState(`© ${new Date().getFullYear()} Hablapraxia · Para darte de baja respondé este email.`);
   const [courses, setCourses] = useState<Course[]>([]);
   const [sending, setSending] = useState(false);
-  const [result, setResult] = useState<{ sent: number; failed: number; total: number } | null>(null);
+  const [result, setResult] = useState<{ total: number } | null>(null);
   const [error, setError] = useState('');
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000';
@@ -192,7 +192,7 @@ export default function MarketingPage() {
       });
       const data = await res.json();
       if (!res.ok) setError(data.error ?? 'Error al enviar.');
-      else setResult(data);
+      else setResult({ total: data.total });
     } catch {
       setError('Error de conexión.');
     } finally {
@@ -284,8 +284,8 @@ export default function MarketingPage() {
             {result && (
               <div className={styles.successBanner}>
                 <CheckCircle size={18} />
-                Enviado: <strong>{result.sent}</strong> de <strong>{result.total}</strong>
-                {result.failed > 0 && <span style={{ color: '#e74c3c' }}> · Fallidos: {result.failed}</span>}
+                Campaña en camino a <strong>{result.total}</strong> destinatario{result.total === 1 ? '' : 's'}. El envío se procesa en segundo plano — revisá el resultado en{' '}
+                <a href="/admin/emails" style={{ color: 'inherit', textDecoration: 'underline' }}>Correos</a>.
               </div>
             )}
 

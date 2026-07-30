@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import AdminLayout from '../components/AdminLayout';
 import {
   Plus,
@@ -11,11 +12,10 @@ import {
   Users as UsersIcon,
   Filter,
   Search,
-  Trash2
+  Copy
 } from 'lucide-react';
 import styles from './courses.module.css';
 import Link from 'next/link';
-import ConfirmModal from '../components/ConfirmModal';
 
 type Course = {
   id: number;
@@ -41,10 +41,11 @@ const MODALITY_LABEL: Record<string, string> = {
 };
 
 export default function CoursesPage() {
+  const router = useRouter();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [confirmModal, setConfirmModal] = useState<{ message: string; onConfirm: () => void } | null>(null);
+  const [duplicatingId, setDuplicatingId] = useState<number | null>(null);
 
   useEffect(() => {
     fetch('/api/courses')
@@ -58,15 +59,21 @@ export default function CoursesPage() {
     c.title.toLowerCase().includes(search.toLowerCase())
   );
 
-  const deleteCourse = (id: number, title: string) => {
-    setConfirmModal({
-      message: `¿Eliminar el curso "${title}"? Esta acción no se puede deshacer.`,
-      onConfirm: async () => {
-        setConfirmModal(null);
-        const res = await fetch(`/api/courses/${id}`, { method: 'DELETE' });
-        if (res.ok) setCourses((prev) => prev.filter((c) => c.id !== id));
-      },
-    });
+  const duplicateCourse = async (id: number) => {
+    setDuplicatingId(id);
+    try {
+      const res = await fetch(`/api/courses/${id}/duplicate`, { method: 'POST' });
+      if (!res.ok) {
+        alert('No se pudo duplicar el curso. Intentá de nuevo.');
+        return;
+      }
+      const data = await res.json();
+      router.push(`/admin/courses/${data.id}`);
+    } catch {
+      alert('Error de conexión al duplicar el curso.');
+    } finally {
+      setDuplicatingId(null);
+    }
   };
 
   return (
@@ -168,11 +175,12 @@ export default function CoursesPage() {
                           Administrar
                         </Link>
                         <button
-                          title="Eliminar curso"
-                          className={styles.actionBtnDelete}
-                          onClick={() => deleteCourse(course.id, course.title)}
+                          title="Duplicar curso"
+                          className={styles.actionBtn}
+                          disabled={duplicatingId === course.id}
+                          onClick={() => duplicateCourse(course.id)}
                         >
-                          <Trash2 size={18} />
+                          <Copy size={18} />
                         </button>
                       </div>
                     </td>
@@ -183,13 +191,6 @@ export default function CoursesPage() {
           )}
         </div>
       </div>
-      {confirmModal && (
-        <ConfirmModal
-          message={confirmModal.message}
-          onConfirm={confirmModal.onConfirm}
-          onCancel={() => setConfirmModal(null)}
-        />
-      )}
     </AdminLayout>
   );
 }
