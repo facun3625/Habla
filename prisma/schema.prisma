@@ -75,6 +75,18 @@ model Course {
   modules                  Module[]
   prices                   Price[]
   connectionGateProgress   ConnectionGateProgress[]
+  videos                   CourseVideo[]
+}
+
+model CourseVideo {
+  id        Int      @id @default(autoincrement())
+  courseId  Int
+  title     String
+  driveUrl  String
+  visible   Boolean  @default(false)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
 }
 
 model CourseProfile {

@@ -3,7 +3,7 @@
 import { useState, use, useEffect } from 'react';
 import AdminLayout from '../../components/AdminLayout';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Info, Layers, Users as UsersIcon, DollarSign, Mail, BookOpen, CreditCard, Video, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Info, Layers, Users as UsersIcon, DollarSign, Mail, BookOpen, CreditCard, Video, AlertTriangle, PlayCircle } from 'lucide-react';
 import styles from './courseAdmin.module.css';
 import Link from 'next/link';
 
@@ -16,8 +16,9 @@ import Repository from './tabs/Repository';
 import Installments from './tabs/Installments';
 import ConnectionGate from './tabs/ConnectionGate';
 import DangerZone from './tabs/DangerZone';
+import Videos from './tabs/Videos';
 
-type TabType = 'general' | 'modules' | 'connectionGate' | 'prices' | 'enrollments' | 'confirmEmail' | 'repository' | 'installments' | 'danger';
+type TabType = 'general' | 'modules' | 'connectionGate' | 'prices' | 'enrollments' | 'confirmEmail' | 'repository' | 'installments' | 'videos' | 'danger';
 
 export default function CourseAdminPage({ params }: { params: Promise<{ id: string }> }) {
   const { id: courseId } = use(params);
@@ -69,6 +70,7 @@ export default function CourseAdminPage({ params }: { params: Promise<{ id: stri
     { id: 'confirmEmail', label: 'Email de confirmación',  icon: Mail },
     { id: 'repository',    label: 'Repositorio',             icon: BookOpen },
     { id: 'installments',  label: 'Cuotas',                  icon: CreditCard },
+    { id: 'videos',        label: 'Videos',                  icon: PlayCircle },
     { id: 'danger',        label: 'Zona de riesgo',          icon: AlertTriangle },
   ];
 
@@ -82,6 +84,7 @@ export default function CourseAdminPage({ params }: { params: Promise<{ id: stri
       case 'confirmEmail': return <ConfirmationEmail courseId={courseId} />;
       case 'repository':    return <Repository courseId={courseId} />;
       case 'installments':  return <Installments courseId={courseId} />;
+      case 'videos':        return <Videos courseId={courseId} />;
       case 'danger':        return <DangerZone courseId={courseId} courseTitle={courseTitle} />;
       default:              return null;
     }

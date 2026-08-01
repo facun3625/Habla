@@ -10,6 +10,7 @@ import ModulesTab from './tabs/ModulesTab';
 import ContentTab from './tabs/ContentTab';
 import ConnectionTab from './tabs/ConnectionTab';
 import ComingSoonTab from './tabs/ComingSoonTab';
+import VideosTab from './tabs/VideosTab';
 
 type Resource = {
   id: number;
@@ -126,7 +127,7 @@ export default function CourseModulesPage({ params }: { params: Promise<{ id: st
       {activeTab === 'modules' && <ModulesTab modules={course.modules} profileId={profileId} />}
       {activeTab === 'connection' && <ConnectionTab courseId={id} profileId={profileId} />}
       {activeTab === 'content' && <ContentTab resources={course.resources} />}
-      {activeTab === 'videos' && <ComingSoonTab message="Los videos de las clases dictadas van a estar disponibles próximamente." />}
+      {activeTab === 'videos' && <VideosTab courseId={id} />}
       {activeTab === 'certificate' && <ComingSoonTab message="Tu certificado va a estar disponible acá una vez finalizado el curso." />}
     </>
   );
