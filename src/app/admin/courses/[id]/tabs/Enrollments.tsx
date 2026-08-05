@@ -102,6 +102,46 @@ const CURRENCY_FOR_METHOD: Record<string, 'ARS' | 'USD'> = {
 
 type Price = { amount: number; currency: string; profile: { id: number } | null };
 
+// Monto a mostrar por inscripción en la columna "Precio". Si pesify está activo,
+// todo se re-expresa en el precio ARS del perfil (cuotas: proporcional a lo pagado).
+function enrollmentAmount(
+  e: Enrollment,
+  prices: Price[],
+  pesify: boolean
+): { text: string; approx: boolean } {
+  if (e.status !== 'CONFIRMADA') return { text: '—', approx: false };
+
+  if (pesify) {
+    const arsPrice = e.profile?.id
+      ? prices.find((p) => p.profile?.id === e.profile!.id && p.currency === 'ARS')
+      : undefined;
+    if (!arsPrice) return { text: '—', approx: false };
+    if (e.installmentPlan) {
+      const totalContracted = e.installmentPlan.numInstallments * e.installmentPlan.amountPerInstallment;
+      const paid = e.installmentPlan.installments
+        .filter((i) => i.status === 'ACCEPTED')
+        .reduce((sum, i) => sum + i.amount, 0);
+      const fraction = totalContracted > 0 ? paid / totalContracted : 0;
+      return { text: `${Math.round(arsPrice.amount * fraction).toLocaleString('es-AR')} ARS`, approx: true };
+    }
+    return { text: `${arsPrice.amount.toLocaleString('es-AR')} ARS`, approx: false };
+  }
+
+  if (e.installmentPlan) {
+    const paid = e.installmentPlan.installments
+      .filter((i) => i.status === 'ACCEPTED')
+      .reduce((sum, i) => sum + i.amount, 0);
+    return { text: `${paid.toLocaleString('es-AR')} ${e.installmentPlan.currency}`, approx: false };
+  }
+
+  const currency = e.paymentMethod ? CURRENCY_FOR_METHOD[e.paymentMethod] : undefined;
+  const price = currency && e.profile?.id
+    ? prices.find((p) => p.profile?.id === e.profile!.id && p.currency === currency)
+    : undefined;
+  if (!price) return { text: '—', approx: false };
+  return { text: `${price.amount.toLocaleString('es-AR')} ${currency}`, approx: true };
+}
+
 const INST_STATUS: Record<string, string> = {
   PENDING: 'Pendiente', SUBMITTED: 'Enviado', ACCEPTED: 'Acreditado', REJECTED: 'Rechazado',
 };
@@ -124,6 +164,7 @@ export default function Enrollments({ courseId }: { courseId: string }) {
   const [extraEmail, setExtraEmail] = useState('');
   const [resendStatus, setResendStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const [resendError, setResendError] = useState('');
+  const [pesify, setPesify] = useState(false);
 
   const refetch = () =>
     fetch(`/api/courses/${courseId}/enrollments`)
@@ -282,6 +323,34 @@ export default function Enrollments({ courseId }: { courseId: string }) {
     else totalARS += price.amount;
   }
 
+  // "Pesificar todo": en vez de sumar por moneda, cada inscripción se cuenta con el
+  // precio en ARS de SU perfil (el mismo esquema de precios de la pestaña "Precios"),
+  // sin importar en qué moneda pagó realmente. No es una cotización de dólar —
+  // usa el precio en pesos que vos ya configuraste para ese perfil.
+  let totalPesified = 0;
+  let pesifyUndeterminedCount = 0;
+
+  if (pesify) {
+    for (const e of enrollments) {
+      if (e.status !== 'CONFIRMADA') continue;
+      const arsPrice = e.profile?.id
+        ? prices.find((p) => p.profile?.id === e.profile!.id && p.currency === 'ARS')
+        : undefined;
+      if (!arsPrice) { pesifyUndeterminedCount++; continue; }
+
+      if (e.installmentPlan) {
+        const totalContracted = e.installmentPlan.numInstallments * e.installmentPlan.amountPerInstallment;
+        const paid = e.installmentPlan.installments
+          .filter((i) => i.status === 'ACCEPTED')
+          .reduce((sum, i) => sum + i.amount, 0);
+        const fraction = totalContracted > 0 ? paid / totalContracted : 0;
+        totalPesified += arsPrice.amount * fraction;
+      } else {
+        totalPesified += arsPrice.amount;
+      }
+    }
+  }
+
   const filteredByStatus = filter === 'all' ? enrollments
     : filter === 'CUOTAS_PENDIENTES' ? withPendingInstallments
     : filter === 'CUOTAS_COMPLETAS' ? withCompletedPlan
@@ -308,28 +377,60 @@ export default function Enrollments({ courseId }: { courseId: string }) {
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
           {(totalARS > 0 || totalUSD > 0) && (
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-              {totalARS > 0 && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+              {pesify ? (
                 <div
-                  title="Cuotas: exacto (solo acreditadas). Pago único: estimado con el precio actual del perfil."
+                  title="Cada inscripción cuenta con el precio en ARS de su perfil, no con una cotización de dólar."
                   style={{ background: '#f0fdf4', border: '1.5px solid #bbf7d0', color: '#15803d', padding: '6px 14px', borderRadius: 20, fontSize: '0.82rem', fontWeight: 700 }}
                 >
-                  Total pagado: {totalARS.toLocaleString('es-AR')} ARS
+                  Total pesificado: {Math.round(totalPesified).toLocaleString('es-AR')} ARS
                 </div>
+              ) : (
+                <>
+                  {totalARS > 0 && (
+                    <div
+                      title="Cuotas: exacto (solo acreditadas). Pago único: estimado con el precio actual del perfil."
+                      style={{ background: '#f0fdf4', border: '1.5px solid #bbf7d0', color: '#15803d', padding: '6px 14px', borderRadius: 20, fontSize: '0.82rem', fontWeight: 700 }}
+                    >
+                      Total pagado: {totalARS.toLocaleString('es-AR')} ARS
+                    </div>
+                  )}
+                  {totalUSD > 0 && (
+                    <div
+                      title="Cuotas: exacto (solo acreditadas). Pago único: estimado con el precio actual del perfil."
+                      style={{ background: '#f0fdf4', border: '1.5px solid #bbf7d0', color: '#15803d', padding: '6px 14px', borderRadius: 20, fontSize: '0.82rem', fontWeight: 700 }}
+                    >
+                      Total pagado: {totalUSD.toLocaleString('es-AR')} USD
+                    </div>
+                  )}
+                </>
               )}
               {totalUSD > 0 && (
-                <div
-                  title="Cuotas: exacto (solo acreditadas). Pago único: estimado con el precio actual del perfil."
-                  style={{ background: '#f0fdf4', border: '1.5px solid #bbf7d0', color: '#15803d', padding: '6px 14px', borderRadius: 20, fontSize: '0.82rem', fontWeight: 700 }}
+                <button
+                  type="button"
+                  onClick={() => setPesify((v) => !v)}
+                  title="Convierte todo a pesos usando el precio en ARS de cada perfil (no aplica cotización de dólar)."
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 6,
+                    background: pesify ? '#6c5ce7' : '#f1f5f9',
+                    color: pesify ? 'white' : '#475569',
+                    border: 'none', borderRadius: 20, padding: '6px 14px',
+                    fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
+                  }}
                 >
-                  Total pagado: {totalUSD.toLocaleString('es-AR')} USD
-                </div>
+                  🇦🇷 {pesify ? 'Pesificado' : 'Pesificar todo'}
+                </button>
               )}
             </div>
           )}
-          {undeterminedCount > 0 && (
+          {!pesify && undeterminedCount > 0 && (
             <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
               {undeterminedCount} confirmada{undeterminedCount > 1 ? 's' : ''} sin precio configurado para su perfil/moneda — no se sumó al total
+            </span>
+          )}
+          {pesify && pesifyUndeterminedCount > 0 && (
+            <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+              {pesifyUndeterminedCount} confirmada{pesifyUndeterminedCount > 1 ? 's' : ''} sin precio en ARS configurado para su perfil — no se sumó al total
             </span>
           )}
           {pendingReceipts > 0 && (
@@ -385,6 +486,7 @@ export default function Enrollments({ courseId }: { courseId: string }) {
                 <th>Alumno</th>
                 <th>Perfil</th>
                 <th>Pago</th>
+                <th>Precio</th>
                 <th>Estado</th>
                 <th title="Aceptó la información y los términos de 'Links de conexión'">Consent.</th>
                 <th>Comprobante</th>
@@ -416,6 +518,19 @@ export default function Enrollments({ courseId }: { courseId: string }) {
                             </span>
                           )}
                         </div>
+                      </td>
+                      <td>
+                        {(() => {
+                          const { text, approx } = enrollmentAmount(e, prices, pesify);
+                          return (
+                            <span
+                              title={approx ? 'Estimado con el precio configurado, no es el monto exacto guardado del pago.' : undefined}
+                              style={{ fontWeight: 700, color: text === '—' ? '#cbd5e1' : '#1e293b' }}
+                            >
+                              {text}
+                            </span>
+                          );
+                        })()}
                       </td>
                       <td>
                         <span className={`${styles.enrollStatusBadge} ${STATUS_CLASS[e.status] ?? ''}`}>
@@ -469,7 +584,7 @@ export default function Enrollments({ courseId }: { courseId: string }) {
                     </tr>
                     {hasPlan && isExpanded && (
                       <tr>
-                        <td colSpan={8} style={{ padding: '0 0 12px 0', background: '#faf9ff' }}>
+                        <td colSpan={9} style={{ padding: '0 0 12px 0', background: '#faf9ff' }}>
                           <div style={{ margin: '0 12px', border: '1.5px solid #e4dcff', borderRadius: 12, overflow: 'hidden' }}>
                             <div style={{ padding: '10px 16px', background: '#f0ebff', fontWeight: 700, fontSize: '0.82rem', color: '#4c3a8a', display: 'flex', justifyContent: 'space-between' }}>
                               <span>Cuenta corriente — {e.installmentPlan!.numInstallments} cuotas de {e.installmentPlan!.amountPerInstallment.toLocaleString('es-AR')} {e.installmentPlan!.currency}</span>
