@@ -9,8 +9,8 @@ import { canAccess, type Module } from './courseAccess';
 import ModulesTab from './tabs/ModulesTab';
 import ContentTab from './tabs/ContentTab';
 import ConnectionTab from './tabs/ConnectionTab';
-import ComingSoonTab from './tabs/ComingSoonTab';
 import VideosTab from './tabs/VideosTab';
+import CertificateTab from './tabs/CertificateTab';
 
 type Resource = {
   id: number;
@@ -128,7 +128,7 @@ export default function CourseModulesPage({ params }: { params: Promise<{ id: st
       {activeTab === 'connection' && <ConnectionTab courseId={id} profileId={profileId} />}
       {activeTab === 'content' && <ContentTab resources={course.resources} />}
       {activeTab === 'videos' && <VideosTab courseId={id} />}
-      {activeTab === 'certificate' && <ComingSoonTab message="Tu certificado va a estar disponible acá una vez finalizado el curso." />}
+      {activeTab === 'certificate' && <CertificateTab courseId={id} />}
     </>
   );
 }

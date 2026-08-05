@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import AdminLayout from '../components/AdminLayout';
-import { Save, Eye, EyeOff, CheckCircle, AlertCircle, Mail, Megaphone, X } from 'lucide-react';
+import { Save, Eye, EyeOff, CheckCircle, AlertCircle, Mail, Megaphone, X, Award, Upload, Plus } from 'lucide-react';
 import RichEditor from '../../components/RichEditor';
 import styles from './settings.module.css';
 
@@ -60,6 +60,10 @@ const DEFAULTS: Settings = {
   installments_gate_enabled: 'false',
   installments_gate_title: '',
   installments_gate_message: '',
+  // Certificados
+  certificate_header_url: '',
+  certificate_footer_url: '',
+  certificate_signatures: '[]',
   // SMTP
   smtp_host: '',
   smtp_port: '587',
@@ -78,6 +82,8 @@ export default function SettingsPage() {
   const [error, setError] = useState('');
   const [showSecrets, setShowSecrets] = useState<Record<string, boolean>>({});
   const [showPopupPreview, setShowPopupPreview] = useState(false);
+  const [uploadingCert, setUploadingCert] = useState<Record<string, boolean>>({});
+  const [uploadingSig, setUploadingSig] = useState<Record<number, boolean>>({});
 
   useEffect(() => {
     fetch('/api/settings')
@@ -92,6 +98,24 @@ export default function SettingsPage() {
 
   const toggle = (key: string) =>
     setSettings((prev) => ({ ...prev, [key]: prev[key] === 'true' ? 'false' : 'true' }));
+
+  const uploadCertImage = (key: 'certificate_header_url' | 'certificate_footer_url') => async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingCert((prev) => ({ ...prev, [key]: true }));
+    const fd = new FormData();
+    fd.append('file', file);
+    const res = await fetch('/api/upload', { method: 'POST', body: fd });
+    const data = await res.json();
+    if (data.url) setSettings((prev) => ({ ...prev, [key]: data.url }));
+    setUploadingCert((prev) => ({ ...prev, [key]: false }));
+    e.target.value = '';
+  };
+
+  let certSignatures: { name: string; imageUrl: string }[] = [];
+  try { certSignatures = JSON.parse(settings.certificate_signatures || '[]'); } catch { certSignatures = []; }
+  const setCertSignatures = (next: { name: string; imageUrl: string }[]) =>
+    setSettings((prev) => ({ ...prev, certificate_signatures: JSON.stringify(next) }));
 
   const toggleShow = (key: string) => setShowSecrets((prev) => ({ ...prev, [key]: !prev[key] }));
 
@@ -511,6 +535,99 @@ export default function SettingsPage() {
               </div>
             </div>
           )}
+        </section>
+
+        {/* ── CERTIFICADOS ── */}
+        <div className={styles.groupLabel}>Certificados</div>
+        <section className={styles.section}>
+          <div className={styles.sectionHeader}>
+            <div className={styles.sectionIcon} style={{ background: '#fff7ed' }}>
+              <Award size={22} color="#c2410c" />
+            </div>
+            <div style={{ flex: 1 }}>
+              <h3>Encabezado, pie y firmas de los certificados</h3>
+              <p>Se usan siempre, en los certificados de todos los cursos. El curso y el nombre de la alumna se agregan automáticamente en el medio.</p>
+            </div>
+          </div>
+          <div className={styles.fields}>
+            {([
+              { key: 'certificate_header_url' as const, label: 'Encabezado (logos, auspiciantes)' },
+              { key: 'certificate_footer_url' as const, label: 'Pie (decoración, opcional)' },
+            ]).map(({ key, label }) => (
+              <div key={key} className={`${styles.field} ${styles.fieldFull}`}>
+                <label>{label}</label>
+                {settings[key] && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={settings[key]} alt="" style={{ maxWidth: '100%', maxHeight: 160, borderRadius: 10, border: '1px solid #e2e8f0', marginBottom: 8, display: 'block' }} />
+                )}
+                <label
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#f0eeff', color: '#6c5ce7', border: 'none', borderRadius: 10, padding: '0.5rem 1rem', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', width: 'fit-content' }}
+                >
+                  <Upload size={15} /> {uploadingCert[key] ? 'Subiendo...' : settings[key] ? 'Cambiar imagen' : 'Subir imagen'}
+                  <input type="file" accept="image/*" style={{ display: 'none' }} onChange={uploadCertImage(key)} disabled={uploadingCert[key]} />
+                </label>
+              </div>
+            ))}
+
+            <div className={`${styles.field} ${styles.fieldFull}`}>
+              <label>Firmas</label>
+              <span className={styles.hint} style={{ display: 'block', marginBottom: 8 }}>
+                Nombre + imagen de la firma por cada una (cualquier formato, PNG con fondo transparente recomendado) — podés agregar una o varias (ej: las dos directoras).
+              </span>
+              {certSignatures.map((sig, i) => (
+                <div key={i} style={{ display: 'flex', gap: 8, marginBottom: 8, alignItems: 'flex-start' }}>
+                  {sig.imageUrl && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={sig.imageUrl} alt="" style={{ height: 44, width: 100, objectFit: 'contain', border: '1px solid #e2e8f0', borderRadius: 8, background: 'white', flexShrink: 0 }} />
+                  )}
+                  <label
+                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, background: '#f0eeff', color: '#6c5ce7', border: 'none', borderRadius: 8, height: 38, width: 90, fontWeight: 700, fontSize: '0.75rem', cursor: 'pointer', flexShrink: 0, textAlign: 'center' }}
+                  >
+                    <Upload size={13} /> {uploadingSig[i] ? '...' : sig.imageUrl ? 'Cambiar' : 'Subir'}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      style={{ display: 'none' }}
+                      disabled={uploadingSig[i]}
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        setUploadingSig((prev) => ({ ...prev, [i]: true }));
+                        const fd = new FormData();
+                        fd.append('file', file);
+                        const res = await fetch('/api/upload', { method: 'POST', body: fd });
+                        const data = await res.json();
+                        if (data.url) setCertSignatures(certSignatures.map((s, j) => j === i ? { ...s, imageUrl: data.url } : s));
+                        setUploadingSig((prev) => ({ ...prev, [i]: false }));
+                        e.target.value = '';
+                      }}
+                    />
+                  </label>
+                  <input
+                    type="text"
+                    className={styles.input}
+                    value={sig.name}
+                    placeholder="Ej: Lic. Ma Virginia Trotta"
+                    onChange={(e) => setCertSignatures(certSignatures.map((s, j) => j === i ? { ...s, name: e.target.value } : s))}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setCertSignatures(certSignatures.filter((_, j) => j !== i))}
+                    style={{ background: '#fef2f2', color: '#ef4444', border: 'none', borderRadius: 8, width: 38, height: 38, cursor: 'pointer', flexShrink: 0 }}
+                  >
+                    <X size={15} style={{ margin: '0 auto' }} />
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => setCertSignatures([...certSignatures, { name: '', imageUrl: '' }])}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#f0eeff', color: '#6c5ce7', border: 'none', borderRadius: 10, padding: '0.5rem 1rem', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', width: 'fit-content' }}
+              >
+                <Plus size={15} /> Agregar firma
+              </button>
+            </div>
+          </div>
         </section>
 
         {/* ── EMAIL ── */}

@@ -3,7 +3,7 @@
 import { useState, use, useEffect, useRef } from 'react';
 import AdminLayout from '../../components/AdminLayout';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Info, Layers, Users as UsersIcon, DollarSign, Mail, BookOpen, CreditCard, Video, AlertTriangle, PlayCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Info, Layers, Users as UsersIcon, DollarSign, Mail, BookOpen, CreditCard, Video, AlertTriangle, PlayCircle, ChevronLeft, ChevronRight, Award } from 'lucide-react';
 import styles from './courseAdmin.module.css';
 import Link from 'next/link';
 
@@ -17,8 +17,9 @@ import Installments from './tabs/Installments';
 import ConnectionGate from './tabs/ConnectionGate';
 import DangerZone from './tabs/DangerZone';
 import Videos from './tabs/Videos';
+import Certificate from './tabs/Certificate';
 
-type TabType = 'general' | 'modules' | 'connectionGate' | 'prices' | 'enrollments' | 'confirmEmail' | 'repository' | 'installments' | 'videos' | 'danger';
+type TabType = 'general' | 'modules' | 'connectionGate' | 'prices' | 'enrollments' | 'confirmEmail' | 'repository' | 'installments' | 'videos' | 'certificate' | 'danger';
 
 export default function CourseAdminPage({ params }: { params: Promise<{ id: string }> }) {
   const { id: courseId } = use(params);
@@ -106,6 +107,7 @@ export default function CourseAdminPage({ params }: { params: Promise<{ id: stri
     { id: 'repository',    label: 'Repositorio',             icon: BookOpen },
     { id: 'installments',  label: 'Cuotas',                  icon: CreditCard },
     { id: 'videos',        label: 'Videos',                  icon: PlayCircle },
+    { id: 'certificate',   label: 'Certificado',             icon: Award },
     { id: 'danger',        label: 'Zona de riesgo',          icon: AlertTriangle },
   ];
 
@@ -120,6 +122,7 @@ export default function CourseAdminPage({ params }: { params: Promise<{ id: stri
       case 'repository':    return <Repository courseId={courseId} />;
       case 'installments':  return <Installments courseId={courseId} />;
       case 'videos':        return <Videos courseId={courseId} />;
+      case 'certificate':   return <Certificate courseId={courseId} />;
       case 'danger':        return <DangerZone courseId={courseId} courseTitle={courseTitle} />;
       default:              return null;
     }

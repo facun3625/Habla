@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { CheckCircle, XCircle, ExternalLink, Trash2, X, ChevronDown, Bell, Search, Mail } from 'lucide-react';
+import { CheckCircle, XCircle, ExternalLink, Trash2, X, ChevronDown, Bell, Search, Mail, Award } from 'lucide-react';
 import React from 'react';
 import styles from '../courseAdmin.module.css';
 import ConfirmModal from '../../../components/ConfirmModal';
@@ -63,6 +63,7 @@ type Enrollment = {
   notes: string | null;
   installmentPlan: InstallmentPlan | null;
   gateAccepted: boolean;
+  certificateEnabled: boolean;
 };
 
 const STATUS_LABEL: Record<string, string> = {
@@ -202,6 +203,18 @@ export default function Enrollments({ courseId }: { courseId: string }) {
 
   const toggleExpand = (id: number) =>
     setExpandedIds(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
+
+  const toggleCertificate = async (id: number, current: boolean) => {
+    setEnrollments(prev => prev.map(e => e.id === id ? { ...e, certificateEnabled: !current } : e));
+    const res = await fetch(`/api/enrollments/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ certificateEnabled: !current }),
+    });
+    if (!res.ok) {
+      setEnrollments(prev => prev.map(e => e.id === id ? { ...e, certificateEnabled: current } : e));
+    }
+  };
 
   const updateInstallment = async (installmentId: number, status: string) => {
     try {
@@ -489,6 +502,7 @@ export default function Enrollments({ courseId }: { courseId: string }) {
                 <th>Precio</th>
                 <th>Estado</th>
                 <th title="Aceptó la información y los términos de 'Links de conexión'">Consent.</th>
+                <th title="Habilita que la alumna pueda descargar su certificado">Certificado</th>
                 <th>Comprobante</th>
                 <th>Título</th>
                 <th>Acciones</th>
@@ -542,6 +556,20 @@ export default function Enrollments({ courseId }: { courseId: string }) {
                           ? <CheckCircle size={16} color="#15803d" />
                           : <XCircle size={16} color="#cbd5e1" />}
                       </td>
+                      <td style={{ textAlign: 'center' }}>
+                        {e.status === 'CONFIRMADA' ? (
+                          <button
+                            title={e.certificateEnabled ? 'Certificado habilitado — click para deshabilitar' : 'Habilitar certificado'}
+                            onClick={() => toggleCertificate(e.id, e.certificateEnabled)}
+                            style={{
+                              background: 'none', border: 'none', cursor: 'pointer', padding: 4,
+                              display: 'inline-flex', alignItems: 'center',
+                            }}
+                          >
+                            <Award size={16} color={e.certificateEnabled ? '#c2410c' : '#cbd5e1'} fill={e.certificateEnabled ? '#fed7aa' : 'none'} />
+                          </button>
+                        ) : '—'}
+                      </td>
                       <td>{e.receiptUrl ? <FileLink url={e.receiptUrl} /> : '—'}</td>
                       <td>{e.credentialUrl ? <FileLink url={e.credentialUrl} /> : '—'}</td>
                       <td>
@@ -584,7 +612,7 @@ export default function Enrollments({ courseId }: { courseId: string }) {
                     </tr>
                     {hasPlan && isExpanded && (
                       <tr>
-                        <td colSpan={9} style={{ padding: '0 0 12px 0', background: '#faf9ff' }}>
+                        <td colSpan={10} style={{ padding: '0 0 12px 0', background: '#faf9ff' }}>
                           <div style={{ margin: '0 12px', border: '1.5px solid #e4dcff', borderRadius: 12, overflow: 'hidden' }}>
                             <div style={{ padding: '10px 16px', background: '#f0ebff', fontWeight: 700, fontSize: '0.82rem', color: '#4c3a8a', display: 'flex', justifyContent: 'space-between' }}>
                               <span>Cuenta corriente — {e.installmentPlan!.numInstallments} cuotas de {e.installmentPlan!.amountPerInstallment.toLocaleString('es-AR')} {e.installmentPlan!.currency}</span>

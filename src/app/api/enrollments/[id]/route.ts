@@ -13,6 +13,7 @@ export async function PATCH(req: NextRequest, { params }: P) {
         status: body.status,
         notes: body.notes,
         paidAt: body.status === 'CONFIRMADA' ? new Date() : undefined,
+        certificateEnabled: typeof body.certificateEnabled === 'boolean' ? body.certificateEnabled : undefined,
       },
       include: { profile: true },
     });

@@ -76,6 +76,22 @@ model Course {
   prices                   Price[]
   connectionGateProgress   ConnectionGateProgress[]
   videos                   CourseVideo[]
+  certificateTemplates     CertificateTemplate[]
+}
+
+model CertificateTemplate {
+  id           Int      @id @default(autoincrement())
+  courseId     Int
+  moduleId     Int?
+  title        String
+  subtitle     String?
+  bodyTemplate String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  course       Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  module       Module?  @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@unique([courseId, moduleId])
 }
 
 model CourseVideo {
@@ -115,6 +131,7 @@ model Module {
   connectionInfo String?
   course         Course         @relation(fields: [courseId], references: [id], onDelete: Cascade)
   accessProfiles ModuleAccess[]
+  certificateTemplates CertificateTemplate[]
 }
 
 model ModuleAccess {
@@ -153,6 +170,7 @@ model Enrollment {
   receiptUrl      String?
   status          EnrollmentStatus @default(PENDIENTE_PAGO)
   credentialUrl   String?
+  certificateEnabled Boolean       @default(false)
   course          Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
   profile         Profile?         @relation(fields: [profileId], references: [id])
   user            User?            @relation(fields: [userId], references: [id])
