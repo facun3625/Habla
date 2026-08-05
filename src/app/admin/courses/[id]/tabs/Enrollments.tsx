@@ -46,7 +46,7 @@ function FileLink({ url, label = 'Ver' }: { url: string; label?: string }) {
   );
 }
 
-type Profile = { name: string };
+type Profile = { name: string; id?: number };
 type Installment = { id: number; number: number; amount: number; dueDate: string | null; status: string; proofUrl: string | null; notes: string | null };
 type InstallmentPlan = { id: number; numInstallments: number; amountPerInstallment: number; currency: string; installments: Installment[] };
 type Enrollment = {
@@ -88,6 +88,20 @@ const METHOD_LABEL: Record<string, string> = {
   TRANSFERENCIA_EXT: 'Transferencia Exterior',
 };
 
+// A qué moneda del esquema de precios corresponde cada medio de pago.
+// No hay un monto guardado por inscripción, así que el total pagado se estima
+// buscando el precio actual del perfil en la moneda que corresponde a este medio.
+const CURRENCY_FOR_METHOD: Record<string, 'ARS' | 'USD'> = {
+  MERCADO_PAGO: 'ARS',
+  TRANSFERENCIA: 'ARS',
+  TRANSFERENCIA_AR: 'ARS',
+  TRANSFERENCIA_UY: 'USD',
+  TRANSFERENCIA_EXT: 'USD',
+  PAYPAL: 'USD',
+};
+
+type Price = { amount: number; currency: string; profile: { id: number } | null };
+
 const INST_STATUS: Record<string, string> = {
   PENDING: 'Pendiente', SUBMITTED: 'Enviado', ACCEPTED: 'Acreditado', REJECTED: 'Rechazado',
 };
@@ -100,6 +114,7 @@ const INST_BG: Record<string, string> = {
 
 export default function Enrollments({ courseId }: { courseId: string }) {
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
+  const [prices, setPrices] = useState<Price[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>('all');
   const [search, setSearch] = useState('');
@@ -117,6 +132,10 @@ export default function Enrollments({ courseId }: { courseId: string }) {
 
   useEffect(() => {
     refetch().finally(() => setLoading(false));
+    fetch(`/api/courses/${courseId}/prices`)
+      .then((r) => r.json())
+      .then((data) => setPrices(Array.isArray(data) ? data : []))
+      .catch(() => setPrices([]));
   }, [courseId]);
 
   const confirmEnrollment = async (id: number) => {
@@ -235,6 +254,34 @@ export default function Enrollments({ courseId }: { courseId: string }) {
     e.status === 'CONFIRMADA' && !e.installmentPlan
   );
 
+  // Total pagado: para cuotas es exacto (suma de cuotas acreditadas). Para pago único
+  // no hay un monto guardado por inscripción, así que se estima con el precio ACTUAL
+  // del perfil — si cambiaste un precio después de esa inscripción, esa parte va a quedar aproximada.
+  let totalARS = 0;
+  let totalUSD = 0;
+  let undeterminedCount = 0;
+
+  for (const e of enrollments) {
+    if (e.status !== 'CONFIRMADA') continue;
+
+    if (e.installmentPlan) {
+      const paid = e.installmentPlan.installments
+        .filter((i) => i.status === 'ACCEPTED')
+        .reduce((sum, i) => sum + i.amount, 0);
+      if (e.installmentPlan.currency === 'USD') totalUSD += paid;
+      else totalARS += paid;
+      continue;
+    }
+
+    const currency = e.paymentMethod ? CURRENCY_FOR_METHOD[e.paymentMethod] : undefined;
+    const price = currency && e.profile?.id
+      ? prices.find((p) => p.profile?.id === e.profile!.id && p.currency === currency)
+      : undefined;
+    if (!price) { undeterminedCount++; continue; }
+    if (currency === 'USD') totalUSD += price.amount;
+    else totalARS += price.amount;
+  }
+
   const filteredByStatus = filter === 'all' ? enrollments
     : filter === 'CUOTAS_PENDIENTES' ? withPendingInstallments
     : filter === 'CUOTAS_COMPLETAS' ? withCompletedPlan
@@ -259,11 +306,38 @@ export default function Enrollments({ courseId }: { courseId: string }) {
           <h3 className={styles.sectionTitle}>Inscripciones ({enrollments.length})</h3>
           <p className={styles.sectionDesc}>Revisá pagos y confirmá inscripciones.</p>
         </div>
-        {pendingReceipts > 0 && (
-          <div className={styles.alertBadge}>
-            {pendingReceipts} comprobante{pendingReceipts > 1 ? 's' : ''} para revisar
-          </div>
-        )}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
+          {(totalARS > 0 || totalUSD > 0) && (
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+              {totalARS > 0 && (
+                <div
+                  title="Cuotas: exacto (solo acreditadas). Pago único: estimado con el precio actual del perfil."
+                  style={{ background: '#f0fdf4', border: '1.5px solid #bbf7d0', color: '#15803d', padding: '6px 14px', borderRadius: 20, fontSize: '0.82rem', fontWeight: 700 }}
+                >
+                  Total pagado: {totalARS.toLocaleString('es-AR')} ARS
+                </div>
+              )}
+              {totalUSD > 0 && (
+                <div
+                  title="Cuotas: exacto (solo acreditadas). Pago único: estimado con el precio actual del perfil."
+                  style={{ background: '#f0fdf4', border: '1.5px solid #bbf7d0', color: '#15803d', padding: '6px 14px', borderRadius: 20, fontSize: '0.82rem', fontWeight: 700 }}
+                >
+                  Total pagado: {totalUSD.toLocaleString('es-AR')} USD
+                </div>
+              )}
+            </div>
+          )}
+          {undeterminedCount > 0 && (
+            <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+              {undeterminedCount} confirmada{undeterminedCount > 1 ? 's' : ''} sin precio configurado para su perfil/moneda — no se sumó al total
+            </span>
+          )}
+          {pendingReceipts > 0 && (
+            <div className={styles.alertBadge}>
+              {pendingReceipts} comprobante{pendingReceipts > 1 ? 's' : ''} para revisar
+            </div>
+          )}
+        </div>
       </div>
 
       <div className={styles.searchBox}>

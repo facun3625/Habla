@@ -80,17 +80,53 @@
   gap: 24px;
 }
 
+.tabsRow {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
 .tabsList {
   display: flex;
   gap: 8px;
   border-bottom: 1px solid #e2e8f0;
   padding-bottom: 2px;
   overflow-x: auto;
+  scroll-behavior: smooth;
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
 .tabsList::-webkit-scrollbar {
   display: none;
+}
+
+.tabsScrollBtn {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid #e2e8f0;
+  background: white;
+  color: #64748b;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 2;
+}
+
+.tabsScrollBtn:hover {
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.tabsScrollBtnLeft {
+  margin-right: 6px;
+}
+
+.tabsScrollBtnRight {
+  margin-left: 6px;
 }
 
 .tabItem {

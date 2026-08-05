@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, use, useEffect } from 'react';
+import { useState, use, useEffect, useRef } from 'react';
 import AdminLayout from '../../components/AdminLayout';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Info, Layers, Users as UsersIcon, DollarSign, Mail, BookOpen, CreditCard, Video, AlertTriangle, PlayCircle } from 'lucide-react';
+import { ArrowLeft, Info, Layers, Users as UsersIcon, DollarSign, Mail, BookOpen, CreditCard, Video, AlertTriangle, PlayCircle, ChevronLeft, ChevronRight } from 'lucide-react';
 import styles from './courseAdmin.module.css';
 import Link from 'next/link';
 
@@ -27,6 +27,9 @@ export default function CourseAdminPage({ params }: { params: Promise<{ id: stri
   const [activeTab, setActiveTab] = useState<TabType>((searchParams.get('tab') as TabType) || 'general');
   const [courseTitle, setCourseTitle] = useState('...');
   const [pendingCount, setPendingCount] = useState(0);
+  const tabsListRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
 
   useEffect(() => {
     const tab = searchParams.get('tab') as TabType;
@@ -60,6 +63,38 @@ export default function CourseAdminPage({ params }: { params: Promise<{ id: stri
     window.addEventListener('refreshNotifications', fetchPendingCount);
     return () => window.removeEventListener('refreshNotifications', fetchPendingCount);
   }, [courseId]);
+
+  // La barra de pestañas puede no entrar en pantallas angostas: mostramos flechas
+  // cuando hay contenido oculto a los costados, en vez de depender de que la
+  // alumna/admin descubra que se puede arrastrar para scrollear.
+  useEffect(() => {
+    const el = tabsListRef.current;
+    if (!el) return;
+    const updateScrollState = () => {
+      setCanScrollLeft(el.scrollLeft > 4);
+      setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
+    };
+    updateScrollState();
+    el.addEventListener('scroll', updateScrollState);
+    window.addEventListener('resize', updateScrollState);
+    return () => {
+      el.removeEventListener('scroll', updateScrollState);
+      window.removeEventListener('resize', updateScrollState);
+    };
+  }, []);
+
+  const scrollTabs = (dir: -1 | 1) => {
+    tabsListRef.current?.scrollBy({ left: dir * 220, behavior: 'smooth' });
+  };
+
+  const handleTabsWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    const el = tabsListRef.current;
+    if (!el) return;
+    if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+      el.scrollLeft += e.deltaY;
+      e.preventDefault();
+    }
+  };
 
   const tabs = [
     { id: 'general',      label: 'Datos Generales',       icon: Info },
@@ -108,21 +143,43 @@ export default function CourseAdminPage({ params }: { params: Promise<{ id: stri
         </div>
 
         <div className={styles.tabsContainer}>
-          <div className={styles.tabsList}>
-            {tabs.map((tab) => (
+          <div className={styles.tabsRow}>
+            {canScrollLeft && (
               <button
-                key={tab.id}
-                className={`${styles.tabItem} ${activeTab === tab.id ? styles.tabActive : ''}`}
-                onClick={() => handleTabChange(tab.id as TabType)}
-                style={tab.id === 'danger' ? { color: activeTab === 'danger' ? '#dc2626' : '#f87171', borderBottomColor: activeTab === 'danger' ? '#dc2626' : undefined } : undefined}
+                type="button"
+                className={`${styles.tabsScrollBtn} ${styles.tabsScrollBtnLeft}`}
+                onClick={() => scrollTabs(-1)}
+                aria-label="Ver pestañas anteriores"
               >
-                <tab.icon size={18} />
-                {tab.label}
-                {tab.id === 'enrollments' && pendingCount > 0 && (
-                  <span className={styles.tabBadge}>{pendingCount}</span>
-                )}
+                <ChevronLeft size={18} />
               </button>
-            ))}
+            )}
+            <div className={styles.tabsList} ref={tabsListRef} onWheel={handleTabsWheel}>
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  className={`${styles.tabItem} ${activeTab === tab.id ? styles.tabActive : ''}`}
+                  onClick={() => handleTabChange(tab.id as TabType)}
+                  style={tab.id === 'danger' ? { color: activeTab === 'danger' ? '#dc2626' : '#f87171', borderBottomColor: activeTab === 'danger' ? '#dc2626' : undefined } : undefined}
+                >
+                  <tab.icon size={18} />
+                  {tab.label}
+                  {tab.id === 'enrollments' && pendingCount > 0 && (
+                    <span className={styles.tabBadge}>{pendingCount}</span>
+                  )}
+                </button>
+              ))}
+            </div>
+            {canScrollRight && (
+              <button
+                type="button"
+                className={`${styles.tabsScrollBtn} ${styles.tabsScrollBtnRight}`}
+                onClick={() => scrollTabs(1)}
+                aria-label="Ver más pestañas"
+              >
+                <ChevronRight size={18} />
+              </button>
+            )}
           </div>
 
           <div className={styles.tabContent}>
