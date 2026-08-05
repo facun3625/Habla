@@ -505,7 +505,7 @@ export default function Enrollments({ courseId }: { courseId: string }) {
                 <th title="Habilita que la alumna pueda descargar su certificado">Certificado</th>
                 <th>Comprobante</th>
                 <th>Título</th>
-                <th>Acciones</th>
+                <th className={styles.stickyActions}>Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -572,7 +572,7 @@ export default function Enrollments({ courseId }: { courseId: string }) {
                       </td>
                       <td>{e.receiptUrl ? <FileLink url={e.receiptUrl} /> : '—'}</td>
                       <td>{e.credentialUrl ? <FileLink url={e.credentialUrl} /> : '—'}</td>
-                      <td>
+                      <td className={styles.stickyActions}>
                         <div style={{ display: 'flex', gap: 6 }}>
                           {hasPlan ? (
                             <button
