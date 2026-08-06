@@ -65,12 +65,12 @@ export async function GET(req: NextRequest, { params }: Params) {
 
   const resolvedTemplates = applicableTemplates.map((t) => ({
     id: t.id,
-    title: t.title,
-    subtitle: t.subtitle,
+    title: fillCertificateTemplate(t.title, { ...vars, modulo: t.module?.name ?? '' }),
+    subtitle: t.subtitle ? fillCertificateTemplate(t.subtitle, { ...vars, modulo: t.module?.name ?? '' }) : null,
     body: fillCertificateTemplate(t.bodyTemplate, { ...vars, modulo: t.module?.name ?? '' }),
   }));
 
-  let signatures: { name: string; imageUrl: string | null }[] = [];
+  let signatures: { name: string; imageUrl: string | null; subtitle?: string | null }[] = [];
   try { signatures = JSON.parse(settings.certificate_signatures || '[]'); } catch { signatures = []; }
 
   return NextResponse.json({

@@ -6,7 +6,7 @@ import styles from '../../../account.module.css';
 import { downloadCertificatePdf } from '@/lib/certificateRender';
 
 type CertTemplate = { id: number; title: string; subtitle: string | null; body: string };
-type Signature = { name: string; imageUrl: string | null };
+type Signature = { name: string; imageUrl: string | null; subtitle?: string | null };
 type Data = { enabled: boolean; headerUrl: string | null; footerUrl: string | null; signatures: Signature[]; templates: CertTemplate[] };
 
 export default function CertificateTab({ courseId }: { courseId: string }) {
@@ -93,7 +93,10 @@ export default function CertificateTab({ courseId }: { courseId: string }) {
                       <img src={sig.imageUrl} alt="" style={{ height: 50, maxWidth: 180, objectFit: 'contain', display: 'block', margin: '0 auto' }} />
                     )}
                     <div style={{ borderTop: '2px solid #4c3fae', margin: '0 auto 8px', width: 180 }} />
-                    <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#374151' }}>{sig.name}</span>
+                    <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#374151', display: 'block' }}>{sig.name}</span>
+                    {sig.subtitle && (
+                      <span style={{ fontSize: '0.72rem', color: '#64748b', display: 'block', marginTop: 2 }}>{sig.subtitle}</span>
+                    )}
                   </div>
                 ))}
               </div>

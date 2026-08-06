@@ -112,9 +112,9 @@ export default function SettingsPage() {
     e.target.value = '';
   };
 
-  let certSignatures: { name: string; imageUrl: string }[] = [];
+  let certSignatures: { name: string; imageUrl: string; subtitle?: string }[] = [];
   try { certSignatures = JSON.parse(settings.certificate_signatures || '[]'); } catch { certSignatures = []; }
-  const setCertSignatures = (next: { name: string; imageUrl: string }[]) =>
+  const setCertSignatures = (next: { name: string; imageUrl: string; subtitle?: string }[]) =>
     setSettings((prev) => ({ ...prev, certificate_signatures: JSON.stringify(next) }));
 
   const toggleShow = (key: string) => setShowSecrets((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -603,17 +603,26 @@ export default function SettingsPage() {
                       }}
                     />
                   </label>
-                  <input
-                    type="text"
-                    className={styles.input}
-                    value={sig.name}
-                    placeholder="Ej: Lic. Ma Virginia Trotta"
-                    onChange={(e) => setCertSignatures(certSignatures.map((s, j) => j === i ? { ...s, name: e.target.value } : s))}
-                  />
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <input
+                      type="text"
+                      className={styles.input}
+                      value={sig.name}
+                      placeholder="Ej: Lic. Ma Virginia Trotta"
+                      onChange={(e) => setCertSignatures(certSignatures.map((s, j) => j === i ? { ...s, name: e.target.value } : s))}
+                    />
+                    <input
+                      type="text"
+                      className={styles.input}
+                      value={sig.subtitle || ''}
+                      placeholder="Ej: M.P. 12345 / Directora (opcional)"
+                      onChange={(e) => setCertSignatures(certSignatures.map((s, j) => j === i ? { ...s, subtitle: e.target.value } : s))}
+                    />
+                  </div>
                   <button
                     type="button"
                     onClick={() => setCertSignatures(certSignatures.filter((_, j) => j !== i))}
-                    style={{ background: '#fef2f2', color: '#ef4444', border: 'none', borderRadius: 8, width: 38, height: 38, cursor: 'pointer', flexShrink: 0 }}
+                    style={{ background: '#fef2f2', color: '#ef4444', border: 'none', borderRadius: 8, width: 38, height: 38, cursor: 'pointer', flexShrink: 0, alignSelf: 'flex-start' }}
                   >
                     <X size={15} style={{ margin: '0 auto' }} />
                   </button>
@@ -621,7 +630,7 @@ export default function SettingsPage() {
               ))}
               <button
                 type="button"
-                onClick={() => setCertSignatures([...certSignatures, { name: '', imageUrl: '' }])}
+                onClick={() => setCertSignatures([...certSignatures, { name: '', imageUrl: '', subtitle: '' }])}
                 style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#f0eeff', color: '#6c5ce7', border: 'none', borderRadius: 10, padding: '0.5rem 1rem', fontWeight: 700, fontSize: '0.85rem', cursor: 'pointer', width: 'fit-content' }}
               >
                 <Plus size={15} /> Agregar firma

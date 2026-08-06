@@ -94,7 +94,7 @@ export default function Certificate({ courseId }: { courseId: string }) {
   const [courseTitle, setCourseTitle] = useState('');
   const [headerUrl, setHeaderUrl] = useState('');
   const [footerUrl, setFooterUrl] = useState('');
-  const [signatures, setSignatures] = useState<{ name: string; imageUrl: string }[]>([]);
+  const [signatures, setSignatures] = useState<{ name: string; imageUrl: string; subtitle?: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -104,6 +104,9 @@ export default function Certificate({ courseId }: { courseId: string }) {
   const [editing, setEditing] = useState<'new' | number | null>(null);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const bodyEditorRef = useRef<HTMLDivElement | null>(null);
+  const titleInputRef = useRef<HTMLInputElement | null>(null);
+  const subtitleInputRef = useRef<HTMLInputElement | null>(null);
+  const [activeField, setActiveField] = useState<'title' | 'subtitle' | 'body' | null>(null);
 
   const reload = () =>
     fetch(`/api/courses/${courseId}/certificate`)
@@ -137,11 +140,37 @@ export default function Certificate({ courseId }: { courseId: string }) {
   const cancelForm = () => { setEditing(null); setForm(EMPTY_FORM); setError(''); };
 
   const insertVar = (key: string) => {
-    const el = bodyEditorRef.current;
-    if (!el) return;
-    el.focus();
-    document.execCommand('insertText', false, `{${key}}`);
-    setForm((prev) => ({ ...prev, bodyTemplate: el.innerHTML }));
+    if (activeField === 'title' && titleInputRef.current) {
+      const input = titleInputRef.current;
+      const start = input.selectionStart ?? 0;
+      const end = input.selectionEnd ?? 0;
+      const text = input.value;
+      const nextVal = text.substring(0, start) + `{${key}}` + text.substring(end);
+      setForm((prev) => ({ ...prev, title: nextVal }));
+      setTimeout(() => {
+        input.focus();
+        const nextPos = start + key.length + 2;
+        input.setSelectionRange(nextPos, nextPos);
+      }, 0);
+    } else if (activeField === 'subtitle' && subtitleInputRef.current) {
+      const input = subtitleInputRef.current;
+      const start = input.selectionStart ?? 0;
+      const end = input.selectionEnd ?? 0;
+      const text = input.value;
+      const nextVal = text.substring(0, start) + `{${key}}` + text.substring(end);
+      setForm((prev) => ({ ...prev, subtitle: nextVal }));
+      setTimeout(() => {
+        input.focus();
+        const nextPos = start + key.length + 2;
+        input.setSelectionRange(nextPos, nextPos);
+      }, 0);
+    } else {
+      const el = bodyEditorRef.current;
+      if (!el) return;
+      el.focus();
+      document.execCommand('insertText', false, `{${key}}`);
+      setForm((prev) => ({ ...prev, bodyTemplate: el.innerHTML }));
+    }
   };
 
   const saveTemplate = async () => {
@@ -227,17 +256,21 @@ export default function Certificate({ courseId }: { courseId: string }) {
           )}
 
           <input
+            ref={titleInputRef}
             className={styles.input}
             placeholder="Título (ej: Curso de Apraxia del Habla Infantil)"
             value={form.title}
             onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))}
+            onFocus={() => setActiveField('title')}
             style={{ marginBottom: 8 }}
           />
           <input
+            ref={subtitleInputRef}
             className={styles.input}
             placeholder="Subtítulo (opcional)"
             value={form.subtitle}
             onChange={(e) => setForm((prev) => ({ ...prev, subtitle: e.target.value }))}
+            onFocus={() => setActiveField('subtitle')}
             style={{ marginBottom: 8 }}
           />
 
@@ -258,19 +291,25 @@ export default function Certificate({ courseId }: { courseId: string }) {
           <span style={{ display: 'block', fontSize: '0.78rem', color: '#94a3b8', marginBottom: 6 }}>
             Ej: Certifica que {'{nombre}'}, de profesión {'{profesion}'}, completó...
           </span>
-          <BodyEditor
-            key={String(editing)}
-            divRef={bodyEditorRef}
-            initialHtml={form.bodyTemplate}
-            onChange={(html) => setForm((prev) => ({ ...prev, bodyTemplate: html }))}
-          />
+          <div onFocusCapture={() => setActiveField('body')}>
+            <BodyEditor
+              key={String(editing)}
+              divRef={bodyEditorRef}
+              initialHtml={form.bodyTemplate}
+              onChange={(html) => setForm((prev) => ({ ...prev, bodyTemplate: html }))}
+            />
+          </div>
 
           {/* Preview */}
           <div style={{ border: '1px solid #ede9fe', borderRadius: 14, overflow: 'hidden', marginBottom: 12, background: '#f5f3ef' }}>
             {headerUrl && <img src={headerUrl} alt="" style={{ width: '100%', display: 'block' }} />}
             <div style={{ padding: '28px 24px', textAlign: 'center' }}>
-              <p style={{ margin: '0 0 8px', fontSize: '1.3rem', fontWeight: 800, color: '#4c3fae' }}>{form.title || 'Título del certificado'}</p>
-              {form.subtitle && <p style={{ margin: '0 0 14px', fontSize: '0.95rem', fontWeight: 600, color: '#6c5ce7' }}>{form.subtitle}</p>}
+              <p style={{ margin: '0 0 8px', fontSize: '1.3rem', fontWeight: 800, color: '#4c3fae' }}>{previewBody(form.title, editingModuleName) || 'Título del certificado'}</p>
+              {form.subtitle && (
+                <p style={{ margin: '0 0 14px', fontSize: '0.95rem', fontWeight: 600, color: '#6c5ce7' }}>
+                  {previewBody(form.subtitle, editingModuleName)}
+                </p>
+              )}
               {previewBody(form.bodyTemplate, editingModuleName).trim() ? (
                 <div
                   style={{ fontSize: '0.85rem', color: '#374151', lineHeight: 1.6 }}
@@ -288,7 +327,10 @@ export default function Certificate({ courseId }: { courseId: string }) {
                       <img src={sig.imageUrl} alt="" style={{ height: 40, maxWidth: 150, objectFit: 'contain', display: 'block', margin: '0 auto' }} />
                     )}
                     <div style={{ borderTop: '2px solid #4c3fae', margin: '0 auto 6px', width: 150 }} />
-                    <span style={{ fontSize: '0.78rem', fontWeight: 600, color: '#374151' }}>{sig.name}</span>
+                    <span style={{ fontSize: '0.78rem', fontWeight: 600, color: '#374151', display: 'block' }}>{sig.name}</span>
+                    {sig.subtitle && (
+                      <span style={{ fontSize: '0.68rem', color: '#64748b', display: 'block', marginTop: 2 }}>{sig.subtitle}</span>
+                    )}
                   </div>
                 ))}
               </div>

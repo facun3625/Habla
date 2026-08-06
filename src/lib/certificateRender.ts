@@ -1,6 +1,6 @@
 'use client';
 
-export type CertificateSignature = { name: string; imageUrl: string | null };
+export type CertificateSignature = { name: string; imageUrl: string | null; subtitle?: string | null };
 
 export type CertificateContent = {
   headerUrl: string | null;
@@ -121,7 +121,13 @@ async function drawSignatures(ctx: CanvasRenderingContext2D, signatures: Certifi
 
     ctx.font = `600 26px ${FONT_STACK}`;
     ctx.fillStyle = '#374151';
-    ctx.fillText(entry.name, x, y + 40);
+    ctx.fillText(entry.name, x, y + 36);
+
+    if (entry.subtitle) {
+      ctx.font = `400 20px ${FONT_STACK}`;
+      ctx.fillStyle = '#64748b';
+      ctx.fillText(entry.subtitle, x, y + 62);
+    }
 
     x += colWidth + gap;
   });
@@ -160,7 +166,7 @@ async function renderCertificateCanvas(content: CertificateContent): Promise<HTM
 
   if (headerImg) drawImageContain(ctx, headerImg, 0, 0, CANVAS_WIDTH, headerHeight);
   if (footerImg) drawImageContain(ctx, footerImg, 0, CANVAS_HEIGHT - footerHeight, CANVAS_WIDTH, footerHeight);
-  await drawSignatures(ctx, content.signatures, CANVAS_HEIGHT - footerHeight - 60);
+  await drawSignatures(ctx, content.signatures, CANVAS_HEIGHT - footerHeight - 75);
 
   const centerX = CANVAS_WIDTH / 2;
   const maxTextWidth = CANVAS_WIDTH * 0.7;
