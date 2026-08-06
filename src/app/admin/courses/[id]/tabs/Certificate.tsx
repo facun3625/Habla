@@ -1,10 +1,71 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Award, Plus, Trash2, Edit2 } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Award, Plus, Trash2, Edit2, Bold, AlignLeft, AlignCenter, AlignRight, Type } from 'lucide-react';
 import styles from '../courseAdmin.module.css';
 import ConfirmModal from '../../../components/ConfirmModal';
 import { CERTIFICATE_VARIABLES, fillCertificateTemplate } from '@/lib/certificateVars';
+
+// Editor de texto enriquecido para el cuerpo del certificado: negrita, alineación y tamaño.
+// Se guarda como HTML (los {variables} quedan como texto plano adentro, el reemplazo no las toca).
+function BodyEditor({
+  divRef, initialHtml, onChange,
+}: {
+  divRef: React.RefObject<HTMLDivElement | null>;
+  initialHtml: string;
+  onChange: (html: string) => void;
+}) {
+  useEffect(() => {
+    if (divRef.current) divRef.current.innerHTML = initialHtml;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const exec = (cmd: string, value?: string) => {
+    divRef.current?.focus();
+    document.execCommand(cmd, false, value);
+    onChange(divRef.current?.innerHTML ?? '');
+  };
+
+  const handleInput = () => onChange(divRef.current?.innerHTML ?? '');
+
+  // Evita que el botón le robe el foco al editor (perdería la selección de texto).
+  const tb = (fn: () => void) => (e: React.MouseEvent) => { e.preventDefault(); fn(); };
+
+  const ToolBtn = ({ onClick, title, children }: { onClick: () => void; title: string; children: React.ReactNode }) => (
+    <button
+      type="button"
+      onMouseDown={tb(onClick)}
+      title={title}
+      style={{ padding: '4px 8px', borderRadius: 6, border: 'none', cursor: 'pointer', background: 'transparent', color: '#475569', display: 'flex', alignItems: 'center', fontFamily: 'inherit' }}
+    >
+      {children}
+    </button>
+  );
+
+  return (
+    <div style={{ border: '1.5px solid #e2e8f0', borderRadius: 10, overflow: 'hidden', marginBottom: 12 }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 2, padding: '6px 8px', borderBottom: '1px solid #e5e7eb', background: '#f9fafb' }}>
+        <ToolBtn onClick={() => exec('bold')} title="Negrita"><Bold size={15} /></ToolBtn>
+        <div style={{ width: 1, background: '#d1d5db', margin: '0 4px' }} />
+        <ToolBtn onClick={() => exec('justifyLeft')} title="Izquierda"><AlignLeft size={15} /></ToolBtn>
+        <ToolBtn onClick={() => exec('justifyCenter')} title="Centrar"><AlignCenter size={15} /></ToolBtn>
+        <ToolBtn onClick={() => exec('justifyRight')} title="Derecha"><AlignRight size={15} /></ToolBtn>
+        <div style={{ width: 1, background: '#d1d5db', margin: '0 4px' }} />
+        <ToolBtn onClick={() => exec('fontSize', '2')} title="Texto chico"><Type size={12} /></ToolBtn>
+        <ToolBtn onClick={() => exec('fontSize', '4')} title="Texto normal"><Type size={15} /></ToolBtn>
+        <ToolBtn onClick={() => exec('fontSize', '6')} title="Texto grande"><Type size={19} /></ToolBtn>
+      </div>
+      <div
+        ref={divRef}
+        contentEditable
+        suppressContentEditableWarning
+        onInput={handleInput}
+        onBlur={handleInput}
+        style={{ minHeight: 110, padding: '10px 14px', fontSize: '0.9rem', color: '#1e293b', lineHeight: 1.6, textAlign: 'center', outline: 'none' }}
+      />
+    </div>
+  );
+}
 
 type ModuleOpt = { id: number; name: string };
 type Template = {
@@ -42,6 +103,7 @@ export default function Certificate({ courseId }: { courseId: string }) {
   // null = no hay formulario abierto; 'new' = creando; number = editando esa plantilla
   const [editing, setEditing] = useState<'new' | number | null>(null);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
+  const bodyEditorRef = useRef<HTMLDivElement | null>(null);
 
   const reload = () =>
     fetch(`/api/courses/${courseId}/certificate`)
@@ -75,7 +137,11 @@ export default function Certificate({ courseId }: { courseId: string }) {
   const cancelForm = () => { setEditing(null); setForm(EMPTY_FORM); setError(''); };
 
   const insertVar = (key: string) => {
-    setForm((prev) => ({ ...prev, bodyTemplate: `${prev.bodyTemplate}${prev.bodyTemplate ? ' ' : ''}{${key}}` }));
+    const el = bodyEditorRef.current;
+    if (!el) return;
+    el.focus();
+    document.execCommand('insertText', false, `{${key}}`);
+    setForm((prev) => ({ ...prev, bodyTemplate: el.innerHTML }));
   };
 
   const saveTemplate = async () => {
@@ -189,13 +255,14 @@ export default function Certificate({ courseId }: { courseId: string }) {
             ))}
           </div>
 
-          <textarea
-            className={styles.input}
-            rows={4}
-            placeholder="Certifica que {nombre}, de profesión {profesion}, completó..."
-            value={form.bodyTemplate}
-            onChange={(e) => setForm((prev) => ({ ...prev, bodyTemplate: e.target.value }))}
-            style={{ resize: 'vertical', marginBottom: 12 }}
+          <span style={{ display: 'block', fontSize: '0.78rem', color: '#94a3b8', marginBottom: 6 }}>
+            Ej: Certifica que {'{nombre}'}, de profesión {'{profesion}'}, completó...
+          </span>
+          <BodyEditor
+            key={String(editing)}
+            divRef={bodyEditorRef}
+            initialHtml={form.bodyTemplate}
+            onChange={(html) => setForm((prev) => ({ ...prev, bodyTemplate: html }))}
           />
 
           {/* Preview */}
@@ -204,9 +271,14 @@ export default function Certificate({ courseId }: { courseId: string }) {
             <div style={{ padding: '28px 24px', textAlign: 'center' }}>
               <p style={{ margin: '0 0 8px', fontSize: '1.3rem', fontWeight: 800, color: '#4c3fae' }}>{form.title || 'Título del certificado'}</p>
               {form.subtitle && <p style={{ margin: '0 0 14px', fontSize: '0.95rem', fontWeight: 600, color: '#6c5ce7' }}>{form.subtitle}</p>}
-              <p style={{ margin: 0, fontSize: '0.85rem', color: '#374151', lineHeight: 1.6 }}>
-                {previewBody(form.bodyTemplate, editingModuleName) || 'El texto del certificado aparece acá...'}
-              </p>
+              {previewBody(form.bodyTemplate, editingModuleName).trim() ? (
+                <div
+                  style={{ fontSize: '0.85rem', color: '#374151', lineHeight: 1.6 }}
+                  dangerouslySetInnerHTML={{ __html: previewBody(form.bodyTemplate, editingModuleName) }}
+                />
+              ) : (
+                <p style={{ margin: 0, fontSize: '0.85rem', color: '#94a3b8' }}>El texto del certificado aparece acá...</p>
+              )}
             </div>
             {signatures.filter((s) => s.name.trim()).length > 0 && (
               <div style={{ display: 'flex', justifyContent: 'center', gap: 32, flexWrap: 'wrap', padding: '0 24px 24px' }}>

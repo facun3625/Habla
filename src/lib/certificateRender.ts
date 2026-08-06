@@ -25,6 +25,58 @@ function loadImage(src: string): Promise<HTMLImageElement> {
   });
 }
 
+type BodyBlock = { text: string; bold: boolean; align: 'left' | 'center' | 'right'; fontPx: number };
+
+// El editor del admin guarda document.execCommand('fontSize', ...) como <font size="1-7">
+// (escala HTML legacy, no píxeles) — solo usamos los 3 valores que ofrece el editor (2/4/6).
+const FONT_SIZE_PX: Record<string, number> = { '2': 24, '4': 32, '6': 44 };
+
+// El body del certificado se guarda como HTML (negrita, alineación y tamaño por línea).
+// Cada Enter en el editor genera un <div>/<p> por línea; sin ninguno, todo el contenido
+// se trata como un único bloque centrado (compatible con certificados guardados antes
+// de este editor, que eran texto plano sin tags).
+function parseBodyBlocks(html: string): BodyBlock[] {
+  if (!html.trim()) return [];
+  const doc = new DOMParser().parseFromString(`<div>${html}</div>`, 'text/html');
+  const root = doc.body.firstElementChild;
+  if (!root) return [];
+
+  const blockEls = Array.from(root.children).filter((el) => el.tagName === 'DIV' || el.tagName === 'P');
+  const blocks = blockEls.length > 0 ? blockEls : [root];
+
+  return blocks
+    .map((el) => {
+      const text = (el.textContent ?? '').trim();
+      if (!text) return null;
+      const bold = el.tagName === 'B' || el.tagName === 'STRONG' || !!el.querySelector('b, strong');
+      const alignStyle = (el as HTMLElement).style?.textAlign || el.getAttribute('align') || '';
+      const align: BodyBlock['align'] = alignStyle === 'left' ? 'left' : alignStyle === 'right' ? 'right' : 'center';
+      const sizeAttr = el.querySelector('font[size]')?.getAttribute('size') ?? '';
+      const fontPx = FONT_SIZE_PX[sizeAttr] ?? 32;
+      return { text, bold, align, fontPx };
+    })
+    .filter((b): b is BodyBlock => b !== null);
+}
+
+function drawBodyBlocks(ctx: CanvasRenderingContext2D, blocks: BodyBlock[], startY: number, maxWidth: number) {
+  let y = startY;
+  const leftX = (CANVAS_WIDTH - maxWidth) / 2;
+  const rightX = (CANVAS_WIDTH + maxWidth) / 2;
+  const centerX = CANVAS_WIDTH / 2;
+
+  ctx.fillStyle = '#374151';
+  for (const block of blocks) {
+    ctx.font = `${block.bold ? 700 : 400} ${block.fontPx}px ${FONT_STACK}`;
+    ctx.textAlign = block.align;
+    const x = block.align === 'left' ? leftX : block.align === 'right' ? rightX : centerX;
+    const lineHeight = block.fontPx * 1.45;
+    for (const line of wrapText(ctx, block.text, maxWidth)) {
+      ctx.fillText(line, x, y);
+      y += lineHeight;
+    }
+  }
+}
+
 function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
   const words = text.split(/\s+/).filter(Boolean);
   const lines: string[] = [];
@@ -133,12 +185,7 @@ async function renderCertificateCanvas(content: CertificateContent): Promise<HTM
     y += 30;
   }
 
-  ctx.font = `400 32px ${FONT_STACK}`;
-  ctx.fillStyle = '#374151';
-  for (const line of wrapText(ctx, content.body, maxTextWidth)) {
-    ctx.fillText(line, centerX, y);
-    y += 48;
-  }
+  drawBodyBlocks(ctx, parseBodyBlocks(content.body), y, maxTextWidth);
 
   return canvas;
 }

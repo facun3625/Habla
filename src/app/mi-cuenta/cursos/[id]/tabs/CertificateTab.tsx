@@ -80,7 +80,10 @@ export default function CertificateTab({ courseId }: { courseId: string }) {
             <div style={{ padding: '32px 28px', textAlign: 'center' }}>
               <p style={{ margin: '0 0 8px', fontSize: '1.4rem', fontWeight: 800, color: '#4c3fae' }}>{t.title}</p>
               {t.subtitle && <p style={{ margin: '0 0 16px', fontSize: '1rem', fontWeight: 600, color: '#6c5ce7' }}>{t.subtitle}</p>}
-              <p style={{ margin: 0, fontSize: '0.92rem', color: '#374151', lineHeight: 1.7 }}>{t.body}</p>
+              <div
+                style={{ fontSize: '0.92rem', color: '#374151', lineHeight: 1.7 }}
+                dangerouslySetInnerHTML={{ __html: t.body }}
+              />
             </div>
             {data.signatures.filter((s) => s.name.trim()).length > 0 && (
               <div style={{ display: 'flex', justifyContent: 'center', gap: 40, flexWrap: 'wrap', padding: '0 28px 32px' }}>
