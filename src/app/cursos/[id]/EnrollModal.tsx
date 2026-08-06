@@ -511,7 +511,13 @@ export default function EnrollModal({ course, session: initialSession, onClose, 
                         <select
                           value={selectedCuotas}
                           onChange={e => setSelectedCuotas(Number(e.target.value))}
-                          style={{ width: '100%', padding: '8px 10px', borderRadius: 8, border: '1.5px solid #d1d5db', fontSize: '0.9rem', fontFamily: 'inherit' }}
+                          style={{
+                            width: '100%', padding: '8px 34px 8px 10px', borderRadius: 8, border: '1.5px solid #d1d5db',
+                            fontSize: '0.9rem', fontFamily: 'inherit', appearance: 'none', WebkitAppearance: 'none',
+                            backgroundColor: 'white', cursor: 'pointer',
+                            backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236c5ce7' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E\")",
+                            backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center',
+                          }}
                         >
                           {Array.from({ length: maxCuotas - 1 }, (_, i) => i + 2).map(n => (
                             <option key={n} value={n}>{n} cuotas</option>

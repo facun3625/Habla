@@ -19,6 +19,15 @@
   box-shadow: 0 20px 60px rgba(108, 92, 231, 0.2);
   max-height: 90vh;
   overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 24px 18px;
+    border-radius: 18px;
+  }
 }
 
 .closeBtn {
@@ -101,6 +110,8 @@
   background: #f8fafc;
   outline: none;
   transition: border-color 0.15s;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .input:focus {
@@ -112,6 +123,17 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
+  min-width: 0;
+}
+
+.row > .field {
+  min-width: 0;
+}
+
+@media (max-width: 480px) {
+  .row {
+    grid-template-columns: 1fr;
+  }
 }
 
 .ageDisplay {
