@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyToken, COOKIE } from '@/lib/auth';
 import { getSettings } from '@/lib/settings';
-import { fillCertificateTemplate } from '@/lib/certificateVars';
+import { fillCertificateTemplate, toTitleCase } from '@/lib/certificateVars';
 import { canAccess } from '@/app/mi-cuenta/cursos/[id]/courseAccess';
 
 type Params = { params: Promise<{ id: string }> };
@@ -56,7 +56,7 @@ export async function GET(req: NextRequest, { params }: Params) {
     : templates.filter((t) => t.moduleId !== null && accessibleModules.some((m) => m.id === t.moduleId));
 
   const vars = {
-    nombre: enrollment.userName || user?.name || '',
+    nombre: toTitleCase(enrollment.userName || user?.name || ''),
     profesion: user?.profession ?? '',
     dni: user?.dni ?? '',
     curso: course.title,
