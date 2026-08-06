@@ -9,11 +9,13 @@ import QuestionnaireModal from '@/app/components/QuestionnaireModal';
 import PendingGateModal from './components/PendingGateModal';
 import InstallmentsGateModal from './components/InstallmentsGateModal';
 import InstallmentsUploadButton from './components/InstallmentsUploadButton';
+import PhoneRequiredModal from './components/PhoneRequiredModal';
 
 type User = {
   id: number; name: string | null; email: string;
   profile: { name: string } | null;
   questionnaireCompleted: boolean;
+  phone: string | null;
   impersonating?: boolean;
 };
 
@@ -28,6 +30,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [showQuestionnaire, setShowQuestionnaire] = useState(false);
+  const [needsPhone, setNeedsPhone] = useState(false);
   const [pendingInstallments, setPendingInstallments] = useState<{ courseId: number; title: string }[]>([]);
 
   useEffect(() => {
@@ -35,7 +38,11 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
       .then((r) => r.ok ? r.json() : null)
       .then((d) => {
         if (!d) router.push('/');
-        else { setUser(d); if (!d.questionnaireCompleted) setShowQuestionnaire(true); }
+        else {
+          setUser(d);
+          if (!d.questionnaireCompleted) setShowQuestionnaire(true);
+          if (!d.phone) setNeedsPhone(true);
+        }
       });
     fetch('/api/mi-cuenta/installments-gate')
       .then((r) => r.ok ? r.json() : null)
@@ -90,8 +97,11 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
           onClose={() => setShowQuestionnaire(false)}
         />
       )}
-      {!showQuestionnaire && <InstallmentsGateModal />}
-      {!showQuestionnaire && <PendingGateModal />}
+      {!showQuestionnaire && needsPhone && (
+        <PhoneRequiredModal onDone={() => setNeedsPhone(false)} />
+      )}
+      {!showQuestionnaire && !needsPhone && <InstallmentsGateModal />}
+      {!showQuestionnaire && !needsPhone && <PendingGateModal />}
       <aside className={styles.sidebar}>
         <div className={styles.sidebarTop}>
           <div className={styles.avatar}>{initials}</div>
