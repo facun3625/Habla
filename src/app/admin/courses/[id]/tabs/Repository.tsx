@@ -157,7 +157,7 @@ export default function Repository({ courseId }: { courseId: string }) {
     const res = await fetch(`/api/courses/${courseId}/resources`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'FILE', title: newFileTitle.trim(), fileUrl: upData.url }),
+      body: JSON.stringify({ type: 'FILE', title: newFileTitle.trim(), fileUrl: upData.url, order: insertAfterOrder + 1 }),
     });
     setUploading(false);
     if (!res.ok) { setError('Error al guardar.'); return; }

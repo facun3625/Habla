@@ -44,7 +44,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       // Las secciones son solo un título organizador: nacen visibles.
       // Los archivos nacen ocultos hasta que el admin los revise y publique.
       visible: body.type === 'SECTION',
-      order: (last?.order ?? -1) + 1,
+      // El cliente calcula dónde debe ir (justo después de la sección elegida) y ya
+      // corrió el order de los ítems siguientes para hacerle lugar — si no lo respetamos
+      // acá, el archivo siempre termina al final de la lista, en la última sección.
+      order: typeof body.order === 'number' ? body.order : (last?.order ?? -1) + 1,
     },
   });
   return NextResponse.json(resource, { status: 201 });
