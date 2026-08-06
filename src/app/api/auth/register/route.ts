@@ -5,9 +5,9 @@ import bcrypt from 'bcryptjs';
 
 export async function POST(req: NextRequest) {
   try {
-    const { name, email, password, profileId } = await req.json();
+    const { name, email, password, profileId, phone } = await req.json();
 
-    if (!email || !password || !name) {
+    if (!email || !password || !name || !phone) {
       return NextResponse.json({ error: 'Todos los campos son obligatorios.' }, { status: 400 });
     }
     if (password.length < 6) {
@@ -27,6 +27,7 @@ export async function POST(req: NextRequest) {
         password: hash,
         role: 'STUDENT',
         profileId: profileId ? Number(profileId) : null,
+      phone: phone
       },
     });
 

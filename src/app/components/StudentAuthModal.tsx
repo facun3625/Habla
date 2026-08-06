@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Eye, EyeOff, Lock, Mail, User, ArrowRight, Loader, X, CheckCircle } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail, User, Phone, ArrowRight, Loader, X, CheckCircle } from 'lucide-react';
 import styles from '../admin/components/LoginModal.module.css';
 import modalStyles from './StudentAuthModal.module.css';
 
@@ -24,6 +24,7 @@ export default function StudentAuthModal({ onClose, onSuccess, returnTo }: Props
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [profileId, setProfileId] = useState('');
+  const [phone, setPhone] = useState('');
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -65,7 +66,7 @@ export default function StudentAuthModal({ onClose, onSuccess, returnTo }: Props
     const res = await fetch('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, password, profileId: profileId ? Number(profileId) : null }),
+      body: JSON.stringify({ name, email, password, phone, profileId: profileId ? Number(profileId) : null }),
     });
     const data = await res.json();
     setLoading(false);
@@ -174,6 +175,13 @@ export default function StudentAuthModal({ onClose, onSuccess, returnTo }: Props
                 <div className={styles.inputWrapper}>
                   <User className={styles.inputIcon} size={18} />
                   <input type="text" className={styles.input} placeholder="Tu nombre" value={name} onChange={e => setName(e.target.value)} required autoFocus />
+                </div>
+              </div>
+              <div className={styles.field}>
+                <label className={styles.label}>Teléfono</label>
+                <div className={styles.inputWrapper}>
+                  <Phone className={styles.inputIcon} size={18} />
+                  <input type="tel" className={styles.input} placeholder="+54 9 11 1234-5678" value={phone} onChange={e => setPhone(e.target.value)} required />
                 </div>
               </div>
               <div className={styles.field}>
