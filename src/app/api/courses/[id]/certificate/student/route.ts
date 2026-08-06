@@ -36,7 +36,7 @@ export async function GET(req: NextRequest, { params }: Params) {
     prisma.course.findUnique({ where: { id: courseId }, select: { title: true } }),
     prisma.certificateTemplate.findMany({
       where: { courseId },
-      include: { module: { select: { id: true, name: true } } },
+      include: { module: { select: { id: true, name: true, date: true } } },
     }),
     prisma.module.findMany({
       where: { courseId },
@@ -51,9 +51,13 @@ export async function GET(req: NextRequest, { params }: Params) {
   const accessibleModules = modules.filter((m) => canAccess(m, profileId));
   const hasFullAccess = modules.length > 0 && accessibleModules.length === modules.length;
 
-  const applicableTemplates = hasFullAccess
-    ? templates.filter((t) => t.moduleId === null)
-    : templates.filter((t) => t.moduleId !== null && accessibleModules.some((m) => m.id === t.moduleId));
+  const applicableTemplates = templates.filter((t) => {
+    if (t.moduleId === null) {
+      return hasFullAccess;
+    } else {
+      return accessibleModules.some((m) => m.id === t.moduleId);
+    }
+  });
 
   const vars = {
     nombre: toTitleCase(enrollment.userName || user?.name || ''),
@@ -63,12 +67,19 @@ export async function GET(req: NextRequest, { params }: Params) {
     fecha: new Date().toLocaleDateString('es-AR'),
   };
 
-  const resolvedTemplates = applicableTemplates.map((t) => ({
-    id: t.id,
-    title: fillCertificateTemplate(t.title, { ...vars, modulo: t.module?.name ?? '' }),
-    subtitle: t.subtitle ? fillCertificateTemplate(t.subtitle, { ...vars, modulo: t.module?.name ?? '' }) : null,
-    body: fillCertificateTemplate(t.bodyTemplate, { ...vars, modulo: t.module?.name ?? '' }),
-  }));
+  const resolvedTemplates = applicableTemplates.map((t) => {
+    const templateVars = {
+      ...vars,
+      fecha: (t.moduleId !== null && t.module?.date) ? t.module.date : vars.fecha,
+      modulo: t.module?.name ?? '',
+    };
+    return {
+      id: t.id,
+      title: fillCertificateTemplate(t.title, templateVars),
+      subtitle: t.subtitle ? fillCertificateTemplate(t.subtitle, templateVars) : null,
+      body: fillCertificateTemplate(t.bodyTemplate, templateVars),
+    };
+  });
 
   let signatures: { name: string; imageUrl: string | null; subtitle?: string | null }[] = [];
   try { signatures = JSON.parse(settings.certificate_signatures || '[]'); } catch { signatures = []; }

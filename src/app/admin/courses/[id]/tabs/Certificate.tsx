@@ -67,7 +67,7 @@ function BodyEditor({
   );
 }
 
-type ModuleOpt = { id: number; name: string };
+type ModuleOpt = { id: number; name: string; date: string | null };
 type Template = {
   id: number;
   moduleId: number | null;
@@ -206,10 +206,17 @@ export default function Certificate({ courseId }: { courseId: string }) {
     });
   };
 
-  const previewBody = (bodyTemplate: string, moduleName: string) =>
-    fillCertificateTemplate(bodyTemplate, { ...SAMPLE_VARS, curso: courseTitle, modulo: moduleName });
+  const previewBody = (bodyTemplate: string, moduleName: string, moduleDate?: string | null) =>
+    fillCertificateTemplate(bodyTemplate, {
+      ...SAMPLE_VARS,
+      curso: courseTitle,
+      modulo: moduleName,
+      fecha: moduleDate || SAMPLE_VARS.fecha,
+    });
 
-  const editingModuleName = form.moduleId ? modules.find((m) => String(m.id) === form.moduleId)?.name ?? '' : '';
+  const editingModule = form.moduleId ? modules.find((m) => String(m.id) === form.moduleId) : null;
+  const editingModuleName = editingModule?.name ?? '';
+  const editingModuleDate = editingModule?.date ?? null;
 
   if (loading) return <p style={{ padding: '1rem', color: '#888' }}>Cargando...</p>;
 
@@ -304,16 +311,16 @@ export default function Certificate({ courseId }: { courseId: string }) {
           <div style={{ border: '1px solid #ede9fe', borderRadius: 14, overflow: 'hidden', marginBottom: 12, background: '#f5f3ef' }}>
             {headerUrl && <img src={headerUrl} alt="" style={{ width: '100%', display: 'block' }} />}
             <div style={{ padding: '28px 24px', textAlign: 'center' }}>
-              <p style={{ margin: '0 0 8px', fontSize: '1.3rem', fontWeight: 800, color: '#4c3fae' }}>{previewBody(form.title, editingModuleName) || 'Título del certificado'}</p>
+              <p style={{ margin: '0 0 8px', fontSize: '1.3rem', fontWeight: 800, color: '#4c3fae' }}>{previewBody(form.title, editingModuleName, editingModuleDate) || 'Título del certificado'}</p>
               {form.subtitle && (
                 <p style={{ margin: '0 0 14px', fontSize: '0.95rem', fontWeight: 600, color: '#6c5ce7' }}>
-                  {previewBody(form.subtitle, editingModuleName)}
+                  {previewBody(form.subtitle, editingModuleName, editingModuleDate)}
                 </p>
               )}
-              {previewBody(form.bodyTemplate, editingModuleName).trim() ? (
+              {previewBody(form.bodyTemplate, editingModuleName, editingModuleDate).trim() ? (
                 <div
                   style={{ fontSize: '0.85rem', color: '#374151', lineHeight: 1.6 }}
-                  dangerouslySetInnerHTML={{ __html: previewBody(form.bodyTemplate, editingModuleName) }}
+                  dangerouslySetInnerHTML={{ __html: previewBody(form.bodyTemplate, editingModuleName, editingModuleDate) }}
                 />
               ) : (
                 <p style={{ margin: 0, fontSize: '0.85rem', color: '#94a3b8' }}>El texto del certificado aparece acá...</p>
