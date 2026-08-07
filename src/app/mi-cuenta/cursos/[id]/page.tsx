@@ -44,10 +44,16 @@ export default function CourseModulesPage({ params }: { params: Promise<{ id: st
     Promise.all([
       fetch(`/api/courses/${id}/public`).then((r) => r.ok ? r.json() : null),
       fetch('/api/auth/me').then((r) => r.ok ? r.json() : null),
-    ]).then(([courseData, user]) => {
+      fetch('/api/enrollments').then((r) => r.ok ? r.json() : []),
+    ]).then(([courseData, user, enrollments]) => {
       if (!courseData) { setNotFound(true); }
       else { setCourse(courseData); }
-      if (user?.profileId) setProfileId(user.profileId);
+      // El acceso a los módulos se define por el perfil con el que se inscribió a ESTE curso,
+      // no por el perfil global del usuario (que suele quedar vacío en el registro).
+      const enrollment = Array.isArray(enrollments)
+        ? enrollments.find((e: { course: { id: number }; profile: { id: number } | null }) => e.course?.id === Number(id))
+        : null;
+      setProfileId(enrollment?.profile?.id ?? user?.profileId ?? null);
     }).finally(() => setLoading(false));
   }, [id]);
 

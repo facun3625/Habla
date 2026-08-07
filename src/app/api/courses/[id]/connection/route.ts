@@ -68,8 +68,10 @@ export async function GET(req: NextRequest, { params }: Params) {
     return NextResponse.json({ gate, progress, modules: null });
   }
 
-  const user = await prisma.user.findUnique({ where: { id: userId }, select: { profileId: true } });
-  const profileId = user?.profileId ?? null;
+  // El acceso a los módulos se define por el perfil con el que se inscribió a ESTE curso
+  // (Enrollment.profileId), no por el perfil global del usuario (User.profileId), que
+  // suele quedar vacío en el registro y dejaría invisibles los módulos restringidos por perfil.
+  const profileId = enrollment.profileId;
 
   const modules = await prisma.module.findMany({
     where: { courseId },
