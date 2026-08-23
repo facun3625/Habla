@@ -90,6 +90,7 @@ model CertificateTemplate {
   updatedAt    DateTime @updatedAt
   course       Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
   module       Module?  @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  enrollments  Enrollment[]
 
   @@unique([courseId, moduleId])
 }
@@ -171,9 +172,11 @@ model Enrollment {
   status          EnrollmentStatus @default(PENDIENTE_PAGO)
   credentialUrl   String?
   certificateEnabled Boolean       @default(false)
+  certificateTemplateId Int?
   course          Course           @relation(fields: [courseId], references: [id], onDelete: Cascade)
   profile         Profile?         @relation(fields: [profileId], references: [id])
   user            User?            @relation(fields: [userId], references: [id])
+  certificateTemplate CertificateTemplate? @relation(fields: [certificateTemplateId], references: [id])
   installmentPlan InstallmentPlan?
 }
 

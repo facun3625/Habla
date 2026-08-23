@@ -47,17 +47,24 @@ export async function GET(req: NextRequest, { params }: Params) {
 
   if (!course) return NextResponse.json({ error: 'No encontrado' }, { status: 404 });
 
-  const profileId = enrollment.profileId;
-  const accessibleModules = modules.filter((m) => canAccess(m, profileId));
-  const hasFullAccess = modules.length > 0 && accessibleModules.length === modules.length;
+  // Si la admin eligió a mano qué certificado le corresponde a esta inscripción, se usa ese
+  // y se ignora el cálculo automático por perfil/módulo.
+  let applicableTemplates = templates;
+  if (enrollment.certificateTemplateId !== null) {
+    applicableTemplates = templates.filter((t) => t.id === enrollment.certificateTemplateId);
+  } else {
+    const profileId = enrollment.profileId;
+    const accessibleModules = modules.filter((m) => canAccess(m, profileId));
+    const hasFullAccess = modules.length > 0 && accessibleModules.length === modules.length;
 
-  const applicableTemplates = templates.filter((t) => {
-    if (t.moduleId === null) {
-      return hasFullAccess;
-    } else {
-      return accessibleModules.some((m) => m.id === t.moduleId);
-    }
-  });
+    // Es uno u otro, no ambos: con acceso completo va el de curso completo (si existe);
+    // con acceso parcial, solo el/los de los módulos a los que sí llega. Antes se evaluaba
+    // cada plantilla de forma independiente y una alumna con acceso completo podía terminar
+    // viendo TAMBIÉN el certificado de un módulo puntual (pensado para perfiles con acceso parcial).
+    applicableTemplates = hasFullAccess
+      ? templates.filter((t) => t.moduleId === null)
+      : templates.filter((t) => t.moduleId !== null && accessibleModules.some((m) => m.id === t.moduleId));
+  }
 
   const vars = {
     nombre: toTitleCase(enrollment.userName || user?.name || ''),

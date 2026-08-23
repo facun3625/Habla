@@ -64,7 +64,10 @@ type Enrollment = {
   installmentPlan: InstallmentPlan | null;
   gateAccepted: boolean;
   certificateEnabled: boolean;
+  certificateTemplateId: number | null;
 };
+
+type CertTemplate = { id: number; title: string; module: { id: number; name: string } | null };
 
 const STATUS_LABEL: Record<string, string> = {
   PENDIENTE_PAGO: 'Pendiente',
@@ -156,6 +159,7 @@ const INST_BG: Record<string, string> = {
 export default function Enrollments({ courseId }: { courseId: string }) {
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [prices, setPrices] = useState<Price[]>([]);
+  const [certTemplates, setCertTemplates] = useState<CertTemplate[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>('all');
   const [search, setSearch] = useState('');
@@ -178,6 +182,10 @@ export default function Enrollments({ courseId }: { courseId: string }) {
       .then((r) => r.json())
       .then((data) => setPrices(Array.isArray(data) ? data : []))
       .catch(() => setPrices([]));
+    fetch(`/api/courses/${courseId}/certificate`)
+      .then((r) => r.json())
+      .then((data) => setCertTemplates(Array.isArray(data) ? data : []))
+      .catch(() => setCertTemplates([]));
   }, [courseId]);
 
   const confirmEnrollment = async (id: number) => {
@@ -213,6 +221,19 @@ export default function Enrollments({ courseId }: { courseId: string }) {
     });
     if (!res.ok) {
       setEnrollments(prev => prev.map(e => e.id === id ? { ...e, certificateEnabled: current } : e));
+    }
+  };
+
+  const setCertificateTemplate = async (id: number, templateId: number | null) => {
+    const prev = enrollments.find(e => e.id === id)?.certificateTemplateId ?? null;
+    setEnrollments(list => list.map(e => e.id === id ? { ...e, certificateTemplateId: templateId } : e));
+    const res = await fetch(`/api/enrollments/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ certificateTemplateId: templateId }),
+    });
+    if (!res.ok) {
+      setEnrollments(list => list.map(e => e.id === id ? { ...e, certificateTemplateId: prev } : e));
     }
   };
 
@@ -558,16 +579,33 @@ export default function Enrollments({ courseId }: { courseId: string }) {
                       </td>
                       <td style={{ textAlign: 'center' }}>
                         {e.status === 'CONFIRMADA' ? (
-                          <button
-                            title={e.certificateEnabled ? 'Certificado habilitado — click para deshabilitar' : 'Habilitar certificado'}
-                            onClick={() => toggleCertificate(e.id, e.certificateEnabled)}
-                            style={{
-                              background: 'none', border: 'none', cursor: 'pointer', padding: 4,
-                              display: 'inline-flex', alignItems: 'center',
-                            }}
-                          >
-                            <Award size={16} color={e.certificateEnabled ? '#c2410c' : '#cbd5e1'} fill={e.certificateEnabled ? '#fed7aa' : 'none'} />
-                          </button>
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                            <button
+                              title={e.certificateEnabled ? 'Certificado habilitado — click para deshabilitar' : 'Habilitar certificado'}
+                              onClick={() => toggleCertificate(e.id, e.certificateEnabled)}
+                              style={{
+                                background: 'none', border: 'none', cursor: 'pointer', padding: 4,
+                                display: 'inline-flex', alignItems: 'center',
+                              }}
+                            >
+                              <Award size={16} color={e.certificateEnabled ? '#c2410c' : '#cbd5e1'} fill={e.certificateEnabled ? '#fed7aa' : 'none'} />
+                            </button>
+                            {e.certificateEnabled && certTemplates.length > 0 && (
+                              <select
+                                value={e.certificateTemplateId ?? ''}
+                                onChange={(ev) => setCertificateTemplate(e.id, ev.target.value ? Number(ev.target.value) : null)}
+                                title="Elegir qué certificado le corresponde a esta inscripción"
+                                style={{ fontSize: '0.72rem', border: '1px solid #e2e8f0', borderRadius: 6, padding: '2px 4px', color: '#475569', maxWidth: 120 }}
+                              >
+                                <option value="">Automático</option>
+                                {certTemplates.map((t) => (
+                                  <option key={t.id} value={t.id}>
+                                    {t.module ? `Módulo: ${t.module.name}` : 'Curso completo'}
+                                  </option>
+                                ))}
+                              </select>
+                            )}
+                          </div>
                         ) : '—'}
                       </td>
                       <td>{e.receiptUrl ? <FileLink url={e.receiptUrl} /> : '—'}</td>

@@ -14,6 +14,11 @@ export async function PATCH(req: NextRequest, { params }: P) {
         notes: body.notes,
         paidAt: body.status === 'CONFIRMADA' ? new Date() : undefined,
         certificateEnabled: typeof body.certificateEnabled === 'boolean' ? body.certificateEnabled : undefined,
+        // Si el campo viene en el body (aunque sea null, para volver a "Automático"), lo actualizamos;
+        // si no viene, no lo tocamos.
+        certificateTemplateId: 'certificateTemplateId' in body
+          ? (body.certificateTemplateId ? Number(body.certificateTemplateId) : null)
+          : undefined,
       },
       include: { profile: true },
     });
