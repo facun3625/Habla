@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Effects of the PROMPT Intervention in a Girl with Childhood Apraxia of Speech: A Case Study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,600;0,700;1,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue:#1e5fa8; --navy:#1b4a93; --purple:#6c4ca0; --violet:#7a4fa8; --teal:#17877b;
+    --green:#2e7d4f; --orange:#e5673c; --red:#be4a43; --amber:#c08a16;
+    --ink:#2e3138; --ink-2:#41454e; --muted:#6b7280; --grid:#dfe3ea;
+    --radius:22px;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:#fff;color:var(--ink);font-family:"Open Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;font-size:16px;line-height:1.55}
+  img{max-width:100%;height:auto;display:block}
+  h1,h2,h3,p,ul{margin:0}
+  .wrap{max-width:1640px;margin:0 auto;padding:24px 20px 40px}
+
+  /* ---------- Header ---------- */
+  .masthead{display:grid;grid-template-columns:1fr 1fr;grid-template-areas:"l1 l2" "title title";align-items:center;gap:20px 24px;padding:8px 0 28px}
+  .masthead .logo1{grid-area:l1;justify-self:start;max-height:110px;width:auto}
+  .masthead .logo2{grid-area:l2;justify-self:end;max-height:140px;width:auto}
+  .title-block{grid-area:title;text-align:center}
+  h1{color:var(--blue);font-weight:700;font-size:clamp(1.45rem,1rem + 2.2vw,2.9rem);line-height:1.22;letter-spacing:.005em;text-transform:uppercase}
+  h1 span{display:block}
+  .author{margin-top:22px;color:var(--blue);font-weight:700;font-size:clamp(1.15rem,1rem + .6vw,1.6rem)}
+  .meta{color:var(--ink-2);font-size:clamp(.95rem,.9rem + .3vw,1.3rem);line-height:1.7}
+  .meta a{color:inherit;text-decoration:none;border-bottom:1px solid #c9ced8}
+  .meta a:hover{border-color:var(--ink-2)}
+
+  /* ---------- Grid ---------- */
+  .board{display:grid;grid-template-columns:1fr;gap:22px}
+  .col{display:flex;flex-direction:column;gap:22px;min-width:0}
+  .pair{display:grid;grid-template-columns:1fr;gap:22px}
+  @media (min-width:820px){
+    .board{grid-template-columns:1fr 1fr}
+    .col-c{grid-column:1 / -1}
+    .pair{grid-template-columns:1fr 1fr}
+  }
+  @media (min-width:1360px){
+    .board{grid-template-columns:1fr 1fr 2fr}
+    .col-c{grid-column:auto}
+    .card{font-size:15px;padding:20px 22px 24px}
+    .card h2{font-size:1.18rem}
+  }
+  @media (min-width:820px){ .masthead{grid-template-columns:auto 1fr auto;grid-template-areas:"l1 title l2"} }
+
+  /* ---------- Cards ---------- */
+  .card{container-type:inline-size;--accent:var(--purple);--bg:#fff;--line:#ded2f1;background:var(--bg);border:2px solid var(--line);border-radius:var(--radius);padding:22px 26px 26px}
+  .card.plain{background:none;border:0;padding:6px 26px}
+  .lav{--bg:#f7f3fc;--line:#ddd0ee}
+  .pink{--bg:#fdf1f7;--line:#f0d2e4}
+  .sky{--bg:#eff5fd;--line:#cbdff4}
+  .lilac{--bg:#f5f1fc;--line:#ded2f1}
+  .w-sky{--bg:#fff;--line:#cbdff4}
+  .w-teal{--bg:#fff;--line:#bfe3dc}
+  .w-lilac{--bg:#fff;--line:#ded2f1}
+  .mint{--bg:#eff8f1;--line:#c4e2ce}
+  .peach{--bg:#fff4ee;--line:#f7cdb6}
+  .a-purple{--accent:var(--purple)} .a-violet{--accent:var(--violet)} .a-blue{--accent:var(--blue)}
+  .a-teal{--accent:var(--teal)} .a-green{--accent:var(--green)} .a-orange{--accent:var(--orange)}
+
+  .card h2{display:flex;align-items:center;gap:14px;color:var(--accent);font-size:clamp(1.15rem,1rem + .45vw,1.45rem);font-weight:700;letter-spacing:.03em;text-transform:uppercase;line-height:1.25;margin-bottom:16px}
+  .ico{flex:none;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:#f1ecf8;background:color-mix(in srgb,var(--accent) 14%,#fff);color:var(--accent)}
+  .ico svg{width:24px;height:24px}
+  h3{color:var(--accent);font-size:1.03rem;font-weight:700;margin:18px 0 8px;display:flex;align-items:center;gap:10px}
+  h3 .ico{width:32px;height:32px}
+  h3 .ico svg{width:18px;height:18px}
+  .card p{color:var(--ink)}
+  .card p + p{margin-top:14px}
+  .small{font-size:.94rem;color:var(--ink-2)}
+  .tight p + p{margin-top:0}
+
+  ul.dots{list-style:none;padding:0;display:grid;gap:9px;align-content:start}
+  ul.dots li{position:relative;padding-left:22px}
+  ul.dots li::before{content:"";position:absolute;left:4px;top:.62em;width:6px;height:6px;border-radius:50%;background:var(--accent)}
+  ul.dots.strong li.b{font-weight:700}
+
+  /* ---------- 3: illustration ---------- */
+  .speaker{display:flex;align-items:flex-end;gap:14px;margin-top:26px}
+  .speaker svg{flex:none}
+  .bubble{flex:1;max-width:360px;height:96px;border:2px solid #cbdff4;background:#fff;border-radius:30px;display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:46px}
+  .bubble i{width:22px;height:22px;border-radius:50%;background:#7fc6e8}
+
+  /* ---------- 4: inner boxes ---------- */
+  .focus{border:2px solid var(--line);background:var(--bg);border-radius:18px;padding:16px 18px;margin-top:14px}
+  .focus h3{margin-top:0}
+  .focus.f1{--bg:#f3effc;--line:#ded2f1;--accent:var(--violet)}
+  .focus.f2{--bg:#eaf6f3;--line:#bfe3dc;--accent:var(--teal)}
+  .focus p{font-size:.95rem}
+
+  /* ---------- 7: scores ---------- */
+  .scores{list-style:none;padding:0;border-bottom:2px solid #d9e3f3;margin-bottom:6px}
+  .scores li{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:2px 12px;padding:6px 12px}
+  .scores li > div{flex:1 1 180px}
+  .scores li:nth-child(odd){background:#f4f7fc}
+  .scores strong{display:block;font-size:.93rem;line-height:1.3}
+  .lvl{display:inline-flex;align-items:center;gap:7px;font-size:.85rem;line-height:1.3;padding-left:6px}
+  .lvl::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+  .lvl.up{color:var(--green)} .lvl.down{color:var(--red)} .lvl.mid{color:var(--amber)}
+  .num{font-size:.86rem;color:var(--ink-2);white-space:nowrap;text-align:right;margin-left:auto}
+
+  /* ---------- 8 ---------- */
+  .duo{margin-top:24px}
+
+  /* ---------- 9: support ladder ---------- */
+  .ladder{display:grid;grid-template-columns:1fr auto;gap:10px 18px;margin:22px 0 10px}
+  .rungs{display:grid;gap:10px}
+  .rung{border:2px solid var(--blue);border-radius:26px;padding:11px 18px;background:#f7faff}
+  .rung:first-child{background:#e3edfa;color:var(--blue)}
+  .rung:nth-child(2){background:#eef4fd}
+  .less{position:relative;width:26px;display:flex;flex-direction:column;align-items:center;color:var(--blue);font-size:.8rem}
+  .less .line{flex:1;width:3px;margin-bottom:12px;background:var(--blue);position:relative}
+  .less .line::after{content:"";position:absolute;bottom:-12px;left:50%;transform:translateX(-50%);border:10px solid transparent;border-top:13px solid var(--blue);border-bottom:0}
+  .less span{position:absolute;top:50%;left:50%;writing-mode:vertical-rl;transform:translate(-50%,-50%) rotate(180deg);background:var(--bg);padding:6px 0;white-space:nowrap}
+
+  /* ---------- 10: progression ---------- */
+  .steps{list-style:none;padding:0;display:grid;gap:26px;margin:6px 0 18px}
+  .steps li{position:relative;display:flex;align-items:center;gap:14px;border:2px solid var(--line);background:var(--bg);border-radius:28px;padding:9px 16px}
+  .steps li:not(:last-child)::after{content:"";position:absolute;left:50%;bottom:-24px;width:2px;height:16px;background:#cfd6e2}
+  .steps li:not(:last-child)::before{content:"";position:absolute;left:calc(50% - 6px);bottom:-26px;border:6px solid transparent;border-top:8px solid #cfd6e2;border-bottom:0}
+  .steps .s1{--bg:#e9f6ec;--line:#bfe3c9;--accent:var(--green)}
+  .steps .s2{--bg:#e5f3f0;--line:#bfe3dc;--accent:var(--teal)}
+  .steps .s3{--bg:#fcf4dd;--line:#efd9a0;--accent:var(--amber)}
+  .steps .s4{--bg:#f1ebfb;--line:#ddd0ee;--accent:var(--purple)}
+  .steps .ico{width:36px;height:36px;background:#fff}
+  .steps .ico svg{width:20px;height:20px}
+
+  /* ---------- Bar charts (13, 15) ---------- */
+  .chart-row{display:grid;grid-template-columns:1fr;gap:20px;align-items:start}
+  @container (min-width:520px){ .chart-row.r13{grid-template-columns:1fr auto} }
+  @container (min-width:520px){ .chart-row.r15{grid-template-columns:1fr auto} .chart-row.r15 > div:last-child{grid-column:1 / -1} }
+  @container (min-width:900px){ .chart-row.r15{grid-template-columns:minmax(300px,1.1fr) auto minmax(260px,1.2fr)} .chart-row.r15 > div:last-child{grid-column:auto} }
+  .bars{--h:190px;--steps:4;display:grid;grid-template-columns:34px 1fr;column-gap:8px}
+  .bars .axis{height:var(--h);display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end;font-size:.78rem;color:var(--muted);line-height:0;padding:0}
+  .bars .axis span{display:block;height:0}
+  .plot{position:relative;height:var(--h);display:flex;justify-content:space-around;align-items:flex-end;border-bottom:2px solid #9aa3ae;
+        background-image:linear-gradient(to bottom,var(--grid) 1px,transparent 1px);background-size:100% calc(100% / var(--steps))}
+  .grp{display:flex;align-items:flex-end;gap:4px;height:100%;width:clamp(56px,20%,120px)}
+  .bar{flex:1;height:calc(var(--v) * 1%);position:relative;border-radius:2px 2px 0 0}
+  .bar b{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);font-weight:400;font-size:.8rem;color:var(--ink-2);padding-bottom:3px;white-space:nowrap}
+  .labels{grid-column:2;display:flex;justify-content:space-around;margin-top:6px}
+  .labels span{width:clamp(56px,20%,130px);text-align:center;font-size:.82rem;line-height:1.25}
+  .c13 .bar.i{background:#8fd8cc} .c13 .bar.f{background:#17877b}
+  .c15 .bar.i{background:#c9b8ef} .c15 .bar.f{background:#3fae9f}
+  .c15{--steps:5}
+  .legend{list-style:none;padding:0;display:grid;gap:10px;font-size:.93rem}
+  .legend li{display:flex;align-items:center;gap:10px}
+  .sw{width:18px;height:18px;border-radius:5px;flex:none}
+  .legend .note{font-size:.8rem;color:var(--muted);line-height:1.35}
+  .delta{display:grid;grid-template-columns:18px 1fr;column-gap:10px;align-items:start;margin-top:4px}
+  .delta svg{width:16px;height:16px;color:var(--teal);margin-top:4px}
+  .delta b{color:var(--teal);display:block;line-height:1.3}
+  .delta small{color:var(--ink-2);font-size:.8rem}
+  .foot-note{margin-top:18px;font-size:.93rem;color:var(--ink-2)}
+
+  /* ---------- 14 ---------- */
+  .tiles{list-style:none;padding:0;display:grid;grid-template-columns:repeat(2,1fr);gap:18px 12px;margin-bottom:10px}
+  @container (min-width:420px){ .tiles{grid-template-columns:repeat(3,1fr)} }
+  @container (min-width:700px){ .tiles{grid-template-columns:repeat(6,1fr)} }
+  .tiles li{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;font-size:.84rem;line-height:1.3}
+  .tiles .ico{width:66px;height:66px}
+  .tiles .ico svg{width:32px;height:32px}
+  .t1{--accent:#d99310} .t2{--accent:#e5673c} .t3{--accent:#2860ad} .t4{--accent:#6c4ca0} .t5{--accent:#e0506a} .t6{--accent:#17877b}
+  .two{display:grid;grid-template-columns:1fr;gap:6px 36px}
+  @container (min-width:600px){ .two{grid-template-columns:1fr 1fr} }
+
+  /* ---------- 16 ---------- */
+  .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .focus-chart{min-width:680px;width:100%;height:auto;display:block;margin-top:14px}
+  .focus-chart text{font-family:inherit}
+  .keys{display:flex;gap:22px;font-size:.93rem;margin:6px 0 12px 6px}
+  .keys span{display:inline-flex;align-items:center;gap:8px}
+  .keys i{width:11px;height:11px;border-radius:50%}
+  .levels{border:2px solid #cbdff4;border-radius:12px;padding:8px 14px;display:flex;flex-wrap:wrap;justify-content:center;gap:4px 22px;font-size:.88rem}
+  .levels b.r{color:var(--red)} .levels b.a{color:var(--amber)} .levels b.g{color:var(--green)}
+  .result{margin-top:12px;background:#b7a5e0;border-radius:14px;padding:10px 16px;text-align:center;font-weight:700;color:#072038;font-size:1.02rem}
+
+  /* ---------- 19 ---------- */
+  ol.refs{padding-left:22px;display:grid;gap:8px;font-size:.84rem;color:var(--ink-2);line-height:1.4}
+  ol.refs em{font-style:italic}
+
+  /* ---------- Footer ---------- */
+  .closing{margin-top:22px;display:grid;grid-template-columns:1fr;gap:26px;background:#eaf2fb;border:2px solid #cbdff4;border-radius:var(--radius);padding:28px}
+  @media (min-width:900px){ .closing{grid-template-columns:1fr 1fr;align-items:center} }
+  .closing .side{display:flex;align-items:center;gap:26px}
+  .closing .claim{color:var(--blue);font-weight:700;font-size:clamp(1.1rem,1rem + .6vw,1.6rem);line-height:1.45}
+  .closing blockquote{margin:0;flex:1;text-align:center;color:var(--navy);font-family:Arial,"Helvetica Neue",Helvetica,sans-serif;font-style:italic;font-weight:700;font-size:clamp(1.2rem,1rem + .9vw,1.9rem);line-height:1.45}
+  @media (max-width:560px){ .closing .side{flex-direction:column;text-align:center} .closing .side svg{width:120px} }
+  /* ---------- Small screens ---------- */
+  @container (max-width:519px){
+    .legend{display:flex;flex-wrap:wrap;gap:8px 18px}
+    .legend .note,.legend .delta{flex-basis:100%}
+    .labels span{font-size:.72rem}
+    .bar b{font-size:.72rem}
+  }
+  @media (max-width:480px){
+    .wrap{padding:16px 12px 32px}
+    .card{padding:18px 18px 22px}
+    .card.plain{padding:6px 6px}
+    .closing{padding:22px 18px}
+  }
+</style>
+</head>
+<body>
+
+<!-- ======= Icon sprite ======= -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-book" viewBox="0 0 24 24"><path fill="currentColor" d="M3 5.5C5.5 4.8 8.5 5 11 6.3V19c-2.5-1.2-5.5-1.4-8-.7zM21 5.5c-2.5-.7-5.5-.5-8 .8V19c2.5-1.2 5.5-1.4 8-.7z"/></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/></g><circle cx="12" cy="12" r="1.8" fill="currentColor"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="7.5" r="4" fill="currentColor"/><path fill="currentColor" d="M4 20.5c0-4.4 3.6-7 8-7s8 2.6 8 7z"/></symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="5.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></g><circle cx="12" cy="12" r="1.8" fill="currentColor"/></symbol>
+    <symbol id="i-clip" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2.5"/><path d="M9 3h6v3H9zM9 11l2 2 4-4M9 16l2 2 4-4"/></g></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2"><rect x="3.5" y="3.5" width="17" height="17" rx="3"/></g><path fill="currentColor" d="M7.5 13h2.2v4H7.5zM10.9 10h2.2v7h-2.2zM14.3 7h2.2v10h-2.2z"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5.5 5.5"/></g></symbol>
+    <symbol id="i-hand" viewBox="0 0 24 24"><path fill="currentColor" d="M7 11V5.5a1.5 1.5 0 0 1 3 0V10h.6V3.8a1.5 1.5 0 0 1 3 0V10h.6V4.8a1.5 1.5 0 0 1 3 0V11h.3V8a1.5 1.5 0 0 1 3 0v7.5c0 3.6-2.9 6.5-6.5 6.5h-1.6c-2.2 0-4-1.1-5.1-2.9L3.9 14.6a1.6 1.6 0 0 1 2.6-1.8L7 13.6z"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-smile" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="3.5" y="3.5" width="17" height="17" rx="6"/><path d="M8.3 14c1 1.4 2.2 2 3.7 2s2.7-.6 3.7-2"/></g><circle cx="9" cy="10" r="1.3" fill="currentColor"/><circle cx="15" cy="10" r="1.3" fill="currentColor"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" d="M5.5 4.5h13a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H11l-4.5 3.5v-3.5h-1a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2z"/><circle cx="8.5" cy="10.5" r="1.3" fill="currentColor"/><circle cx="12" cy="10.5" r="1.3" fill="currentColor"/><circle cx="15.5" cy="10.5" r="1.3" fill="currentColor"/></symbol>
+    <symbol id="i-rocket" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2c3 2.4 4.5 5.8 4.5 9.6 0 1.6-.3 3.2-.9 4.6H8.4c-.6-1.4-.9-3-.9-4.6C7.5 7.8 9 4.4 12 2zm0 6.2a1.9 1.9 0 1 0 0 3.8 1.9 1.9 0 0 0 0-3.8zM7.2 12.6 4.5 16l.4 3.2 3.4-1.8zM16.8 12.6l2.7 3.4-.4 3.2-3.4-1.8zM10 17.5h4l-2 4z"/></symbol>
+    <symbol id="i-group" viewBox="0 0 24 24"><g fill="currentColor"><circle cx="5.5" cy="8" r="2.6"/><circle cx="12" cy="7" r="3"/><circle cx="18.5" cy="8" r="2.6"/><path d="M1 17c0-2.8 2-4.6 4.5-4.6 1.2 0 2.2.4 3 1.1-.9 1-1.4 2.2-1.5 3.5zM23 17c0-2.8-2-4.6-4.5-4.6-1.2 0-2.2.4-3 1.1.9 1 1.4 2.2 1.5 3.5zM7 18c0-3.2 2.3-5.4 5-5.4s5 2.2 5 5.4z"/></g></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" d="M5 19L18 6M9 5.5h9.5V15"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></g><g fill="currentColor"><circle cx="8" cy="14.5" r="1.1"/><circle cx="12" cy="14.5" r="1.1"/><circle cx="16" cy="14.5" r="1.1"/></g></symbol>
+    <symbol id="i-lips" viewBox="0 0 24 24"><path fill="currentColor" d="M2 11.5c2.2-3 4.6-4.5 6.6-4.5 1.3 0 2.5.6 3.4 1.4.9-.8 2.1-1.4 3.4-1.4 2 0 4.4 1.5 6.6 4.5-2.3 3.6-5.9 5.5-10 5.5S4.3 15.1 2 11.5zm3.4.1c2 1.2 4.2 1.8 6.6 1.8s4.6-.6 6.6-1.8c-2 .4-4.2.6-6.6.6s-4.6-.2-6.6-.6z"/></symbol>
+    <symbol id="i-jaw" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" d="M4 6.5h16c0 6.6-3.6 11-8 11s-8-4.4-8-11z"/><path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" d="M12 7v6"/></symbol>
+  </defs>
+</svg>
+
+<div class="wrap">
+
+  <!-- ======= Header ======= -->
+  <header class="masthead">
+    <img class="logo1" src="logo1.png" alt="Logo 1">
+    <div class="title-block">
+      <h1>
+        <span>Effects of the PROMPT intervention</span>
+        <span>in a girl with childhood apraxia of speech:</span>
+        <span>a case study</span>
+      </h1>
+      <p class="author">María Virginia Trotta</p>
+      <p class="meta">Speech-Language Pathologist · License No. 263/1F8 L1<br>
+        Santa Fe, Argentina | <a href="mailto:mavirginiatrotta@gmail.com">mavirginiatrotta@gmail.com</a></p>
+    </div>
+    <img class="logo2" src="logo2.png" alt="Logo 2">
+  </header>
+
+  <main class="board">
+
+    <!-- ================= Column A ================= -->
+    <div class="col col-a">
+
+      <section class="card lav a-purple">
+        <h2><span class="ico"><svg><use href="#i-book"/></svg></span>1. Introduction</h2>
+        <p>Childhood apraxia of speech (CAS) is a motor speech disorder characterized by difficulties in planning and programming the movements needed to produce precise, consistent and intelligible speech (ASHA, 2007).</p>
+        <p>PROMPT (Prompts for Restructuring Oral Muscular Phonetic Targets) is a tactile-kinesthetic approach that organizes intervention according to the Motor Speech Hierarchy and integrates the physical-sensory, cognitive-linguistic and social-emotional domains (Hayden, 2006; PROMPT Institute, 2019).</p>
+      </section>
+
+      <section class="card pink a-purple">
+        <h2><span class="ico"><svg><use href="#i-target"/></svg></span>2. Objective</h2>
+        <p>To describe the motor, articulatory and communicative changes observed after a PROMPT-based intervention in a 6-year-old girl with childhood apraxia of speech co-occurring with a predominantly expressive developmental language disorder.</p>
+      </section>
+
+      <section class="card sky a-purple">
+        <h2><span class="ico"><svg><use href="#i-user"/></svg></span>3. Case presentation</h2>
+        <p>A 6-year-old girl with a clinical diagnosis of childhood apraxia of speech and a predominantly expressive developmental language disorder.</p>
+        <h3>Initial characteristics</h3>
+        <ul class="dots strong">
+          <li class="b">Low speech intelligibility.</li>
+          <li class="b">Inconsistent consonant productions.</li>
+          <li class="b">Altered coarticulatory timing.</li>
+          <li class="b">Prosodic and speech rhythm impairments.</li>
+          <li>Difficulty maintaining the jaw at midline.</li>
+          <li>Compensatory lip hyperretraction.</li>
+          <li>Reduced lip rounding and protrusion.</li>
+          <li>Difficulty with tongue-jaw dissociation.</li>
+          <li>Jaw instability and lateralization.</li>
+          <li>Predominant use of single words and short phrases.</li>
+        </ul>
+        <div class="speaker" aria-hidden="true">
+          <svg width="110" height="150" viewBox="0 0 110 150">
+            <path d="M8 150c0-30 20-48 47-48s47 18 47 48z" fill="#f2c5c0"/>
+            <ellipse cx="55" cy="58" rx="46" ry="48" fill="#7a4e3a"/>
+            <path d="M92 70c14 6 16 22 8 30-4-10-10-16-14-18z" fill="#7a4e3a"/>
+            <circle cx="55" cy="66" r="37" fill="#f8dccb"/>
+            <path d="M18 56c6-22 22-32 38-32s30 8 36 26c-18-2-30-8-38-18-6 12-18 20-36 24z" fill="#7a4e3a"/>
+            <circle cx="42" cy="66" r="3.6" fill="#3a2a24"/><circle cx="68" cy="66" r="3.6" fill="#3a2a24"/>
+            <path d="M46 80c5 5 13 5 18 0" fill="none" stroke="#d9695b" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+          <div class="bubble"><i></i><i></i><i></i></div>
+        </div>
+      </section>
+
+      <section class="card lilac a-violet">
+        <h2><span class="ico"><svg><use href="#i-target"/></svg></span>4. Communication focus areas</h2>
+        <div class="focus f1">
+          <h3><span class="ico"><svg><use href="#i-smile"/></svg></span>1 · Speech subsystem control</h3>
+          <p>Improve intelligibility by developing more stable, symmetrical and varied jaw and labial-facial movements, and promote anterior and mid-posterior tongue contraction in words and short phrases.</p>
+        </div>
+        <div class="focus f2">
+          <h3><span class="ico"><svg><use href="#i-chat"/></svg></span>2 · Interactive communication routines</h3>
+          <p>Promote verbal interaction through turn-taking, initiating exchanges, asking questions and producing answers.</p>
+        </div>
+      </section>
+
+      <section class="card w-sky a-blue">
+        <h2><span class="ico"><svg><use href="#i-gear"/></svg></span>5. Methodology</h2>
+        <h3><span class="ico"><svg><use href="#i-search"/></svg></span>Design</h3>
+        <p>Single-case, longitudinal, descriptive clinical study.</p>
+        <h3><span class="ico"><svg><use href="#i-calendar"/></svg></span>Intervention</h3>
+        <ul class="dots">
+          <li>Period: August to November 2025.</li>
+          <li>Frequency: 2 sessions per week.</li>
+          <li>Session length: 45 minutes.</li>
+          <li>Total duration: 4 months.</li>
+          <li>Approximate total: 32 sessions.</li>
+        </ul>
+      </section>
+
+      <section class="card sky a-blue">
+        <h2><span class="ico"><svg><use href="#i-clip"/></svg></span>6. Assessment and diagnosis</h2>
+        <div class="tight">
+          <p>The diagnosis of childhood apraxia of speech was clinical, based on the developmental history, the motor speech analysis and the presence of features consistent with CAS.</p>
+          <p>The complementary instruments were used to characterize the overall clinical profile and thus carry out the differential diagnosis.</p>
+        </div>
+        <h3>Complementary instruments</h3>
+        <ul class="dots">
+          <li>VMPAC: nonverbal oral movements, to explore oral praxis difficulties.</li>
+          <li>CELF-5: language profile and documentation of the co-occurring language disorder.</li>
+          <li>MABC-2: administered by Occupational Therapy, as background on the global motor profile.</li>
+          <li>FOCUS: pre-post functional measure completed by the family.</li>
+        </ul>
+      </section>
+    </div>
+
+    <!-- ================= Column B ================= -->
+    <div class="col col-b">
+
+      <section class="card w-lilac a-violet">
+        <h2><span class="ico"><svg><use href="#i-chart"/></svg></span>7. Language profile (CELF-5)</h2>
+        <p class="small">Relatively preserved receptive language, with greater difficulties in the expressive component, sentence formulation and repetition, and pragmatic skills.</p>
+        <h3>Subtests</h3>
+        <ul class="scores">
+          <li><div><strong>Sentence Comprehension</strong><span class="lvl up">Above average</span></div><span class="num">Raw 25 · Scaled 14 · %ile 91</span></li>
+          <li><div><strong>Linguistic Concepts</strong><span class="lvl down">Below average</span></div><span class="num">Raw 15 · Scaled 5 · %ile 5</span></li>
+          <li><div><strong>Word Structure</strong><span class="lvl mid">Borderline</span></div><span class="num">Raw 8 · Scaled 7 · %ile 16</span></li>
+          <li><div><strong>Formulated Sentences</strong><span class="lvl down">Below average</span></div><span class="num">Raw 3 · Scaled 3 · %ile 1</span></li>
+          <li><div><strong>Recalling Sentences</strong><span class="lvl down">Below average</span></div><span class="num">Raw 4 · Scaled 1 · %ile 0.1</span></li>
+        </ul>
+        <h3>Indexes</h3>
+        <ul class="scores">
+          <li><div><strong>Core Language Score (CLS)</strong><span class="lvl mid">Borderline</span></div><span class="num">Standard 79 · %ile 8</span></li>
+          <li><div><strong>Receptive Language Index (RLI)</strong><span class="lvl up">Average</span></div><span class="num">Standard 96 · %ile 39</span></li>
+          <li><div><strong>Expressive Language Index (ELI)</strong><span class="lvl down">Well below average</span></div><span class="num">Standard 64 · %ile 1</span></li>
+          <li><div><strong>Language Content Index (LCI)</strong><span class="lvl mid">Borderline</span></div><span class="num">Standard 79 · %ile 8</span></li>
+          <li><div><strong>Language Structure Index (LSI)</strong><span class="lvl mid">Borderline</span></div><span class="num">Standard 79 · %ile 8</span></li>
+        </ul>
+      </section>
+
+      <section class="card plain a-teal">
+        <h2><span class="ico"><svg><use href="#i-search"/></svg></span>8. Performance recording and analysis</h2>
+        <p class="small">Performance recording and analysis</p>
+        <p class="small">Each session included a structured motor warm-up with 19 target words, each practiced 3 times (≈57 productions).</p>
+        <p class="small">Then, during games, routines and functional activities, the same 19 words were used in a distributed manner, reaching approximately 100 total productions per session (≈5 productions per word on average).</p>
+        <p class="small">The reported percentages are clinical estimates based on these production opportunities, considering the accuracy of the motor pattern and the level of assistance required.</p>
+        <svg class="duo" width="170" height="130" viewBox="0 0 170 130" aria-hidden="true">
+          <circle cx="50" cy="40" r="30" fill="#d8c8f0"/><path d="M4 130c0-32 20-50 46-50s46 18 46 50z" fill="#b9a6dd"/>
+          <circle cx="40" cy="38" r="3" fill="#3a3140"/><circle cx="60" cy="38" r="3" fill="#3a3140"/>
+          <path d="M42 50c5 4 11 4 16 0" fill="none" stroke="#d9695b" stroke-width="2.6" stroke-linecap="round"/>
+          <circle cx="130" cy="62" r="23" fill="#bfe0f5"/><path d="M98 130c0-26 14-40 32-40s32 14 32 40z" fill="#8cc5e8"/>
+          <circle cx="122" cy="60" r="2.6" fill="#3a3140"/><circle cx="138" cy="60" r="2.6" fill="#3a3140"/>
+          <path d="M124 70c4 3 8 3 12 0" fill="none" stroke="#d9695b" stroke-width="2.4" stroke-linecap="round"/>
+        </svg>
+      </section>
+
+      <section class="card w-sky a-blue">
+        <h2><span class="ico"><svg><use href="#i-hand"/></svg></span>9. Feedback and level of support</h2>
+        <p class="small">Knowledge of performance and knowledge of results feedback during the motor warm-up and functional activities.</p>
+        <div class="ladder">
+          <div class="rungs">
+            <div class="rung">PROMPT tactile-kinesthetic support</div>
+            <div class="rung">Verbal or visual modeling</div>
+            <div class="rung">Independent production</div>
+          </div>
+          <div class="less" aria-label="Less assistance from top to bottom"><div class="line"></div><span>less assistance</span></div>
+        </div>
+        <p class="small">More stable motor patterns + less support needed = indicator of clinical progress.</p>
+      </section>
+
+      <section class="card sky a-blue">
+        <h2><span class="ico"><svg><use href="#i-gear"/></svg></span>10. PROMPT intervention</h2>
+        <p class="small">Jaw, labial-facial and lingual control were prioritized through parameter, syllable and surface PROMPTs.</p>
+        <h3>Therapeutic progression</h3>
+        <ol class="steps">
+          <li class="s1"><span class="ico"><svg><use href="#i-smile"/></svg></span>Jaw stabilization</li>
+          <li class="s2"><span class="ico"><svg><use href="#i-lips"/></svg></span>Labial-facial control</li>
+          <li class="s3"><span class="ico"><svg><use href="#i-jaw"/></svg></span>Tongue-jaw dissociation</li>
+          <li class="s4"><span class="ico"><svg><use href="#i-chat"/></svg></span>Integration into functional words and phrases</li>
+        </ol>
+        <h3><span class="ico"><svg><use href="#i-lips"/></svg></span>Prioritized phonemes and movements</h3>
+        <ul class="dots">
+          <li>Bilabial contact: /p/, /b/, /m/.</li>
+          <li>Rounding and protrusion: /o/, /u/.</li>
+          <li>Anterior linguals: /t/, /n/, /d/.</li>
+          <li>Mid-posterior tongue contraction.</li>
+          <li>Jaw stability and midline control.</li>
+          <li>Jaw – lip – tongue coordination.</li>
+        </ul>
+        <h3><span class="ico"><svg><use href="#i-group"/></svg></span>Activities</h3>
+        <ul class="dots">
+          <li>Symbolic play and turn-taking games.</li>
+          <li>Personalized stories.</li>
+          <li>Functional phrases and communication routines.</li>
+          <li>Home practice with caregivers.</li>
+          <li>Coordination with school and other professionals.</li>
+        </ul>
+      </section>
+    </div>
+
+    <!-- ================= Column C ================= -->
+    <div class="col col-c">
+
+      <div class="pair">
+        <section class="card lav a-purple">
+          <h2><span class="ico"><svg><use href="#i-check"/></svg></span>11. External clinical review</h2>
+          <ul class="dots">
+            <li>Video recordings, reassessment and progress analysis reviewed by a certified PROMPT instructor.</li>
+            <li>Highest score awarded by the instructor for demonstration of change between sessions and for reassessment and progress analysis.</li>
+            <li>No formal inter-rater agreement index was calculated.</li>
+          </ul>
+        </section>
+        <section class="card w-teal a-teal">
+          <h2><span class="ico"><svg><use href="#i-clip"/></svg></span>12. Ethical considerations</h2>
+          <ul class="dots">
+            <li>Institutional consent form of the PROMPT Institute signed by the legal guardians, authorizing audiovisual recording for research and educational purposes.</li>
+            <li>Project and recordings reviewed within the formal PROMPT certification process.</li>
+            <li>Not reviewed by an independent ethics committee.</li>
+          </ul>
+        </section>
+      </div>
+
+      <section class="card w-teal a-teal">
+        <h2><span class="ico"><svg><use href="#i-chart"/></svg></span>13. Articulatory results</h2>
+        <div class="chart-row r13">
+          <div class="bars c13" role="img" aria-label="Motor pattern achievement, initial versus final: bilabial contact 45 to 78, rounding and protrusion 30 to 65, anterior linguals 40 to 70, mid-posterior contraction 25 to 55.">
+            <div class="axis"><span>100</span><span>75</span><span>50</span><span>25</span><span>0</span></div>
+            <div class="plot">
+              <div class="grp"><div class="bar i" style="--v:45"><b>45</b></div><div class="bar f" style="--v:78"><b>78</b></div></div>
+              <div class="grp"><div class="bar i" style="--v:30"><b>30</b></div><div class="bar f" style="--v:65"><b>65</b></div></div>
+              <div class="grp"><div class="bar i" style="--v:40"><b>40</b></div><div class="bar f" style="--v:70"><b>70</b></div></div>
+              <div class="grp"><div class="bar i" style="--v:25"><b>25</b></div><div class="bar f" style="--v:55"><b>55</b></div></div>
+            </div>
+            <div class="labels"><span>Bilabial<br>contact</span><span>Rounding /<br>protrusion</span><span>Anterior<br>linguals</span><span>Mid-posterior<br>contraction</span></div>
+          </div>
+          <ul class="legend">
+            <li><span class="sw" style="background:#8fd8cc"></span>Initial</li>
+            <li><span class="sw" style="background:#17877b"></span>Final</li>
+            <li class="note">% achievement of<br>motor pattern</li>
+          </ul>
+        </div>
+        <p class="foot-note">Methodological note: percentages are clinical estimates obtained from the comparative analysis of production opportunities in the first and last sessions, considering the accuracy of the motor pattern and the level of assistance required.</p>
+      </section>
+
+      <section class="card lav a-purple">
+        <h2><span class="ico"><svg><use href="#i-smile"/></svg></span>14. Functional results</h2>
+        <ul class="tiles">
+          <li class="t1"><span class="ico"><svg><use href="#i-smile"/></svg></span>Greater intelligibility</li>
+          <li class="t2"><span class="ico"><svg><use href="#i-chat"/></svg></span>Greater verbal initiative</li>
+          <li class="t3"><span class="ico"><svg><use href="#i-group"/></svg></span>Greater communicative participation</li>
+          <li class="t4"><span class="ico"><svg><use href="#i-group"/></svg></span>2- and 3-word phrases</li>
+          <li class="t5"><span class="ico"><svg><use href="#i-check"/></svg></span>Better tolerance of tactile contact</li>
+          <li class="t6"><span class="ico"><svg><use href="#i-arrow"/></svg></span>Fewer compensatory movements</li>
+        </ul>
+        <div class="two">
+          <div>
+            <h3><span class="ico"><svg><use href="#i-check"/></svg></span>In the qualitative analysis</h3>
+            <ul class="dots">
+              <li>Reduced lip hyperretraction.</li>
+              <li>Greater articulatory symmetry and jaw stability.</li>
+              <li>Greater lip-jaw independence.</li>
+            </ul>
+          </div>
+          <div>
+            <h3><span class="ico"><svg><use href="#i-chat"/></svg></span>In communication</h3>
+            <ul class="dots">
+              <li>More spontaneous use of words and 2–3-word phrases.</li>
+              <li>Greater communicative intent and participation.</li>
+              <li>Greater verbal autonomy and desire to communicate.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="card lilac a-violet">
+        <h2><span class="ico"><svg><use href="#i-chart"/></svg></span>15. Summary of global PROMPT domains</h2>
+        <div class="chart-row r15">
+          <div class="bars c15" role="img" aria-label="Percentage by domain, initial plan versus reassessment: physical-sensory 60 and 60, cognitive-linguistic 44 and 68, social-emotional 44 and 76.">
+            <div class="axis"><span>100</span><span>80</span><span>60</span><span>40</span><span>20</span><span>0</span></div>
+            <div class="plot">
+              <div class="grp"><div class="bar i" style="--v:60"><b>60%</b></div><div class="bar f" style="--v:60"><b>60%</b></div></div>
+              <div class="grp"><div class="bar i" style="--v:44"><b>44%</b></div><div class="bar f" style="--v:68"><b>68%</b></div></div>
+              <div class="grp"><div class="bar i" style="--v:44"><b>44%</b></div><div class="bar f" style="--v:76"><b>76%</b></div></div>
+            </div>
+            <div class="labels"><span>Physical-<br>sensory</span><span>Cognitive-<br>linguistic</span><span>Social-<br>emotional</span></div>
+          </div>
+          <ul class="legend">
+            <li><span class="sw" style="background:#c9b8ef"></span>Initial plan</li>
+            <li><span class="sw" style="background:#3fae9f"></span>Reassessment</li>
+            <li class="delta"><svg><use href="#i-arrow"/></svg><span><b>+24 pts</b><small>cognitive-linguistic</small></span></li>
+            <li class="delta"><svg><use href="#i-arrow"/></svg><span><b>+32 pts</b><small>social-emotional</small></span></li>
+          </ul>
+          <div>
+            <p class="small">The physical-sensory domain remained at 60%: it includes structural, sensory and gross motor variables that remained affected, so this stability does not imply an absence of motor changes.</p>
+            <p class="small">The specific analysis of the speech motor system did show improvements in jaw stability, bilabial contact, lip protrusion and articulatory coordination.</p>
+            <p class="small">The cognitive-linguistic and social-emotional gains reflect greater spontaneous vocabulary, initiative, turn-taking and self-regulation.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="card w-lilac a-violet">
+        <h2><span class="ico"><svg><use href="#i-chat"/></svg></span>16. FOCUS — pre / post comparison</h2>
+        <p class="small">FOCUS (Focus on the Outcomes of Communication Under Six) is a functional measure completed by parents/caregivers that assesses how the child communicates in real, everyday situations. It evaluates functional communication, including body functions, activity/capacity and social participation.</p>
+        <div class="scroll">
+          <svg class="focus-chart" viewBox="0 0 960 300" role="img" aria-label="FOCUS scores pre and post intervention for nine areas.">
+            <g stroke="#dfe3ea" stroke-width="1">
+              <line x1="70" y1="20" x2="950" y2="20"/><line x1="70" y1="77.5" x2="950" y2="77.5"/>
+              <line x1="70" y1="135" x2="950" y2="135"/><line x1="70" y1="192.5" x2="950" y2="192.5"/>
+            </g>
+            <line x1="70" y1="250" x2="950" y2="250" stroke="#9aa3ae" stroke-width="2"/>
+            <line x1="70" y1="20" x2="70" y2="250" stroke="#9aa3ae" stroke-width="2"/>
+            <g font-size="13" fill="#6b7280" text-anchor="end">
+              <text x="58" y="254">0</text><text x="58" y="196.5">2</text><text x="58" y="139">4</text><text x="58" y="81.5">6</text><text x="58" y="24">8</text>
+            </g>
+            <text transform="translate(22 135) rotate(-90)" font-size="13" fill="#6b7280" text-anchor="middle">Score</text>
+
+            <polyline fill="none" stroke="#17877b" stroke-width="3.5" stroke-linejoin="round" points="118.9,192.5 216.7,132.1 314.4,94.8 412.2,57.4 510.0,106.2 607.8,135.0 705.6,129.2 803.3,132.1 901.1,192.5"/>
+            <polyline fill="none" stroke="#7a4fa8" stroke-width="3.5" stroke-linejoin="round" points="118.9,154.3 216.7,103.4 314.4,89.0 412.2,113.4 510.0,103.4 607.8,142.2 705.6,127.8 803.3,101.7 901.1,169.5"/>
+            <g fill="#17877b">
+              <circle cx="118.9" cy="192.5" r="5.5"/><circle cx="216.7" cy="132.1" r="5.5"/><circle cx="314.4" cy="94.8" r="5.5"/><circle cx="412.2" cy="57.4" r="5.5"/><circle cx="510" cy="106.2" r="5.5"/><circle cx="607.8" cy="135" r="5.5"/><circle cx="705.6" cy="129.2" r="5.5"/><circle cx="803.3" cy="132.1" r="5.5"/><circle cx="901.1" cy="192.5" r="5.5"/>
+            </g>
+            <g fill="#7a4fa8">
+              <circle cx="118.9" cy="154.3" r="5.5"/><circle cx="216.7" cy="103.4" r="5.5"/><circle cx="314.4" cy="89" r="5.5"/><circle cx="412.2" cy="113.4" r="5.5"/><circle cx="510" cy="103.4" r="5.5"/><circle cx="607.8" cy="142.2" r="5.5"/><circle cx="705.6" cy="127.8" r="5.5"/><circle cx="803.3" cy="101.7" r="5.5"/><circle cx="901.1" cy="169.5" r="5.5"/>
+            </g>
+            <!-- value labels: pre (teal) -->
+            <g font-size="13" fill="#17877b" text-anchor="middle">
+              <text x="118.9" y="213">2</text><text x="216.7" y="152">4.1</text><text x="314.4" y="115">5.4</text><text x="412.2" y="45">6.7</text><text x="510" y="126">5</text><text x="607.8" y="123">4</text><text x="705.6" y="149">4.2</text><text x="803.3" y="152">4.1</text><text x="901.1" y="213">2</text>
+            </g>
+            <!-- value labels: post (purple) -->
+            <g font-size="13" fill="#7a4fa8" text-anchor="middle">
+              <text x="118.9" y="142">3.33</text><text x="216.7" y="91">5.1</text><text x="314.4" y="77">5.6</text><text x="412.2" y="133">4.75</text><text x="510" y="91">5.1</text><text x="607.8" y="162">3.75</text><text x="705.6" y="115">4.25</text><text x="803.3" y="89">5.16</text><text x="901.1" y="157">2.8</text>
+            </g>
+            <g font-size="13" fill="#2e3138" text-anchor="middle">
+              <text x="118.9" y="272">Speech</text>
+              <text x="216.7" y="272">Verbal<tspan x="216.7" dy="16">expression</tspan></text>
+              <text x="314.4" y="272">Pragmatics</text>
+              <text x="412.2" y="272">Receptive<tspan x="412.2" dy="16">lang./att.</tspan></text>
+              <text x="510" y="272">Coping</text>
+              <text x="607.8" y="272">Intelligi-<tspan x="607.8" dy="16">bility</tspan></text>
+              <text x="705.6" y="272">Expressive</text>
+              <text x="803.3" y="272">Social<tspan x="803.3" dy="16">play</tspan></text>
+              <text x="901.1" y="272">Indepen-<tspan x="901.1" dy="16">dence</tspan></text>
+            </g>
+          </svg>
+        </div>
+        <div class="keys"><span><i style="background:#17877b"></i>Pre</span><span><i style="background:#7a4fa8"></i>Post</span></div>
+        <div class="levels">
+          <span><b class="r">2 or less:</b> significant difficulty</span>
+          <span><b class="a">4:</b> basic functional performance</span>
+          <span><b class="g">6 or more:</b> near-typical functioning</span>
+        </div>
+        <div class="result">Overall post-intervention score: 19/25 (76%)</div>
+      </section>
+
+      <section class="card mint a-green">
+        <h2><span class="ico"><svg><use href="#i-check"/></svg></span>17. Conclusions</h2>
+        <div class="two">
+          <ul class="dots">
+            <li>The PROMPT intervention was associated with clinically relevant changes in jaw stability, labial-facial and lingual coordination, accuracy of articulatory movements, and functional communication.</li>
+            <li>The progressive reduction in the support needed and the emergence of more stable motor patterns suggest progress toward motor speech autonomy.</li>
+            <li>FOCUS and the progression of the cognitive-linguistic and social-emotional domains complemented the motor findings, with greater participation and communicative functionality.</li>
+          </ul>
+          <ul class="dots">
+            <li>The unchanged physical-sensory score does not imply an absence of specific motor changes, but rather the persistence of structural, sensory and global motor variables not modified over four months.</li>
+            <li>As this is a single-case study, the findings do not allow causal relationships to be established and cannot be generalized.</li>
+          </ul>
+        </div>
+      </section>
+
+      <div class="pair">
+        <section class="card peach a-orange">
+          <h2><span class="ico"><svg><use href="#i-rocket"/></svg></span>18. Future directions</h2>
+          <p class="small">Continue longitudinal recording until clinical discharge to characterize the timing, sequence and types of change observed.</p>
+          <h3>In future studies</h3>
+          <ul class="dots">
+            <li>Systematize the recording of the level of assistance.</li>
+            <li>Include independent raters.</li>
+            <li>Use specific intelligibility measures in functional contexts.</li>
+            <li>Expand the number of cases and develop comparative designs.</li>
+            <li>Replicate with a control group when methodologically feasible.</li>
+          </ul>
+        </section>
+        <section class="card lav a-purple">
+          <h2><span class="ico"><svg><use href="#i-book"/></svg></span>19. References</h2>
+          <ol class="refs">
+            <li>Hayden, D. A. (2006). The PROMPT model: Use and application for children with mixed phonological-motor impairment. <em>Advances in Speech–Language Pathology, 8</em>(3), 265–281.</li>
+            <li>Hayden, D. A. (2004). PROMPT: A tactually grounded treatment approach to speech production disorders. In I. Stockman (Ed.), <em>Movement and action in learning and development</em> (pp. 255–297). Elsevier Academic Press.</li>
+            <li>Hayden, D. A., &amp; Square, P. A. (1999). <em>Verbal Motor Production Assessment for Children.</em> Psychological Corporation.</li>
+            <li>Wiig, E. H., Secord, W. A., &amp; Semel, E. (2013). <em>CELF-5: Clinical Evaluation of Language Fundamentals</em> (5th ed.). Pearson.</li>
+            <li>Thomas-Stonell, N., Oddson, B., Robertson, B., &amp; Rosenbaum, P. (2010). <em>FOCUS: Focus on the Outcomes of Communication Under Six.</em> Holland Bloorview Kids Rehabilitation Hospital.</li>
+          </ol>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <!-- ======= Closing band ======= -->
+  <footer class="closing">
+    <div class="side">
+      <svg width="190" height="150" viewBox="0 0 190 150" aria-hidden="true">
+        <circle cx="62" cy="48" r="36" fill="#d8c8f0"/><path d="M8 150c0-40 24-62 54-62s54 22 54 62z" fill="#b9a6dd"/>
+        <circle cx="148" cy="80" r="28" fill="#bfe0f5"/><path d="M110 150c0-32 17-48 38-48s38 16 38 48z" fill="#8cc5e8"/>
+      </svg>
+      <p class="claim">Interdisciplinary work<br>and active family involvement:<br>keys to enhancing communication<br>and participation.</p>
+    </div>
+    <div class="side">
+      <blockquote>“Listening to movement<br>to give shape to words<br>and build communication.”</blockquote>
+      <svg width="170" height="150" viewBox="0 0 170 150" aria-hidden="true">
+        <path d="M18 150c0-34 18-52 46-52s46 18 46 52z" fill="#cde4f5"/>
+        <circle cx="64" cy="60" r="36" fill="#fff" stroke="#8cc5e8" stroke-width="4"/>
+        <circle cx="52" cy="54" r="4" fill="#1b4a93"/><circle cx="76" cy="54" r="4" fill="#1b4a93"/>
+        <path d="M52 70c7 6 17 6 24 0" fill="none" stroke="#1b4a93" stroke-width="3.5" stroke-linecap="round"/>
+        <g fill="none" stroke="#7fc6e8" stroke-width="4" stroke-linecap="round">
+          <path d="M116 46c5 8 5 18 0 26"/><path d="M130 40c8 12 8 26 0 38"/><path d="M144 34c11 16 11 34 0 50"/>
+        </g>
+      </svg>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>
