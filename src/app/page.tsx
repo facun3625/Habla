@@ -341,7 +341,7 @@ export default function Home() {
             <div className={styles.blogGrid}>
               {blogPosts.length > 0 ? (
                 blogPosts.map(post => (
-                  <article key={post.id} className={styles.blogCard}>
+                  <Link key={post.id} href={`/blog/${post.slug}`} className={styles.blogCard}>
                     <div className={styles.blogImage}>
                       {post.coverImage ? (
                         <img src={post.coverImage} alt={post.title} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
@@ -358,9 +358,9 @@ export default function Home() {
                       </span>
                       <h3 className={styles.blogTitle}>{post.title}</h3>
                       <p className={styles.blogExcerpt}>{post.excerpt}</p>
-                      <Link href={`/blog/${post.slug}`} className={styles.readMore}>Leer más <ArrowRight size={13} /></Link>
+                      <span className={styles.readMore}>Leer más <ArrowRight size={13} /></span>
                     </div>
-                  </article>
+                  </Link>
                 ))
               ) : (
                 [1, 2, 3].map(i => (

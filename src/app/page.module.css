@@ -1157,12 +1157,20 @@
   transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
   display: flex;
   flex-direction: column;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
 }
 
 .blogCard:hover {
   transform: translateY(-5px);
   border-color: rgba(108,92,231,0.5);
   box-shadow: 0 8px 40px rgba(108,92,231,0.2);
+}
+
+.blogCard:focus-visible {
+  outline: 3px solid #a29bfe;
+  outline-offset: 4px;
 }
 
 .blogImage {
@@ -1234,6 +1242,14 @@
   font-weight: 700;
   font-size: 14px;
   transition: color 0.2s;
+}
+
+.blogCard:hover .readMore svg {
+  transform: translateX(4px);
+}
+
+.readMore svg {
+  transition: transform 0.2s ease;
 }
 
 .readMore:hover { color: white; }

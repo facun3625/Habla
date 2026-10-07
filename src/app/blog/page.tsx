@@ -48,7 +48,7 @@ export default async function BlogPage({
         ) : (
           <div className={blogStyles.blogGrid}>
             {posts.map(post => (
-              <article key={post.id} className={blogStyles.blogCard}>
+              <Link key={post.id} href={`/blog/${post.slug}`} className={blogStyles.blogCard}>
                 <div className={blogStyles.blogCardImage}>
                   {post.coverImage && (
                     <img src={post.coverImage} alt={post.title} style={{ objectFit: 'cover', width: '100%', height: '100%' }} />
@@ -63,9 +63,9 @@ export default async function BlogPage({
                   </span>
                   <h2 className={blogStyles.blogCardTitle}>{post.title}</h2>
                   {post.excerpt && <p className={blogStyles.blogCardExcerpt}>{post.excerpt}</p>}
-                  <Link href={`/blog/${post.slug}`} className={blogStyles.blogCardReadMore}>Leer más →</Link>
+                  <span className={blogStyles.blogCardReadMore}>Leer más →</span>
                 </div>
-              </article>
+              </Link>
             ))}
           </div>
         )}
