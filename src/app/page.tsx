@@ -101,7 +101,10 @@ export default function Home() {
 
         {/* ── Cursos ── */}
         {(publicados.length > 0 || cursosAnteriores.length > 0) && (
-          <section id="cursos" className={styles.cursosSection}>
+          <section
+            id="cursos"
+            className={`${styles.cursosSection} ${publicados.length === 0 ? styles.cursosSectionArchiveOnly : ''}`}
+          >
 
             {/* Header dentro del max-width */}
             <div className={styles.sectionInner}>
@@ -114,6 +117,20 @@ export default function Home() {
                     <p className={styles.cursosSectionSubtitle}>Formación especializada en apraxia del habla infantil.</p>
                   </div>
                   <Link href="/cursos" className={styles.verTodosLink}>Ver todos los cursos →</Link>
+                </div>
+              )}
+              {publicados.length === 0 && (
+                <div className={`${styles.cursosSectionHeader} ${styles.cursosArchiveHeader}`}>
+                  <div>
+                    <span className={styles.cursosEyebrow}>Biblioteca de formación</span>
+                    <h2 className={styles.cursosSectionTitle}>Cursos anteriores</h2>
+                    <p className={styles.cursosSectionSubtitle}>
+                      Conocé las formaciones especializadas que ya realizamos.
+                    </p>
+                  </div>
+                  <Link href="/cursos" className={styles.archiveCatalogLink}>
+                    Explorar todos <ArrowRight size={16} />
+                  </Link>
                 </div>
               )}
             </div>
@@ -238,13 +255,20 @@ export default function Home() {
                           }
                         </div>
                         <div className={styles.cursoAnteriorInfo}>
-                          <span className={styles.cursoAnteriorBadge}>Cerrado</span>
+                          <div className={styles.cursoAnteriorMetaRow}>
+                            <span className={styles.cursoAnteriorBadge}>Curso finalizado</span>
+                            <span className={styles.cursoAnteriorModality}>{MODALITY[c.modality] ?? c.modality}</span>
+                          </div>
                           <h4 className={styles.cursoAnteriorTitle}>{c.title}</h4>
-                          {c.startDate && (
-                            <span className={styles.cursoAnteriorDate}>
-                              <Calendar size={12} /> {new Date(c.startDate.slice(0, 10).replace(/-/g, '/')).toLocaleDateString('es-AR', { month: 'long', year: 'numeric' })}
-                            </span>
-                          )}
+                          {c.description && <p className={styles.cursoAnteriorDesc}>{c.description}</p>}
+                          <div className={styles.cursoAnteriorFooter}>
+                            {c.startDate && (
+                              <span className={styles.cursoAnteriorDate}>
+                                <Calendar size={14} /> {new Date(c.startDate.slice(0, 10).replace(/-/g, '/')).toLocaleDateString('es-AR', { month: 'long', year: 'numeric' })}
+                              </span>
+                            )}
+                            <span className={styles.cursoAnteriorCta}>Ver curso <ArrowRight size={15} /></span>
+                          </div>
                         </div>
                       </Link>
                     ))}

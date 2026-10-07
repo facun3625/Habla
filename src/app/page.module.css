@@ -757,6 +757,55 @@
   margin-top: 10px;
 }
 
+.cursosSectionArchiveOnly {
+  padding: 72px 0 80px;
+  background: linear-gradient(145deg, #f7f4ff 0%, #eeeaff 52%, #faf8ff 100%);
+}
+
+.cursosSectionArchiveOnly::before {
+  top: -210px;
+  right: -80px;
+  width: 560px;
+  height: 560px;
+  background: radial-gradient(circle, rgba(108,92,231,0.15) 0%, transparent 66%);
+}
+
+.cursosArchiveHeader {
+  align-items: center;
+  margin-bottom: 34px;
+}
+
+.cursosEyebrow {
+  display: inline-flex;
+  margin-bottom: 14px;
+  color: #6c5ce7;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.archiveCatalogLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 17px;
+  border: 1px solid rgba(108,92,231,0.22);
+  border-radius: 12px;
+  color: #5a4bd1;
+  background: rgba(255,255,255,0.68);
+  font-size: 14px;
+  font-weight: 800;
+  text-decoration: none;
+  transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+}
+
+.archiveCatalogLink:hover {
+  transform: translateY(-2px);
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(108,92,231,0.13);
+}
+
 /* ── Próximo Curso card ── */
 .proximoCursoCard {
   display: grid;
@@ -895,43 +944,62 @@
 
 .cursosAnterioresGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  gap: 20px;
 }
 
 .cursoAnteriorCard {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  background: rgba(255,255,255,0.65);
-  border: 1px solid rgba(108,92,231,0.1);
-  border-radius: 16px;
-  padding: 14px 18px;
+  display: grid;
+  grid-template-columns: 190px 1fr;
+  min-height: 190px;
+  background: rgba(255,255,255,0.86);
+  border: 1px solid rgba(108,92,231,0.12);
+  border-radius: 22px;
+  overflow: hidden;
   text-decoration: none;
   color: inherit;
-  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 8px 28px rgba(80,62,160,0.08);
+  transition: transform 0.25s, background 0.25s, box-shadow 0.25s, border-color 0.25s;
 }
 
 .cursoAnteriorCard:hover {
   background: white;
-  box-shadow: 0 4px 20px rgba(108,92,231,0.1);
+  border-color: rgba(108,92,231,0.25);
+  box-shadow: 0 18px 42px rgba(80,62,160,0.15);
+  transform: translateY(-4px);
 }
 
 .cursoAnteriorImage {
-  width: 56px;
-  height: 56px;
-  border-radius: 10px;
+  width: 100%;
+  height: 100%;
+  min-height: 190px;
   overflow: hidden;
-  flex-shrink: 0;
   position: relative;
   background: linear-gradient(135deg, #a29bfe, #6c5ce7);
+}
+
+.cursoAnteriorImage img {
+  transition: transform 0.4s ease;
+}
+
+.cursoAnteriorCard:hover .cursoAnteriorImage img {
+  transform: scale(1.04);
 }
 
 .cursoAnteriorInfo {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  justify-content: center;
+  gap: 9px;
+  padding: 24px 26px;
   min-width: 0;
+}
+
+.cursoAnteriorMetaRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .cursoAnteriorBadge {
@@ -939,17 +1007,48 @@
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  color: #94a3b8;
+  color: #6c5ce7;
+  background: #eeebff;
+  padding: 5px 9px;
+  border-radius: 999px;
+}
+
+.cursoAnteriorModality {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #8b82a6;
 }
 
 .cursoAnteriorTitle {
-  font-size: 14px;
-  font-weight: 700;
-  color: #3d2a6b;
-  line-height: 1.3;
-  white-space: nowrap;
+  font-size: 19px;
+  font-weight: 850;
+  color: #2f205a;
+  line-height: 1.28;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
+}
+
+.cursoAnteriorDesc {
+  color: #7b7392;
+  font-size: 13px;
+  line-height: 1.55;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cursoAnteriorFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 2px;
 }
 
 .cursoAnteriorDate {
@@ -958,6 +1057,31 @@
   gap: 4px;
   font-size: 12px;
   color: #94a3b8;
+}
+
+.cursoAnteriorCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #6c5ce7;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.cursoAnteriorCard:hover .cursoAnteriorCta svg {
+  transform: translateX(3px);
+}
+
+.cursoAnteriorCta svg {
+  transition: transform 0.2s;
+}
+
+.cursosSectionArchiveOnly .cursosAnterioresWrap {
+  margin-top: 0;
+}
+
+.cursosSectionArchiveOnly .cursosAnterioresLabel {
+  display: none;
 }
 
 /* ── Blog / Noticias Section (dark) ── */
@@ -1370,6 +1494,14 @@
   .cursosSectionHeader { margin-bottom: 28px; }
   .verTodosLink { font-size: 13px; }
 
+  .cursosSectionArchiveOnly { padding: 52px 0 60px; }
+  .cursosArchiveHeader { align-items: flex-start; }
+  .cursosAnterioresGrid { grid-template-columns: 1fr; }
+  .cursoAnteriorCard { grid-template-columns: 135px 1fr; min-height: 160px; }
+  .cursoAnteriorImage { min-height: 160px; }
+  .cursoAnteriorInfo { padding: 18px; }
+  .cursoAnteriorTitle { font-size: 16px; }
+
   .carouselArrowLeft { left: 4px; }
   .carouselArrowRight { right: 4px; }
 
@@ -1389,4 +1521,7 @@
   .sectionTitle { font-size: 24px; }
   .blogSectionTitle { font-size: 24px; }
   .heroImageContainer { min-height: 280px !important; }
+  .cursoAnteriorCard { grid-template-columns: 1fr; }
+  .cursoAnteriorImage { height: 190px; min-height: 0; }
+  .cursoAnteriorInfo { padding: 20px; }
 }
