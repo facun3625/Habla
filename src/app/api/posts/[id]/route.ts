@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { normalizePostCategory, normalizePostContentFormat } from '@/lib/postOptions';
 
 export async function GET(
   request: Request,
@@ -40,6 +41,8 @@ export async function PUT(
         title: data.title,
         excerpt: data.excerpt,
         content: data.content,
+        category: normalizePostCategory(data.category),
+        contentFormat: normalizePostContentFormat(data.contentFormat),
         coverImage: data.coverImage,
         videoUrl: data.videoUrl ?? null,
         showCoverImage: data.showCoverImage ?? true,

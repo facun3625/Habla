@@ -17,7 +17,7 @@ type Stats = {
 const PAGE_LABELS: Record<string, string> = {
   '/': 'Inicio',
   '/cursos': 'Cursos',
-  '/blog': 'Blog',
+  '/blog': 'Novedades',
   '/mi-cuenta': 'Mi Cuenta',
   '/mi-cuenta/cursos': 'Mis Cursos',
 };

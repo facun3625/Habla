@@ -1,10 +1,10 @@
-import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import SiteHeader from '../../components/SiteHeader';
 import SiteFooter from '../../components/SiteFooter';
 import blogStyles from '../blog.module.css';
+import { normalizePostCategory, POST_CATEGORIES } from '@/lib/postOptions';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,15 +22,18 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
   const post = await prisma.post.findUnique({ where: { slug, published: true } });
 
   if (!post) notFound();
+  const category = normalizePostCategory(post.category);
+  const categoryInfo = POST_CATEGORIES[category];
 
   return (
     <>
       <SiteHeader />
       <main className={blogStyles.main}>
         <article className={blogStyles.article}>
-          <Link href="/blog" className={blogStyles.backLink}>← Volver al Blog</Link>
+          <Link href={`/blog?categoria=${categoryInfo.slug}`} className={blogStyles.backLink}>← Volver a {categoryInfo.label}</Link>
 
           <header className={blogStyles.articleHeader}>
+            <span className={blogStyles.categoryBadge}>{categoryInfo.label}</span>
             <span className={blogStyles.articleDate}>
               {new Date(post.createdAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
             </span>
@@ -55,10 +58,19 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
             </div>
           )}
 
-          <div
-            className={blogStyles.articleContent}
-            dangerouslySetInnerHTML={{ __html: post.content }}
-          />
+          {post.contentFormat === 'HTML' ? (
+            <iframe
+              className={blogStyles.htmlDocument}
+              srcDoc={post.content}
+              title={`Contenido de ${post.title}`}
+              sandbox=""
+            />
+          ) : (
+            <div
+              className={blogStyles.articleContent}
+              dangerouslySetInnerHTML={{ __html: post.content }}
+            />
+          )}
         </article>
       </main>
       <SiteFooter />

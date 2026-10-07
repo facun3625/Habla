@@ -236,7 +236,19 @@ export default function SiteHeader() {
                 {label}
               </a>
             ))}
-            <Link href="/blog" className={styles.navLink} onClick={() => setIsMenuOpen(false)}>Blog</Link>
+            <div className={headerStyles.newsMenu}>
+              <Link href="/blog" className={`${styles.navLink} ${headerStyles.newsTrigger}`} onClick={() => setIsMenuOpen(false)}>
+                Novedades <ChevronDown size={14} />
+              </Link>
+              <div className={headerStyles.newsDropdown}>
+                <Link href="/blog?categoria=blog" className={headerStyles.newsDropdownItem} onClick={() => setIsMenuOpen(false)}>
+                  Blog
+                </Link>
+                <Link href="/blog?categoria=divulgaciones-cientificas" className={headerStyles.newsDropdownItem} onClick={() => setIsMenuOpen(false)}>
+                  Divulgaciones científicas
+                </Link>
+              </div>
+            </div>
             <div className={styles.mobileActions}>
               <Link href="/cursos" className={styles.primaryButton} onClick={() => setIsMenuOpen(false)}><ShoppingCart size={18} />Ver Cursos</Link>
               {mobileAuthSection}

@@ -62,7 +62,7 @@ export default function SiteFooter() {
           <Link href="/" className={styles.footerLink}>Inicio</Link>
           <Link href="/#nosotras" className={styles.footerLink}>Nosotras</Link>
           <Link href="/cursos" className={styles.footerLink}>Cursos</Link>
-          <Link href="/blog" className={styles.footerLink}>Publicaciones</Link>
+          <Link href="/blog" className={styles.footerLink}>Novedades</Link>
         </div>
         <div className={styles.footerColumn}>
           <h4 className={styles.footerTitle}>Contacto</h4>

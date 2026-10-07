@@ -95,7 +95,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     { name: 'Cursos', href: '/admin/courses', icon: BookOpen },
     { name: 'Perfiles', href: '/admin/profiles', icon: Users },
     { name: 'Nosotras', href: '/admin/professionals', icon: Users },
-    { name: 'Blog', href: '/admin/blog', icon: FileText },
+    { name: 'Novedades', href: '/admin/blog', icon: FileText },
     { name: 'Suscriptores', href: '/admin/subscribers', icon: Bell },
     { name: 'Usuarios', href: '/admin/users', icon: Users },
     { name: 'Marketing', href: '/admin/marketing', icon: Megaphone },

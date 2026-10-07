@@ -7,6 +7,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './page.module.css';
 import SiteHeader from './components/SiteHeader';
 import SiteFooter from './components/SiteFooter';
+import { normalizePostCategory, POST_CATEGORIES } from '@/lib/postOptions';
 
 const MODALITY: Record<string, string> = { VIRTUAL: 'Virtual', PRESENCIAL: 'Presencial', HIBRIDO: 'Híbrido' };
 
@@ -25,10 +26,10 @@ export default function Home() {
       .then(data => setProfessionals(Array.isArray(data) ? data.filter((p: any) => p.active) : []))
       .catch(err => console.error(err));
 
-    fetch('/api/posts')
+    fetch('/api/posts?published=1&latest=1&limit=3')
       .then(res => res.json())
       .then(data => {
-        if (Array.isArray(data)) setBlogPosts(data.filter(p => p.published).slice(0, 3));
+        if (Array.isArray(data)) setBlogPosts(data);
       })
       .catch(err => console.error(err));
 
@@ -308,7 +309,7 @@ export default function Home() {
           <div className={styles.sectionInner}>
             <div className={styles.blogHeader}>
               <div>
-                <h2 className={styles.blogSectionTitle}>Publicaciones</h2>
+                <h2 className={styles.blogSectionTitle}>Novedades</h2>
                 <p className={styles.blogSectionSubtitle}>Investigaciones, recursos clínicos y novedades sobre apraxia del habla.</p>
               </div>
               <Link href="/blog" className={styles.viewAllLink}>Ver todas →</Link>
@@ -325,6 +326,9 @@ export default function Home() {
                       )}
                     </div>
                     <div className={styles.blogContent}>
+                      <span className={styles.blogCategory}>
+                        {POST_CATEGORIES[normalizePostCategory(post.category)].label}
+                      </span>
                       <span className={styles.blogDate}>
                         {new Date(post.createdAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
                       </span>

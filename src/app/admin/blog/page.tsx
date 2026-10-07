@@ -6,6 +6,7 @@ import { Plus, Edit3, Calendar, Search, FileText, Trash2, ChevronUp, ChevronDown
 import ConfirmModal from '../components/ConfirmModal';
 import styles from '../courses/courses.module.css';
 import Link from 'next/link';
+import { normalizePostCategory, POST_CATEGORIES } from '@/lib/postOptions';
 
 type Post = {
   id: number;
@@ -13,6 +14,7 @@ type Post = {
   published: boolean;
   createdAt: string;
   order: number;
+  category: string;
 };
 
 export default function BlogAdminPage() {
@@ -65,8 +67,8 @@ export default function BlogAdminPage() {
       <div className={styles.container}>
         <div className={styles.header}>
           <div>
-            <h2 className={styles.title}>Blog y Noticias</h2>
-            <p className={styles.subtitle}>Gestioná las entradas de tu blog.</p>
+            <h2 className={styles.title}>Novedades</h2>
+            <p className={styles.subtitle}>Gestioná las publicaciones del blog y las divulgaciones científicas.</p>
           </div>
           <Link href="/admin/blog/new" className={styles.createButton}>
             <Plus size={20} />
@@ -99,6 +101,7 @@ export default function BlogAdminPage() {
                 <tr>
                   {!isSearching && <th style={{ width: 80 }}>Orden</th>}
                   <th>Noticia</th>
+                  <th>Categoría</th>
                   <th>Fecha de Creación</th>
                   <th>Estado</th>
                   <th className={styles.actionsHeader}>Acciones</th>
@@ -133,6 +136,7 @@ export default function BlogAdminPage() {
                       </div>
                       <span className={styles.courseTitle}>{post.title}</span>
                     </td>
+                    <td>{POST_CATEGORIES[normalizePostCategory(post.category)].label}</td>
                     <td>
                       <div className={styles.dateCell}>
                         <Calendar size={14} />

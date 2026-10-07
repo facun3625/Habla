@@ -3,11 +3,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import AdminLayout from '../../components/AdminLayout';
-import { ArrowLeft, Save, Upload, X } from 'lucide-react';
-import Image from 'next/image';
+import { ArrowLeft, FileCode2, Save, Upload, X } from 'lucide-react';
 import styles from '../../courses/courses.module.css';
 import Link from 'next/link';
 import RichEditor from '@/app/components/RichEditor';
+import { POST_CATEGORIES, type PostCategory, type PostContentFormat } from '@/lib/postOptions';
 
 export default function NewPostPage() {
   const router = useRouter();
@@ -17,6 +17,8 @@ export default function NewPostPage() {
     title: '',
     excerpt: '',
     content: '',
+    category: 'BLOG' as PostCategory,
+    contentFormat: 'RICH_TEXT' as PostContentFormat,
     coverImage: '',
     videoUrl: '',
     showCoverImage: true,
@@ -35,10 +37,18 @@ export default function NewPostPage() {
     setUploading(false);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     const checked = (e.target as HTMLInputElement).checked;
     setFormData((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+  };
+
+  const handleHtmlUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const content = await file.text();
+    setFormData((prev) => ({ ...prev, content, contentFormat: 'HTML' }));
+    e.target.value = '';
   };
 
   const handleQuillChange = (content: string) => {
@@ -73,7 +83,7 @@ export default function NewPostPage() {
         <div className={styles.header}>
           <div>
             <Link href="/admin/blog" className={styles.backLink} style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-light)', marginBottom: '10px', textDecoration: 'none' }}>
-              <ArrowLeft size={16} /> Volver a Blog
+              <ArrowLeft size={16} /> Volver a Novedades
             </Link>
             <h2 className={styles.title}>Nueva Noticia</h2>
           </div>
@@ -99,6 +109,21 @@ export default function NewPostPage() {
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <label htmlFor="category" style={{ fontWeight: 600 }}>Categoría *</label>
+              <select
+                id="category"
+                name="category"
+                value={formData.category}
+                onChange={handleChange}
+                style={{ padding: '12px', borderRadius: '8px', border: '1px solid #ddd', fontSize: '16px', background: '#fff' }}
+              >
+                {Object.entries(POST_CATEGORIES).map(([value, item]) => (
+                  <option key={value} value={value}>{item.label}</option>
+                ))}
+              </select>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <label style={{ fontWeight: 600 }}>Resumen (Excerpt)</label>
               <textarea
                 name="excerpt"
@@ -110,12 +135,54 @@ export default function NewPostPage() {
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <label style={{ fontWeight: 600 }}>Contenido Principal *</label>
-              <RichEditor
-                value={formData.content}
-                onChange={handleQuillChange}
-                placeholder="Escribí el contenido del artículo..."
-              />
+              <label style={{ fontWeight: 600 }}>Formato del contenido *</label>
+              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  onClick={() => setFormData((prev) => ({ ...prev, contentFormat: 'RICH_TEXT' }))}
+                  style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #cfc8ff', cursor: 'pointer', fontWeight: 700, background: formData.contentFormat === 'RICH_TEXT' ? '#6c5ce7' : '#fff', color: formData.contentFormat === 'RICH_TEXT' ? '#fff' : '#5f4ed1' }}
+                >
+                  Editor visual
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFormData((prev) => ({ ...prev, contentFormat: 'HTML' }))}
+                  style={{ padding: '10px 16px', borderRadius: 8, border: '1px solid #cfc8ff', cursor: 'pointer', fontWeight: 700, background: formData.contentFormat === 'HTML' ? '#6c5ce7' : '#fff', color: formData.contentFormat === 'HTML' ? '#fff' : '#5f4ed1' }}
+                >
+                  HTML completo
+                </button>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <label style={{ fontWeight: 600 }}>Contenido principal *</label>
+              {formData.contentFormat === 'HTML' ? (
+                <>
+                  <p style={{ margin: 0, color: '#64748b', fontSize: '0.9rem' }}>
+                    Pegá el documento HTML completo o cargá un archivo. Se mostrará aislado del diseño del sitio y sin ejecutar scripts.
+                  </p>
+                  <label style={{ display: 'inline-flex', width: 'fit-content', alignItems: 'center', gap: 8, padding: '9px 13px', border: '1px dashed #8b7ee8', borderRadius: 8, color: '#5f4ed1', cursor: 'pointer', fontWeight: 700 }}>
+                    <FileCode2 size={18} /> Cargar archivo .html
+                    <input type="file" accept=".html,.htm,text/html" onChange={handleHtmlUpload} style={{ display: 'none' }} />
+                  </label>
+                  <textarea
+                    required
+                    name="content"
+                    value={formData.content}
+                    onChange={handleChange}
+                    rows={24}
+                    spellCheck={false}
+                    placeholder="<!doctype html>\n<html>\n  ...\n</html>"
+                    style={{ padding: 14, borderRadius: 8, border: '1px solid #d1d5db', font: '13px/1.55 monospace', resize: 'vertical' }}
+                  />
+                </>
+              ) : (
+                <RichEditor
+                  value={formData.content}
+                  onChange={handleQuillChange}
+                  placeholder="Escribí el contenido del artículo..."
+                />
+              )}
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '20px' }}>

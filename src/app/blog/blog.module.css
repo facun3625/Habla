@@ -23,6 +23,33 @@
   color: var(--text-light);
 }
 
+.categoryTabs {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 28px;
+}
+
+.categoryTab {
+  padding: 9px 16px;
+  border: 1px solid #ddd7ff;
+  border-radius: 999px;
+  color: var(--primary);
+  background: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: color 0.2s, background 0.2s, border-color 0.2s;
+}
+
+.categoryTab:hover,
+.categoryTabActive {
+  color: #fff;
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
 .empty {
   text-align: center;
   color: var(--text-light);
@@ -142,6 +169,15 @@
   margin: 20px 0;
 }
 
+.htmlDocument {
+  display: block;
+  width: 100%;
+  min-height: 850px;
+  border: 1px solid #ede9fe;
+  border-radius: 16px;
+  background: #fff;
+}
+
 .videoWrapper {
   position: relative;
   width: 100%;
@@ -187,6 +223,20 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+}
+
+.categoryBadge {
+  display: inline-flex;
+  width: fit-content;
+  padding: 5px 10px;
+  margin-bottom: 10px;
+  border-radius: 999px;
+  color: #5f4ed1;
+  background: #f0eeff;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .blogCardDate {
@@ -244,6 +294,7 @@
   .articleContent h1 { font-size: 22px; }
   .articleContent h2 { font-size: 19px; }
   .articleContent h3 { font-size: 17px; }
+  .htmlDocument { min-height: 650px; border-radius: 12px; }
 }
 
 @media (max-width: 480px) {

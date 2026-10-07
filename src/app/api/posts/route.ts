@@ -1,10 +1,21 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { normalizePostCategory, normalizePostContentFormat } from '@/lib/postOptions';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const latest = searchParams.get('latest') === '1';
+    const publishedOnly = searchParams.get('published') === '1';
+    const requestedLimit = Number(searchParams.get('limit'));
+    const limit = Number.isInteger(requestedLimit) && requestedLimit > 0
+      ? Math.min(requestedLimit, 20)
+      : undefined;
+
     const posts = await prisma.post.findMany({
-      orderBy: [{ order: 'asc' }, { createdAt: 'desc' }]
+      where: publishedOnly ? { published: true } : undefined,
+      orderBy: latest ? { createdAt: 'desc' } : [{ order: 'asc' }, { createdAt: 'desc' }],
+      take: limit,
     });
     return NextResponse.json(posts);
   } catch (error) {
@@ -32,6 +43,8 @@ export async function POST(request: Request) {
         slug: slug,
         excerpt: data.excerpt,
         content: data.content,
+        category: normalizePostCategory(data.category),
+        contentFormat: normalizePostContentFormat(data.contentFormat),
         coverImage: data.coverImage,
         videoUrl: data.videoUrl ?? null,
         showCoverImage: data.showCoverImage ?? true,
