@@ -1,0 +1,31 @@
+.container { display: flex; flex-direction: column; gap: 24px; }
+.header h2 { color: #1e293b; font-size: 1.8rem; font-weight: 800; margin-bottom: 4px; }
+.header p { color: #64748b; font-weight: 500; }
+.createCard { align-items: center; background: linear-gradient(135deg, #fff 0%, #f8f7ff 100%); border: 1px solid #e2e8f0; border-radius: 18px; display: grid; gap: 16px; grid-template-columns: auto minmax(190px, .75fr) minmax(250px, 1.2fr) auto; padding: 20px; }
+.createIcon { align-items: center; background: #eeeafd; border-radius: 14px; color: var(--primary); display: flex; height: 52px; justify-content: center; width: 52px; }
+.createCopy { display: flex; flex-direction: column; gap: 3px; }
+.createCopy label { color: #1e293b; font-weight: 800; }
+.createCopy span { color: #64748b; font-size: .82rem; }
+.createCard input, .toolbar input { background: #fff; border: 1px solid #dbe2ea; border-radius: 11px; color: #334155; font: inherit; outline: none; padding: 12px 14px; width: 100%; }
+.createCard input:focus, .toolbar:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(108,92,231,.1); }
+.createCard button { align-items: center; background: var(--primary); border-radius: 11px; color: #fff; display: flex; font-weight: 800; gap: 7px; padding: 12px 18px; white-space: nowrap; }
+.createCard button:disabled { cursor: not-allowed; opacity: .55; }
+.toolbar { align-items: center; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; color: #94a3b8; display: flex; padding-left: 14px; }
+.toolbar input { border: 0; box-shadow: none !important; }
+.grid { display: grid; gap: 18px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.card { background: #fff; border: 1px solid #e2e8f0; border-radius: 17px; box-shadow: 0 3px 12px rgba(15,23,42,.04); padding: 20px; }
+.cardTop { align-items: center; display: flex; justify-content: space-between; margin-bottom: 18px; }
+.cardIcon { align-items: center; background: #f3f0ff; border-radius: 12px; color: var(--primary); display: flex; height: 45px; justify-content: center; width: 45px; }
+.status { border-radius: 999px; font-size: .75rem; font-weight: 800; padding: 5px 10px; }
+.active { background: #dcfce7; color: #15803d; }
+.inactive { background: #f1f5f9; color: #64748b; }
+.card h3 { color: #1e293b; font-size: 1.08rem; line-height: 1.35; margin-bottom: 6px; }
+.card p { color: #64748b; font-size: .86rem; }
+.card code { background: #f8fafc; border-radius: 7px; color: #64748b; display: block; font-size: .75rem; margin: 16px 0; overflow: hidden; padding: 8px; text-overflow: ellipsis; white-space: nowrap; }
+.actions { display: flex; gap: 8px; }
+.actions a { align-items: center; border: 1px solid #e2e8f0; border-radius: 9px; color: #475569; display: flex; flex: 1; font-size: .82rem; font-weight: 800; gap: 6px; justify-content: center; padding: 9px 10px; }
+.actions .primaryAction { background: var(--primary); border-color: var(--primary); color: #fff; }
+.empty { background: #fff; border: 1px dashed #cbd5e1; border-radius: 16px; color: #64748b; grid-column: 1 / -1; padding: 48px; text-align: center; }
+.error { background: #fff1f2; border: 1px solid #fecdd3; border-radius: 10px; color: #be123c; padding: 11px 14px; }
+@media (max-width: 1100px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .createCard { grid-template-columns: auto 1fr; } .createCard input { grid-column: 1 / -1; } .createCard button { grid-column: 1 / -1; justify-content: center; } }
+@media (max-width: 700px) { .grid { grid-template-columns: 1fr; } .createCard { grid-template-columns: auto 1fr; } }

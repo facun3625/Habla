@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 import styles from './PromoPopup.module.css';
 
 type Settings = {
@@ -13,6 +14,7 @@ type Settings = {
 };
 
 export default function PromoPopup() {
+  const pathname = usePathname();
   const [visible, setVisible] = useState(false);
   const [cfg, setCfg] = useState<Settings>({});
 
@@ -39,7 +41,7 @@ export default function PromoPopup() {
     sessionStorage.setItem('promo_dismissed', '1');
   };
 
-  if (!visible) return null;
+  if (!visible || pathname.startsWith('/charla/')) return null;
 
   const isExternal = (url: string) => /^https?:\/\//.test(url);
 

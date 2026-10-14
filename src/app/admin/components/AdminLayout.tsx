@@ -18,6 +18,7 @@ import {
   Megaphone,
   Mail,
   BarChart2,
+  QrCode,
 } from 'lucide-react';
 import Image from 'next/image';
 import styles from './AdminLayout.module.css';
@@ -93,6 +94,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const navItems = [
     { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
     { name: 'Cursos', href: '/admin/courses', icon: BookOpen },
+    { name: 'Charlas y QR', href: '/admin/charlas', icon: QrCode },
     { name: 'Perfiles', href: '/admin/profiles', icon: Users },
     { name: 'Nosotras', href: '/admin/professionals', icon: Users },
     { name: 'Novedades', href: '/admin/blog', icon: FileText },
@@ -120,7 +122,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
         <nav className={styles.nav}>
           {navItems.map((item) => {
-            const isActive = pathname.startsWith(item.href);
+            const isActive = item.href === '/admin'
+              ? pathname === '/admin'
+              : pathname.startsWith(item.href);
             return (
               <Link
                 key={item.name}

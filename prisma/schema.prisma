@@ -285,6 +285,32 @@ model PageView {
   createdAt DateTime @default(now())
 }
 
+model TalkPage {
+  id          Int        @id @default(autoincrement())
+  title       String
+  slug        String
+  accessToken String     @unique
+  active      Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  items       TalkItem[]
+
+  @@index([slug, accessToken])
+}
+
+model TalkItem {
+  id        Int      @id @default(autoincrement())
+  talkPageId Int
+  type      String
+  title     String
+  url       String?
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  talkPage  TalkPage @relation(fields: [talkPageId], references: [id], onDelete: Cascade)
+
+  @@index([talkPageId, type, order])
+}
+
 model EmailLog {
   id        Int      @id @default(autoincrement())
   to        String
