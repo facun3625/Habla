@@ -26,8 +26,21 @@
 .resource a { align-items: center; background: #f1effd; border-radius: 9px; color: var(--violet); display: flex; font-size: .78rem; font-weight: 900; gap: 6px; padding: 9px 12px; }
 .videoGrid { display: grid; gap: 22px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .videoCard { background: #fff; border: 1px solid #e9e7f0; border-radius: 16px; box-shadow: 0 5px 20px rgba(39,35,64,.05); overflow: hidden; }
-.videoFrame { aspect-ratio: 16/9; background: #1e1b2e; overflow: hidden; }.videoFrame iframe { border: 0; height: 100%; width: 100%; }
 .videoCard h3 { color: #343049; font-size: .95rem; padding: 15px 17px 17px; }
+.videoPoster { align-items: center; aspect-ratio: 16/9; background: linear-gradient(135deg, #2a2643, #1e1b2e); border: 0; color: #9d97b8; cursor: pointer; display: flex; flex-direction: column; gap: 12px; justify-content: center; overflow: hidden; position: relative; width: 100%; }
+.videoPoster:disabled { cursor: not-allowed; opacity: .6; }
+.videoPoster > svg:first-child { opacity: .45; }
+.playBtn { align-items: center; background: var(--violet); border-radius: 50%; box-shadow: 0 8px 22px rgba(108,92,231,.5); color: #fff; display: flex; height: 56px; justify-content: center; transition: transform .15s; width: 56px; }
+.videoPoster:not(:disabled):hover .playBtn, .videoPoster:not(:disabled):active .playBtn { transform: scale(1.08); }
+
+.lightbox { align-items: center; background: rgba(13,11,24,.92); display: flex; inset: 0; justify-content: center; padding: 24px; position: fixed; z-index: 100; }
+.lightboxInner { background: #111018; border-radius: 18px; display: flex; flex-direction: column; height: min(86vh, 760px); max-width: 960px; overflow: hidden; width: 100%; }
+.lightboxHead { align-items: center; display: flex; flex-shrink: 0; gap: 12px; justify-content: space-between; padding: 14px 18px; }
+.lightboxHead h3 { color: #fff; flex: 1; font-size: .92rem; }
+.lightboxHead button { align-items: center; background: rgba(255,255,255,.08); border: 0; border-radius: 50%; color: #fff; cursor: pointer; display: flex; flex-shrink: 0; height: 36px; justify-content: center; width: 36px; }
+.lightboxFrame { background: #000; flex: 1; min-height: 0; width: 100%; }
+.lightboxFrame iframe { border: 0; height: 100%; width: 100%; }
+.lightboxError { color: #9d97b8; padding: 50px 20px; text-align: center; }
 .empty { background: #fff; border: 1px dashed #d8d4e4; border-radius: 15px; color: #918d9d; padding: 52px 24px; text-align: center; }.empty span { color: #555066; font-weight: 800; }.empty p { font-size: .87rem; margin-top: 4px; }
 .footer { align-items: center; background: #f3f2f8; border-top: 1px solid #e6e4ed; color: #8a8698; display: flex; font-size: .75rem; justify-content: space-between; padding: 20px max(28px, calc((100vw - 1040px)/2)); }.footer img { height: auto; opacity: .75; }
 @media (max-width: 700px) {
@@ -36,4 +49,6 @@
   .content { padding: 28px 18px 56px; }.mobileTabs { background: #fff; border: 1px solid #e9e7f0; border-radius: 12px; display: grid; grid-template-columns: repeat(3, 1fr); margin-bottom: 30px; padding: 5px; }
   .mobileTabs button { align-items: center; border-radius: 8px; color: #7b7789; display: flex; flex-direction: column; font-size: .68rem; font-weight: 800; gap: 3px; padding: 8px 3px; }.mobileTabs .tabActive { background: #eeeafd; color: var(--violet); }
   .videoGrid { grid-template-columns: 1fr; }.resource { align-items: flex-start; flex-wrap: wrap; }.resourceText { min-width: calc(100% - 58px); }.resource a { margin-left: 53px; }.footer { flex-direction: column; gap: 7px; }
+  .lightbox { padding: 0; }
+  .lightboxInner { border-radius: 0; height: 100dvh; max-width: 100%; }
 }
