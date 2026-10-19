@@ -49,6 +49,9 @@
   .content { padding: 28px 18px 56px; }.mobileTabs { background: #fff; border: 1px solid #e9e7f0; border-radius: 12px; display: grid; grid-template-columns: repeat(3, 1fr); margin-bottom: 30px; padding: 5px; }
   .mobileTabs button { align-items: center; border-radius: 8px; color: #7b7789; display: flex; flex-direction: column; font-size: .68rem; font-weight: 800; gap: 3px; padding: 8px 3px; }.mobileTabs .tabActive { background: #eeeafd; color: var(--violet); }
   .videoGrid { grid-template-columns: 1fr; }.resource { align-items: flex-start; flex-wrap: wrap; }.resourceText { min-width: calc(100% - 58px); }.resource a { margin-left: 53px; }.footer { flex-direction: column; gap: 7px; }
+}
+@media (max-width: 700px), (max-height: 500px) {
   .lightbox { padding: 0; }
   .lightboxInner { border-radius: 0; height: 100dvh; max-width: 100%; }
+  .lightboxHead { padding: 10px 14px; }
 }
